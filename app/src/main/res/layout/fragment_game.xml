@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.eryuksa.catchline_android.ui.game.GameViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_game"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_24">
+
+            <TextView
+                style="@style/TextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:letterSpacing="0.05"
+                android:text="@string/title_app" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <ImageView
+            android:id="@+id/thumbnail_image_game"
+            gameState="@{viewModel.gameState}"
+            thumbnailUrl="@{viewModel.currentContent.posterUrl}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/background_thumbnail_game"
+            android:scaleType="centerCrop"
+            android:src="@drawable/movie"
+            app:layout_constraintDimensionRatio="h, 1:1.3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_game"
+            app:layout_constraintWidth_percent="0.8" />
+
+        <TextView
+            android:id="@+id/hint_and_answer_game"
+            style="@style/TextSansSerifMedium.HintAnswer"
+            gameState="@{viewModel.gameState}"
+            title="@{viewModel.currentContent.title}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/question_mark"
+            app:layout_constraintBottom_toTopOf="@id/record_text_game"
+            app:layout_constraintEnd_toEndOf="@id/thumbnail_image_game"
+            app:layout_constraintStart_toStartOf="@id/thumbnail_image_game"
+            app:layout_constraintTop_toBottomOf="@id/thumbnail_image_game" />
+
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/refresh_Button_game"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/circle_button"
+            android:scaleType="center"
+            android:src="@drawable/ic_round_refresh_24"
+            android:tint="@color/red2"
+            app:layout_constraintBottom_toBottomOf="@id/record_text_game"
+            app:layout_constraintEnd_toStartOf="@id/record_text_game"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/record_text_game"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="64dp"
+            android:background="@drawable/circle_button"
+            android:gravity="center"
+            android:text="@{@string/game_record(viewModel.caughtNumber, viewModel.challengeNumber)}"
+            app:layout_constraintBottom_toTopOf="@id/submit_title_game"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/hint_or_next_button_game"
+            gameState="@{viewModel.gameState}"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/circle_button"
+            android:contentDescription="@string/ask_hint"
+            android:scaleType="center"
+            android:src="@drawable/ic_round_hint_24"
+            app:layout_constraintBottom_toBottomOf="@id/record_text_game"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/record_text_game" />
+
+        <EditText
+            android:id="@+id/input_title_text_game"
+            style="@style/TextSansSerifMedium"
+            content="@{viewModel.currentContent}"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:autofillHints="@string/hint_input_title"
+            android:background="@android:color/transparent"
+            android:hint="@string/hint_input_title"
+            android:inputType="text"
+            android:maxLines="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/submit_title_game"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/detail_button_game"
+            isVisible="@{viewModel.gameState > 3}"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@null"
+            android:padding="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_round_info_24"
+            app:layout_constraintEnd_toEndOf="@id/thumbnail_image_game"
+            app:layout_constraintTop_toTopOf="@id/thumbnail_image_game" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/play_audio_game"
+            playing="@{viewModel.audioPlaying}"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/paused_circle_24"
+            app:layout_constraintBottom_toBottomOf="@id/thumbnail_image_game"
+            app:layout_constraintEnd_toEndOf="@id/thumbnail_image_game"
+            app:layout_constraintStart_toStartOf="@id/thumbnail_image_game"
+            app:layout_constraintTop_toTopOf="@id/thumbnail_image_game" />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/submit_title_game"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/blue"
+            android:enabled="@{viewModel.gameState &lt; 4}"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/try_text_game"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/input_title_text_game"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/input_title_text_game" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

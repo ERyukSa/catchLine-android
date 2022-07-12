@@ -1,0 +1,109 @@
+{
+  "adult": false,
+  "backdrop_path": "/lZ15EoOGVtKtiLZnRkEwFcBW1p.jpg",
+  "created_by": [
+    {
+      "id": 1248206,
+      "credit_id": "5d2eb6226a300b2246a31420",
+      "name": "Kim Eun-hee",
+      "gender": 1,
+      "profile_path": "/hpD4tMq2MvgEYikQHb4V76TqP6f.jpg"
+    }
+  ],
+  "episode_run_time": [
+    60
+  ],
+  "first_air_date": "2016-01-22",
+  "genres": [
+    {
+      "id": 80,
+      "name": "Crime"
+    }
+  ],
+  "homepage": "http://program.interest.me/tvn/signal/",
+  "id": 64840,
+  "in_production": false,
+  "languages": [
+    "ko"
+  ],
+  "last_air_date": "2016-03-12",
+  "last_episode_to_air": {
+    "air_date": "2016-03-12",
+    "episode_number": 16,
+    "id": 1160230,
+    "name": "Episode 16",
+    "overview": "",
+    "production_code": "",
+    "runtime": 60,
+    "season_number": 1,
+    "still_path": "/rdNICbxGftTShJJMEKwvg5HhgDh.jpg",
+    "vote_average": 8.0,
+    "vote_count": 1
+  },
+  "name": "시그널",
+  "next_episode_to_air": null,
+  "networks": [
+    {
+      "id": 866,
+      "name": "tvN",
+      "logo_path": "/aRDq8zBrX3YLpHSfueNQBkNnn7b.png",
+      "origin_country": "KR"
+    }
+  ],
+  "number_of_episodes": 16,
+  "number_of_seasons": 2,
+  "origin_country": [
+    "KR"
+  ],
+  "original_language": "ko",
+  "original_name": "시그널",
+  "overview": "",
+  "popularity": 12.079,
+  "poster_path": "/mB6FlHFK0A4DPyuGTrlM4QgEkIH.jpg",
+  "production_companies": [
+    {
+      "id": 87422,
+      "logo_path": "/yipyNbVGcdyUtss9RtA4i7Zkkey.png",
+      "name": "AStory",
+      "origin_country": "KR"
+    }
+  ],
+  "production_countries": [
+    {
+      "iso_3166_1": "KR",
+      "name": "South Korea"
+    }
+  ],
+  "seasons": [
+    {
+      "air_date": "2016-01-22",
+      "episode_count": 3,
+      "id": 74154,
+      "name": "Specials",
+      "overview": "",
+      "poster_path": null,
+      "season_number": 0
+    },
+    {
+      "air_date": "2016-01-22",
+      "episode_count": 16,
+      "id": 73132,
+      "name": "Season 1",
+      "overview": "",
+      "poster_path": "/mB6FlHFK0A4DPyuGTrlM4QgEkIH.jpg",
+      "season_number": 1
+    }
+  ],
+  "spoken_languages": [
+    {
+      "english_name": "Korean",
+      "iso_639_1": "ko",
+      "name": "한국어/조선말"
+    }
+  ],
+  "status": "Ended",
+  "tagline": "",
+  "type": "Scripted",
+  "vote_average": 8.1,
+  "vote_count": 67
+}

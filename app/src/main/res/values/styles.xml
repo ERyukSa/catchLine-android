@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Button" parent="TextAppearance.AppCompat.Widget.Button"/>
+
+    <style name="TextTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="fontFamily">@font/great_lakes_nf</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="TextTitle.Big">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextTitle.Large">
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="TextSansSerifMedium" parent="TextAppearance.AppCompat.Medium" >
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextSansSerifMedium.Bold" parent="TextAppearance.AppCompat.Medium" >
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextSansSerifMedium.HintAnswer" >
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+</resources>

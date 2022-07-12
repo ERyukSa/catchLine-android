@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/startFragment">
+
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="com.eryuksa.catchline_android.ui.StartFragment"
+        android:label="StartFragment" >
+        <action
+            android:id="@+id/startFragment_to_gameFragment"
+            app:destination="@id/gameFragment"
+            app:popUpTo="@id/startFragment" />
+        <action
+            android:id="@+id/startFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment"
+            app:popUpTo="@id/startFragment" />
+        <action
+            android:id="@+id/startFragment_to_recordFragment"
+            app:destination="@id/recordFragment"
+            app:popUpTo="@id/startFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.eryuksa.catchline_android.ui.game.GameFragment"
+        android:label="GameFragment" >
+        <action
+            android:id="@+id/gameFragment_to_detailFragment"
+            app:destination="@id/detailFragment"
+            app:popUpTo="@id/gameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.eryuksa.catchline_android.ui.about.AboutFragment"
+        android:label="AboutFragment" />
+    <fragment
+        android:id="@+id/recordFragment"
+        android:name="com.eryuksa.catchline_android.ui.record.RecordFragment"
+        android:label="RecordFragment" >
+        <action
+            android:id="@+id/recordFragment_to_detailFragment"
+            app:destination="@id/detailFragment"
+            app:popUpTo="@id/recordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.eryuksa.catchline_android.ui.detail.DetailFragment"
+        android:label="DetailFragment" />
+</navigation>

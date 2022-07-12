@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_detail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24" />
+
+    <ImageView
+        android:id="@+id/poster_img_detail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/play_line_detail"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/paused_circle_24"
+        app:layout_constraintBottom_toBottomOf="@id/poster_img_detail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/poster_img_detail" />
+
+    <TextView
+        android:id="@+id/title_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:maxLines="2"
+        android:text="내부자들"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/play_line_detail" />
+
+    <TextView
+        android:id="@+id/line_summary_detail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
+        android:text="모히또 가가 몰디브 한잔 할라니껜"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_detail" />
+
+    <TextView
+        android:id="@+id/year_title_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/year"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@id/year_detail"
+        app:layout_constraintStart_toStartOf="@id/year_detail"
+        app:layout_constraintTop_toBottomOf="@id/line_summary_detail" />
+
+    <TextView
+        android:id="@+id/genres_title_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/genre"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@id/genres_detail"
+        app:layout_constraintStart_toStartOf="@id/genres_detail"
+        app:layout_constraintTop_toTopOf="@id/year_title_detail" />
+
+    <TextView
+        android:id="@+id/running_time_title_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/running_time"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@id/running_time_detail"
+        app:layout_constraintStart_toStartOf="@id/running_time_detail"
+        app:layout_constraintTop_toTopOf="@id/year_title_detail" />
+
+    <TextView
+        android:id="@+id/year_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="2015"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/genres_detail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/year_title_detail" />
+
+    <TextView
+        android:id="@+id/genres_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="드라마,범죄,액션"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/running_time_detail"
+        app:layout_constraintStart_toEndOf="@id/year_detail"
+        app:layout_constraintTop_toBottomOf="@id/year_title_detail" />
+
+    <TextView
+        android:id="@+id/running_time_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="2시간 10분"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/genres_detail"
+        app:layout_constraintTop_toBottomOf="@id/running_time_title_detail" />
+
+    <TextView
+        android:id="@+id/overview_detail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:text="유력한 대통령 후보와 재벌 회장, 그들을 돕는 정치깡패 안상구. 뒷거래의 판을 짠 이는 대한민국 여론을 움직이는 유명 논설주간 이강희다. 더 큰 성공을 원한 안상구는 이들의 비자금 파일로 거래를 준비하다 발각되고, 이 일로 폐인이 되어 버려진다. 늘 승진을 눈 앞에 두고 주저 앉는 검사 우장훈는 마침내 대선을 앞둔 대대적인 비자금 조사의 저격수가 되는 기회를 잡는다. 그러나 비자금 파일을 가로챈 안상구 때문에 수사는 종결되고, 우장훈은 책임을 떠안고 좌천되고 마는데..."
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/year_detail"
+        app:layout_constraintVertical_bias="0" />
+</androidx.constraintlayout.widget.ConstraintLayout>
