@@ -4,7 +4,7 @@
 # 소개
 
 # 실행 영상
-https://youtube.com/shorts/1YY0CZ0Ssp8?feature=share
+https://www.youtube.com/watch?v=1YY0CZ0Ssp8
 
 # 타임 라인
 <details>
