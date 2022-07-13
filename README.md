@@ -1,5 +1,7 @@
-# catchLine-android
+# catchLine-android 
 대사를 듣고 어떤 영화, 드라마인지 맞히는 게임
+
+[노션으로 보기](https://knowing-lift-281.notion.site/Catch-The-Lines-47ad5f4e8c904ff28c7d4b0c22c258a0)
 
 # 소개
 ## 새 프로젝트를 시작한 계기
