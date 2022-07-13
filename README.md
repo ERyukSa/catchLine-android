@@ -41,6 +41,7 @@ https://www.youtube.com/watch?v=1YY0CZ0Ssp8
 </details>
 
 # 아키텍처 패턴 정리 (이론)
+노션 링크: https://knowing-lift-281.notion.site/96eef86099b2479088a61911ef3a8645
 <details>
 <summary>자세히</summary> 
 
