@@ -93,7 +93,7 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
     fun hintOrNextBtnClicked() {
         with(_gameState) {
             if (value!! < 3) value = value!! + 1
-            else moveToNextContent()
+            else if (value!! >= 4) moveToNextContent()
         }
     }
 

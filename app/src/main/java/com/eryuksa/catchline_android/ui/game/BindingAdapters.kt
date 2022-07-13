@@ -31,6 +31,7 @@ fun setTitleText(textView: TextView, gameState: Int, title: String) {
         2 -> {
             textView.text = textView.text.replaceRange(0, 1, title[0].toString())
         }
+        3 -> {}
         else -> {
             textView.text = title
         }

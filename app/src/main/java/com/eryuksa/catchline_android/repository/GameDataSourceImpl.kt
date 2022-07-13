@@ -52,6 +52,7 @@ class GameDataSourceImpl(
             val apiId = contentJson.getInt("api_id")
             val content =
                 Content(id, title, audioName, posterUrl, lineSummary, showed, caught, apiId)
+
             contentList.add(content)
         }
 
