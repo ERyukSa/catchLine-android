@@ -47,8 +47,8 @@ https://www.youtube.com/watch?v=1YY0CZ0Ssp8
 2. 구체적 서비스와 화면 도출 및 레이아웃 작업
 3. 레이아웃과 기능에 기반해서 어떤 태스크가 필요할지 정리
 4. 개발)
-    1. UI에 필요한 데이터를 바탕으로 필요한 model과 data layer 정의
-    2. ViewModel이 가질 데이터와 메소드 결정
+    1. 화면에서 보여줄 데이터를 바탕으로 ViewModel에서 사용할 data class와 UI data 정의
+    2. Data Layer의 메소드 결정
     3. 관심사 분리와 의존성 관계에 대해 고민하며 기능 구현
     4. 간단한 테스트와 디버깅
     5. 중복되는 코드 개선
