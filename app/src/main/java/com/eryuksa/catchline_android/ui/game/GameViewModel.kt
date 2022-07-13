@@ -4,7 +4,6 @@ import android.media.MediaPlayer
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.eryuksa.catchline_android.model.Content
 import com.eryuksa.catchline_android.repository.GameRepository
@@ -37,24 +36,39 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
 
     init {
         loadGameData()
+        moveToNextContent()
     }
 
-    // TODO 1. 전적 텍스트 뷰를 하나로 설정해놔서, ~~Number.value를 변경할 때마다 text 값이 변경된다.
+    // TODO 1. 전적 텍스트 뷰를 하나로 설정해놔서, 둘 중 하나를 변경할 때마다 전체 text가 변경된다.
     //  2. _challengeNumber를 2번 변경한다.
+    /**
+     * 전적 기록, 출제할 Content 리스트, 실행시킬 MediaPlayer를 로드합니다.
+     */
     private fun loadGameData() {
-
         _challengeNumber.value = repository.getChallengeNumber()
         _caughtNumber.value = repository.getCaughtNumber()
         contentList.addAll(repository.getUncaughtContents().shuffled())
-        contentList.removeLastOrNull()?.let{ content ->
-            // 지금 문제를 처음 만났으면 challengeNumber에 +1
-            if (!content.challenged) {
-                _challengeNumber.value = _challengeNumber.value!! + 1
-                content.challenged = true
-            }
-            _currentContent.value = content
-            mediaPlayer = getMediaPlayer(content) // 해당 컨텐츠의 오디오 플레이어 할당받기
+    }
+
+    private fun moveToNextContent() {
+        mediaPlayer?.release()
+
+        // 다음 컨텐츠가 존재한다면
+        contentList.removeLastOrNull()?.let { nextContent ->
+            _currentContent.value = nextContent       // 다음 문제
+            mediaPlayer = getMediaPlayer(nextContent) // 오디오 플레이어 할당받기
+            if (_gameState.value != 0) _gameState.value = 0 // 캐치 모드로 변경
+            // 처음 보는 문제인 경우
+            if (!nextContent.challenged) doNewChallengedProcess(nextContent)
         }
+    }
+
+    /**
+     * 새로 나온 문제가 처음 도전하는 문제일 경우에 필요한 처리를 한다.
+     */
+    private fun doNewChallengedProcess(content: Content) {
+        _challengeNumber.value = _challengeNumber.value!! + 1 // 도전 카운트
+        content.challenged = true // 도전 표시
     }
 
     private fun getMediaPlayer(content: Content): MediaPlayer {
@@ -79,9 +93,7 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
     fun hintOrNextBtnClicked() {
         with(_gameState) {
             if (value!! < 3) value = value!! + 1
-            else { // gameState >= 4 -> 문제를 맞힌 상태이므로 현재 버튼은 next 버튼이다
-                showNextContent()
-            }
+            else moveToNextContent()
         }
     }
 
@@ -111,21 +123,6 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
         _gameState.value = 4 // gameState: 4 -> 정답
         _caughtNumber.value = _caughtNumber.value!! + 1  // 캐치 카운트 증가
         _currentContent.value!!.caught = true            // 문제 캐치 상태로 변경
-
-    }
-
-    private fun showNextContent() {
-        _currentContent.value = contentList.removeLastOrNull() // 다음 문제로 변경
-
-        _currentContent.value?.let { changedContent ->
-            _gameState.value = 0 // 화면을 캐치 모드로 변경
-            mediaPlayer?.release()
-            mediaPlayer = getMediaPlayer(changedContent) // 오디오 변경
-
-            if (!changedContent.challenged) { // 처음 본 문제면 챌린지 카운트 증가
-                _challengeNumber.value = _challengeNumber.value!! + 1
-            }
-        }
     }
 
     override fun onCleared() {
