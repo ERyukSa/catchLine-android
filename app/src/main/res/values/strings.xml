@@ -1,22 +1,11 @@
 <resources>
     <string name="app_name">Catch The Lines</string>
-    <string name="hint_input_title">제목을 입력하세요</string>
-    <string name="try_text_game">도전</string>
-    <string name="title_game">제목: %s</string>
-    <string name="title_app">Catch the Lines</string>
-    <string name="answer_game">%1$s\n %2$s</string>
-    <string name="question_mark">\?\?\?</string>
-    <string name="title_game_record">게임 기록</string>
-    <string name="challenger_contents_number">도전한 컨텐츠</string>
-    <string name="catch_contents_number">캐치한 컨텐츠</string>
     <string name="play">시작 하기</string>
     <string name="about">설명 보기</string>
     <string name="see_record">기록 보기</string>
     <string name="exit">종료 하기</string>
-    <string name="year">연도</string>
-    <string name="genre">장르</string>
-    <string name="running_time">러닝 타임</string>
-    <string name="game_record">%1$d / %2$d</string>
-    <string name="title_answer">정답:</string>
-    <string name="ask_hint">힌트 요청</string>
+
+    <string name="hint_input_title">제목을 입력하세요</string>
+    <string name="description_select_hint">힌트 선택</string>
+    <string name="description_change_line">대사 변경</string>
 </resources>
