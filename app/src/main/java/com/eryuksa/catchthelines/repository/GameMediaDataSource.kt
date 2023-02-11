@@ -1,4 +1,4 @@
-package com.eryuksa.catchline_android.repository
+package com.eryuksa.catchthelines.repository
 
 import android.media.MediaPlayer
 

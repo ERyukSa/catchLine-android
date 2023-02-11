@@ -1,4 +1,4 @@
-package com.eryuksa.catchline_android.ui
+package com.eryuksa.catchthelines.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.eryuksa.catchline_android.R
 
-class StartFragment: Fragment() {
+class StartFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,21 +1,16 @@
-package com.eryuksa.catchline_android.ui.game
+package com.eryuksa.catchthelines.ui.game
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.request.RequestOptions
-import com.eryuksa.catchline_android.common.GlideApp
 import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
-import com.eryuksa.catchline_android.model.ViewModelFactory
-import jp.wasabeef.glide.transformations.BlurTransformation
+import com.eryuksa.catchthelines.common.ViewModelFactory
 
 class GameFragment : Fragment() {
 
@@ -26,7 +21,7 @@ class GameFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentGameBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -64,4 +59,3 @@ class GameFragment : Fragment() {
         }
     }
 }
-

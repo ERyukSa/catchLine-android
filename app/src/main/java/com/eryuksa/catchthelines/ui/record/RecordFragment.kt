@@ -1,4 +1,4 @@
-package com.eryuksa.catchline_android.ui.record
+package com.eryuksa.catchthelines.ui.record
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.eryuksa.catchline_android.R
 
-class RecordFragment: Fragment() {
+class RecordFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,

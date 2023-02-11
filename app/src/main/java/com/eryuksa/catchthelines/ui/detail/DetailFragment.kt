@@ -1,4 +1,4 @@
-package com.eryuksa.catchline_android.ui.detail
+package com.eryuksa.catchthelines.ui.detail
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import com.eryuksa.catchline_android.common.GlideApp
+import com.bumptech.glide.Glide
 import com.eryuksa.catchline_android.R
 
 class DetailFragment : Fragment() {
@@ -23,7 +23,7 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val posterView = requireActivity().findViewById<ImageView>(R.id.poster_img_detail)
-        GlideApp.with(this)
+        Glide.with(this)
             .load("https://image.tmdb.org/t/p/original/AvMbd9rvH6cpbhXc1YTQsdc9bAh.jpg")
             .into(posterView)
     }

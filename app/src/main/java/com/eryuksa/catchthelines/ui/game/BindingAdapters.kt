@@ -1,4 +1,4 @@
-package com.eryuksa.catchline_android.ui.game
+package com.eryuksa.catchthelines.ui.game
 
 import android.view.View
 import android.widget.EditText
@@ -6,18 +6,17 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchline_android.R
-import com.eryuksa.catchline_android.common.GlideApp
-import com.eryuksa.catchline_android.model.Content
-
+import com.eryuksa.catchthelines.model.Content
 import jp.wasabeef.glide.transformations.BlurTransformation
 
 @BindingAdapter("playing")
 fun setAudioButton(imageView: ImageView, playing: Boolean) {
     if (playing) {
         imageView.setImageResource(R.drawable.playing_circle_24)
-    }else {
+    } else {
         imageView.setImageResource(R.drawable.paused_circle_24)
     }
 }
@@ -42,15 +41,15 @@ fun setTitleText(textView: TextView, gameState: Int, title: String) {
 @BindingAdapter("gameState", "thumbnailUrl")
 fun setThumbnail(imageView: ImageView, gameState: Int, thumbnailUrl: String) {
     when (gameState) {
-        0 -> GlideApp.with(imageView)
+        0 -> Glide.with(imageView)
             .load(thumbnailUrl)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(24, 7)))
             .into(imageView)
-        3 -> GlideApp.with(imageView)
+        3 -> Glide.with(imageView)
             .load(thumbnailUrl)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(24, 2)))
             .into(imageView)
-        4 -> GlideApp.with(imageView)
+        4 -> Glide.with(imageView)
             .load(thumbnailUrl)
             .into(imageView)
     }

@@ -1,8 +1,7 @@
-package com.eryuksa.catchline_android.common
+package com.eryuksa.catchthelines.common
 
 import android.content.Context
 import android.media.MediaPlayer
-import android.util.Log
 
 class MediaLoader(private val context: Context) {
 

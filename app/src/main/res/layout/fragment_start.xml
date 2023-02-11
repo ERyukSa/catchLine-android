@@ -3,31 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/title_main"
-        style="@style/TextTitle.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        app:layout_constraintVertical_bias="0.25"
-        android:letterSpacing="0.05"
+        android:paddingBottom="16dp"
         android:text="@string/title_app"
+        android:textAppearance="@style/SymbolicText.Title"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintVertical_bias="0.25" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/play_button_main"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="52dp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:padding="0dp"
+        style="@style/ButtonStart"
         android:text="@string/play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,12 +30,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/about_button_main"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:padding="0dp"
+        style="@style/ButtonStart"
         android:text="@string/about"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,12 +39,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/record_button_main"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:padding="0dp"
+        style="@style/ButtonStart"
         android:text="@string/see_record"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,12 +48,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/exit_button_main"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:padding="0dp"
+        style="@style/ButtonStart"
         android:text="@string/exit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

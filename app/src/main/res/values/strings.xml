@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">catchLine-android</string>
+    <string name="app_name">Catch The Lines</string>
     <string name="hint_input_title">제목을 입력하세요</string>
     <string name="try_text_game">도전</string>
     <string name="title_game">제목: %s</string>

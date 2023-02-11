@@ -1,16 +1,14 @@
-package com.eryuksa.catchline_android.model
+package com.eryuksa.catchthelines.common
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.eryuksa.catchline_android.common.AssetLoader
-import com.eryuksa.catchline_android.common.MediaLoader
-import com.eryuksa.catchline_android.repository.GameDataSourceImpl
-import com.eryuksa.catchline_android.repository.GameRepository
-import com.eryuksa.catchline_android.ui.game.GameViewModel
+import com.eryuksa.catchthelines.repository.GameDataSourceImpl
+import com.eryuksa.catchthelines.repository.GameRepository
+import com.eryuksa.catchthelines.ui.game.GameViewModel
 import java.lang.IllegalArgumentException
 
-class ViewModelFactory(private val context: Context): ViewModelProvider.Factory {
+class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(GameViewModel::class.java)) {
             val gameRepository =

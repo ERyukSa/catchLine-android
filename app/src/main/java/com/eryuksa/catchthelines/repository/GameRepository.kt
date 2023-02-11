@@ -1,7 +1,7 @@
-package com.eryuksa.catchline_android.repository
+package com.eryuksa.catchthelines.repository
 
 import android.media.MediaPlayer
-import com.eryuksa.catchline_android.model.Content
+import com.eryuksa.catchthelines.model.Content
 
 class GameRepository(private val dataSource: GameDataSourceImpl) {
 

@@ -1,19 +1,19 @@
-package com.eryuksa.catchline_android.ui.game
+package com.eryuksa.catchthelines.ui.game
 
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.eryuksa.catchline_android.model.Content
-import com.eryuksa.catchline_android.repository.GameRepository
+import com.eryuksa.catchthelines.model.Content
+import com.eryuksa.catchthelines.repository.GameRepository
 
-class GameViewModel(private val repository: GameRepository): ViewModel() {
+class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
-    private val _challengeNumber = MutableLiveData<Int>() // 지금까지 도전한 문제 수
+    private val _challengeNumber = MutableLiveData<Int>()
     val challengeNumber: LiveData<Int>
         get() = _challengeNumber
-    private val _caughtNumber = MutableLiveData(0)    // 지금까지 캐치한 문제 수
+    private val _caughtNumber = MutableLiveData(0)
     val caughtNumber: LiveData<Int>
         get() = _caughtNumber
 
@@ -24,15 +24,14 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
 
     // 0: 기본, 1: 힌트1(글자 수 공개), 2: 힌트2(첫 글자 공개), 3: 힌트3(썸네일 덜 흐릿하게), 4: 정답 캐치
     private val _gameState = MutableLiveData<Int>(0)
-    val gameState: LiveData<Int>
-        get() = _gameState
+    val gameState: LiveData<Int> = _gameState
 
     private val _audioPlaying = MutableLiveData(false)
     val audioPlaying: LiveData<Boolean>
         get() = _audioPlaying
 
-    private val contentList = mutableListOf<Content>() // 출제할 컨텐츠 리스트
-    private var mediaPlayer: MediaPlayer? = null       // 대사 플레이어
+    private val contentList = mutableListOf<Content>()
+    private var mediaPlayer: MediaPlayer? = null
 
     init {
         loadGameData()
@@ -46,6 +45,7 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
      */
     private fun loadGameData() {
         _challengeNumber.value = repository.getChallengeNumber()
+        _challengeNumber.postValue(repository.getChallengeNumber())
         _caughtNumber.value = repository.getCaughtNumber()
         contentList.addAll(repository.getUncaughtContents().shuffled())
     }
@@ -55,9 +55,9 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
 
         // 다음 컨텐츠가 존재한다면
         contentList.removeLastOrNull()?.let { nextContent ->
-            _currentContent.value = nextContent       // 다음 문제
-            mediaPlayer = getMediaPlayer(nextContent) // 오디오 플레이어 할당받기
-            if (_gameState.value != 0) _gameState.value = 0 // 캐치 모드로 변경
+            _currentContent.value = nextContent
+            mediaPlayer = getMediaPlayer(nextContent)
+            if (_gameState.value != 0) _gameState.value = 0
             // 처음 보는 문제인 경우
             if (!nextContent.challenged) doNewChallengedProcess(nextContent)
         }
@@ -121,8 +121,8 @@ class GameViewModel(private val repository: GameRepository): ViewModel() {
      */
     private fun doAnswerProcess() {
         _gameState.value = 4 // gameState: 4 -> 정답
-        _caughtNumber.value = _caughtNumber.value!! + 1  // 캐치 카운트 증가
-        _currentContent.value!!.caught = true            // 문제 캐치 상태로 변경
+        _caughtNumber.value = _caughtNumber.value!! + 1
+        _currentContent.value!!.caught = true
     }
 
     override fun onCleared() {

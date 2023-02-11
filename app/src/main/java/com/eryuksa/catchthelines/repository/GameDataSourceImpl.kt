@@ -1,11 +1,12 @@
-package com.eryuksa.catchline_android.repository
+package com.eryuksa.catchthelines.repository
 
 import android.media.MediaPlayer
-import android.util.Log
-import com.eryuksa.catchline_android.common.AssetLoader
-import com.eryuksa.catchline_android.common.MediaLoader
-import com.eryuksa.catchline_android.model.Content
-import org.json.JSONObject
+import com.eryuksa.catchthelines.common.AssetLoader
+import com.eryuksa.catchthelines.common.MediaLoader
+import com.eryuksa.catchthelines.model.Content
+import com.eryuksa.catchthelines.model.GameData
+import com.google.gson.Gson
+import java.util.Collections.emptyList
 
 class GameDataSourceImpl(
     private val assetLoader: AssetLoader,
@@ -13,26 +14,29 @@ class GameDataSourceImpl(
 ) : GameAssetDataSource, GameMediaDataSource {
 
     /**
-     * game.json 파일을 JSONObject로 변환한다.
+     * Gson 라이브러리로 game.json 파일을 GameData 인스턴스로 변환한다.
      */
-    private val gameDataJson: JSONObject? by lazy {
-        assetLoader.getJsonObject("game.json")
+    private val gameData: GameData? by lazy {
+        Gson().fromJson(assetLoader.getJsonString("game.json"), GameData::class.java)
     }
 
     override fun getCaughtNumber(): Int {
-        return gameDataJson?.getInt("caught_contents_number") ?: 0
+        return gameData?.caughtNumber ?: 0
     }
 
     override fun getChallengeNumber(): Int {
-        return gameDataJson?.getInt("challenged_contents_number") ?: 0
+        return gameData?.challengeNumber ?: 0
     }
 
     override fun getUncaughtContents(): List<Content> {
-        return gameDataJson?.let {
-            getContentsFromJson(it)
-        } ?: emptyList()
+        return gameData?.contentList ?: emptyList()
     }
 
+    override fun getMediaPlayer(fileName: String): MediaPlayer {
+        return mediaLoader.getMediaPlayer(fileName)
+    }
+
+    /* JSONObject로 직접 파싱하는 버전
     /**
      * gameDataJsonString에서 Content List를 파싱한다.
      */
@@ -58,8 +62,5 @@ class GameDataSourceImpl(
 
         return contentList
     }
-
-    override fun getMediaPlayer(fileName: String): MediaPlayer {
-        return mediaLoader.getMediaPlayer(fileName)
-    }
+     */
 }

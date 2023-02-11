@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SymbolicText">
+        <item name="fontFamily">@font/great_lakes_nf</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="SymbolicText.Title">
+        <item name="android:textSize">28sp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
+    <style name="BasicText">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="BasicText.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BasicText.Bold.HintAnswer" >
+        <item name="android:textSize">18sp</item>
+    </style>
+</resources>

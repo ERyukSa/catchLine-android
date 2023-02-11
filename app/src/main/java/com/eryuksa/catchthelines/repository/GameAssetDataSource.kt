@@ -1,6 +1,6 @@
-package com.eryuksa.catchline_android.repository
+package com.eryuksa.catchthelines.repository
 
-import com.eryuksa.catchline_android.model.Content
+import com.eryuksa.catchthelines.model.Content
 
 interface GameAssetDataSource {
 
