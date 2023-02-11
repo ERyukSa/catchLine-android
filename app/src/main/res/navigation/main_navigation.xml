@@ -2,34 +2,36 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_navigation"
-    app:startDestination="@id/startFragment">
+    app:startDestination="@id/entryFragment">
 
     <fragment
-        android:id="@+id/startFragment"
-        android:name="com.eryuksa.catchthelines.ui.StartFragment"
-        android:label="StartFragment" >
+        android:id="@+id/entryFragment"
+        android:name="com.eryuksa.catchthelines.ui.EntryFragment"
+        android:label="EntryActivity" >
         <action
-            android:id="@+id/startFragment_to_gameFragment"
+            android:id="@+id/entry_to_game"
             app:destination="@id/gameFragment"
-            app:popUpTo="@id/startFragment" />
+            app:popUpTo="@id/entryFragment" />
         <action
-            android:id="@+id/startFragment_to_aboutFragment"
+            android:id="@+id/entry_to_guide"
             app:destination="@id/aboutFragment"
-            app:popUpTo="@id/startFragment" />
+            app:popUpTo="@id/entryFragment" />
         <action
-            android:id="@+id/startFragment_to_recordFragment"
+            android:id="@+id/entry_to_record"
             app:destination="@id/recordFragment"
-            app:popUpTo="@id/startFragment" />
+            app:popUpTo="@id/entryFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/gameFragment"
         android:name="com.eryuksa.catchthelines.ui.game.GameFragment"
         android:label="GameFragment" >
         <action
-            android:id="@+id/gameFragment_to_detailFragment"
+            android:id="@+id/game_to_detail"
             app:destination="@id/detailFragment"
             app:popUpTo="@id/gameFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/aboutFragment"
         android:name="com.eryuksa.catchthelines.ui.guide.GuideFragment"
@@ -39,10 +41,11 @@
         android:name="com.eryuksa.catchthelines.ui.record.RecordFragment"
         android:label="RecordFragment" >
         <action
-            android:id="@+id/recordFragment_to_detailFragment"
+            android:id="@+id/record_to_detail"
             app:destination="@id/detailFragment"
             app:popUpTo="@id/recordFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.eryuksa.catchthelines.ui.detail.DetailFragment"

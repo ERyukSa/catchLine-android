@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/title_main"
+        android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -20,38 +19,38 @@
         app:layout_constraintVertical_bias="0.25" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/play_button_main"
+        android:id="@+id/btn_play"
         style="@style/ButtonStart"
         android:text="@string/play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_main"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintWidth_percent="0.6" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/about_button_main"
+        android:id="@+id/btn_guide"
         style="@style/ButtonStart"
         android:text="@string/about"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/play_button_main"
+        app:layout_constraintTop_toBottomOf="@id/btn_play"
         app:layout_constraintWidth_percent="0.6" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/record_button_main"
+        android:id="@+id/btn_record"
         style="@style/ButtonStart"
         android:text="@string/see_record"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/about_button_main"
+        app:layout_constraintTop_toBottomOf="@id/btn_guide"
         app:layout_constraintWidth_percent="0.6" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/exit_button_main"
+        android:id="@+id/btn_finish"
         style="@style/ButtonStart"
         android:text="@string/exit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/record_button_main"
+        app:layout_constraintTop_toBottomOf="@id/btn_record"
         app:layout_constraintWidth_percent="0.6" />
 </androidx.constraintlayout.widget.ConstraintLayout>
