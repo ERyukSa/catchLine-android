@@ -40,6 +40,7 @@
             android:gravity="center"
             android:paddingVertical="16dp"
             android:text="대사를 듣고 제목을 맞혀보세요!"
+            android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,6 +72,7 @@
             android:gravity="center"
             android:maxLines="2"
             android:text="범죄 국가 ❌"
+            android:textColor="@color/black"
             app:layout_constraintBottom_toTopOf="@id/btn_play"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -90,6 +92,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_feedback" />
+
+        <TextView
+            android:id="@+id/tv_available_hint_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="남은 힌트: 10개"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/btn_select_hint"
+            app:layout_constraintEnd_toEndOf="@id/btn_select_hint"
+            app:layout_constraintStart_toStartOf="@id/btn_select_hint" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_select_hint"
@@ -126,9 +140,9 @@
             android:gravity="start"
             android:hint="@string/hint_input_title"
             android:inputType="text"
+            android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:padding="14dp"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -139,8 +153,8 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:src="@drawable/icon_submit_24"
-            app:layout_constraintTop_toTopOf="@id/edittext_input_title"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

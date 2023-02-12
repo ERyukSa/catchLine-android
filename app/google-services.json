@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "275851581898",
+    "project_id": "catchthelines-debc4",
+    "storage_bucket": "catchthelines-debc4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275851581898:android:25fecd968277759003d733",
+        "android_client_info": {
+          "package_name": "com.eryuksa.catchthelines"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "275851581898-q0gv2voqfehr5mgvar25mkgm204sbimg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZh_EwY4J_aq_pVH3-MZRdIh7ALEEjut8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "275851581898-q0gv2voqfehr5mgvar25mkgm204sbimg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
