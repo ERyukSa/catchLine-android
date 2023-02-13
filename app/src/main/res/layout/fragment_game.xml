@@ -77,7 +77,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_pager_poster"
-            app:layout_constraintVertical_chainStyle="spread" />
+            app:layout_constraintVertical_chainStyle="spread"/>
 
         <ImageButton
             android:id="@+id/btn_play"
@@ -88,7 +88,7 @@
             android:padding="12dp"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_play_24"
-            app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
+            app:layout_constraintBottom_toTopOf="@id/slider_line_playing_state"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_feedback" />
@@ -131,6 +131,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_play"
             app:layout_constraintTop_toTopOf="@id/btn_select_hint" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_line_playing_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/btn_play"
+            app:layout_constraintStart_toStartOf="@id/btn_select_hint"
+            app:layout_constraintEnd_toEndOf="@id/btn_change_line"
+            app:layout_constraintBottom_toTopOf="@id/edittext_input_title"/>
 
         <EditText
             android:id="@+id/edittext_input_title"
