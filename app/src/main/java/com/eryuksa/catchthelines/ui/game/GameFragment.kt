@@ -18,8 +18,14 @@ import kotlinx.coroutines.launch
 
 class GameFragment : Fragment() {
 
-    private lateinit var binding: FragmentGameBinding
+    private var _binding: FragmentGameBinding? = null
+    private val binding: FragmentGameBinding
+        get() = _binding!!
     private val viewModel: GameViewModel by viewModels()
+
+    private val posterAdapter: PosterViewPagerAdapter by lazy {
+        PosterViewPagerAdapter(this)
+    }
 
     lateinit var gameItem: GameItem
     private val mediaPlayer: MediaPlayer by lazy {
@@ -36,13 +42,8 @@ class GameFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentGameBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        observeData()
+        _binding = FragmentGameBinding.inflate(inflater, container, false)
+        binding.viewPagerPoster.adapter = posterAdapter
         binding.btnSubmitTitle.setOnClickListener {
             viewModel.checkUserTitleIsMatched()
         }
@@ -53,6 +54,12 @@ class GameFragment : Fragment() {
                 startLineAudioProcess()
             }
         }
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeData()
     }
 
     private fun stopLineAudioProcess() {
@@ -75,6 +82,7 @@ class GameFragment : Fragment() {
         with(viewModel) {
             gameItems.observe(viewLifecycleOwner) { gameItems ->
                 gameItem = gameItems.getOrNull(1) ?: return@observe
+                posterAdapter.posterUrls = gameItems.map(GameItem::posterUrl)
             }
 
             hintText.observe(viewLifecycleOwner) { hintText ->
@@ -87,12 +95,6 @@ class GameFragment : Fragment() {
 
             availableHintCount.observe(viewLifecycleOwner) { hintCount ->
                 binding.tvAvailableHintCount.text = hintCount.toString()
-            }
-
-            isLinePlaying.observe(viewLifecycleOwner) { linePlaying ->
-                if (linePlaying) {
-                } else {
-                }
             }
         }
     }
