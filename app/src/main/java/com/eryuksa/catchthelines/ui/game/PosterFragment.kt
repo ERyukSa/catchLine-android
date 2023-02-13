@@ -29,9 +29,9 @@ class PosterFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPosterBinding.inflate(inflater, container, false)
-        Glide.with(binding.root)
+        Glide.with(this)
             .load(posterUrl)
-            .into(binding.root)
+            .into(binding.ivPoster)
         return binding.root
     }
 
