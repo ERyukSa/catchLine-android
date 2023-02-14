@@ -50,12 +50,21 @@
             android:id="@+id/view_pager_poster"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:clipChildren="false"
             android:clipToPadding="false"
+            android:clipChildren="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.45"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_hint" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_line_playing_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="@id/btn_change_line"
+            app:layout_constraintStart_toStartOf="@id/btn_select_hint"
+            app:layout_constraintTop_toBottomOf="@id/view_pager_poster" />
 
         <TextView
             android:id="@+id/tv_feedback"
@@ -80,7 +89,7 @@
             android:padding="12dp"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_play_24"
-            app:layout_constraintBottom_toTopOf="@id/slider_line_playing_progress"
+            app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_feedback" />
@@ -123,15 +132,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_play"
             app:layout_constraintTop_toTopOf="@id/btn_select_hint" />
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/slider_line_playing_progress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
-            app:layout_constraintEnd_toEndOf="@id/btn_change_line"
-            app:layout_constraintStart_toStartOf="@id/btn_select_hint"
-            app:layout_constraintTop_toBottomOf="@id/btn_play" />
 
         <EditText
             android:id="@+id/edittext_input_title"

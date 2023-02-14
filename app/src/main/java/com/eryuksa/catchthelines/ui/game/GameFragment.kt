@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.adapters.ViewBindingAdapter.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +14,7 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
+import com.eryuksa.catchthelines.common.removeOverScroll
 import com.eryuksa.catchthelines.data.dto.GameItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,39 +49,53 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGameBinding.inflate(inflater, container, false)
-        binding.viewPagerPoster.apply {
-            offscreenPageLimit = 3
-            getChildAt(0).overScrollMode = View.OVER_SCROLL_NEVER
-            adapter = posterAdapter
-
-            val transform = CompositePageTransformer()
-            val screenWidth = resources.displayMetrics.widthPixels
-            setPadding((screenWidth * 0.15).toInt(), 0, (screenWidth * 0.15).toInt(), 0)
-            transform.addTransformer(MarginPageTransformer(resources.getDimensionPixelOffset(R.dimen.game_poster_margin)))
-            transform.addTransformer { view: View, fl: Float ->
-                val v = 1 - abs(fl)
-                view.scaleY = 0.8f + v * 0.2f
-            }
-
-            setPageTransformer(transform)
-        }
-
-        binding.btnSubmitTitle.setOnClickListener {
-            viewModel.checkUserTitleIsMatched()
-        }
-        binding.btnPlay.setOnClickListener {
-            if (mediaPlayer.isPlaying) {
-                stopLineAudioProcess()
-            } else {
-                startLineAudioProcess()
-            }
-        }
+        initPosterViewPager()
+        initOnClickListener()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeData()
+    }
+
+    private fun initPosterViewPager() {
+        binding.viewPagerPoster.apply {
+            offscreenPageLimit = 3
+            adapter = posterAdapter
+            this.removeOverScroll()
+            this.setHorizontalPadding(padding = (resources.displayMetrics.widthPixels * 0.15).toInt())
+            setPageTransformer(buildPageTransformer())
+        }
+    }
+
+    private fun initOnClickListener() {
+        binding.btnSubmitTitle.setOnClickListener {
+            viewModel.checkUserInputMatchedWithAnswer()
+        }
+
+        binding.btnPlay.setOnClickListener {
+            when (mediaPlayer.isPlaying) {
+                true -> stopLineAudioProcess()
+                false -> startLineAudioProcess()
+            }
+        }
+    }
+
+    private fun ViewPager2.setHorizontalPadding(padding: Int) {
+        this.setPadding(padding, 0, padding, 0)
+    }
+
+    private fun buildPageTransformer(): CompositePageTransformer {
+        return CompositePageTransformer().also {
+            it.addTransformer(
+                MarginPageTransformer(resources.getDimensionPixelOffset(R.dimen.game_poster_margin))
+            )
+            it.addTransformer { eachPageView: View, positionFromCenter: Float ->
+                val scale = 1 - abs(positionFromCenter)
+                eachPageView.scaleY = 0.85f + 0.15f * scale
+            }
+        }
     }
 
     private fun stopLineAudioProcess() {

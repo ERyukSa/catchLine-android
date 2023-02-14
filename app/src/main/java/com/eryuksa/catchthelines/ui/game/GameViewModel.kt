@@ -38,6 +38,6 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun checkUserTitleIsMatched() {
+    fun checkUserInputMatchedWithAnswer() {
     }
 }
