@@ -1,14 +1,11 @@
 package com.eryuksa.catchthelines.ui.game
 
-import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -16,10 +13,8 @@ import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.common.removeOverScroll
 import com.eryuksa.catchthelines.data.dto.GameItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
 
 class GameFragment : Fragment() {
@@ -33,15 +28,17 @@ class GameFragment : Fragment() {
         PosterViewPagerAdapter(this)
     }
 
-    lateinit var gameItem: GameItem
-    private val mediaPlayer: MediaPlayer by lazy {
-        MediaPlayer.create(requireContext(), Uri.parse(gameItem.lineAudioUrls[0])).apply {
-            this.setOnCompletionListener {
-                lineAudioTimer.cancel()
-            }
+    private val audioPlayer: ExoPlayer by lazy {
+        ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
+    }
+    private var gameItems: List<GameItem> = emptyList()
+
+    private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            stopLineAudioProcess()
+            audioPlayer.seekTo(position, 0)
         }
     }
-    private lateinit var lineAudioTimer: Job
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +46,7 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGameBinding.inflate(inflater, container, false)
+        binding.playerViewLine.player = audioPlayer
         initPosterViewPager()
         initOnClickListener()
         return binding.root
@@ -64,8 +62,9 @@ class GameFragment : Fragment() {
             offscreenPageLimit = 3
             adapter = posterAdapter
             this.removeOverScroll()
-            this.setHorizontalPadding(padding = (resources.displayMetrics.widthPixels * 0.15).toInt())
+            this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
             setPageTransformer(buildPageTransformer())
+            registerOnPageChangeCallback(switchAudioLineOnPageChange)
         }
     }
 
@@ -74,8 +73,8 @@ class GameFragment : Fragment() {
             viewModel.checkUserInputMatchedWithAnswer()
         }
 
-        binding.btnPlay.setOnClickListener {
-            when (mediaPlayer.isPlaying) {
+        binding.btnPlayStop.setOnClickListener {
+            when (audioPlayer.isPlaying) {
                 true -> stopLineAudioProcess()
                 false -> startLineAudioProcess()
             }
@@ -99,26 +98,21 @@ class GameFragment : Fragment() {
     }
 
     private fun stopLineAudioProcess() {
-        mediaPlayer.pause()
-        lineAudioTimer.cancel()
+        audioPlayer.pause()
+        binding.btnPlayStop.setImageResource(R.drawable.icon_play_24)
     }
 
     private fun startLineAudioProcess() {
-        lineAudioTimer = lifecycleScope.launch(Dispatchers.Main.immediate) {
-            binding.sliderLinePlayingProgress.valueTo = mediaPlayer.duration.toFloat()
-            mediaPlayer.start()
-            while (mediaPlayer.isPlaying) {
-                binding.sliderLinePlayingProgress.value = mediaPlayer.currentPosition.toFloat()
-                delay(500)
-            }
-        }
+        audioPlayer.play()
+        binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24)
     }
 
     private fun observeData() {
         with(viewModel) {
             gameItems.observe(viewLifecycleOwner) { gameItems ->
-                gameItem = gameItems.getOrNull(1) ?: return@observe
                 posterAdapter.posterUrls = gameItems.map(GameItem::posterUrl)
+                this@GameFragment.gameItems = gameItems
+                audioPlayer.setUpLines()
             }
 
             hintText.observe(viewLifecycleOwner) { hintText ->
@@ -133,5 +127,14 @@ class GameFragment : Fragment() {
                 binding.tvAvailableHintCount.text = hintCount.toString()
             }
         }
+    }
+
+    private fun ExoPlayer.setUpLines() {
+        audioPlayer.addMediaItems(
+            gameItems.map { item ->
+                MediaItem.fromUri(item.lineAudioUrls[0])
+            }
+        )
+        audioPlayer.prepare()
     }
 }

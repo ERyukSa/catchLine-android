@@ -50,20 +50,23 @@
             android:id="@+id/view_pager_poster"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:clipToPadding="false"
             android:clipChildren="false"
+            android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.45"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_hint" />
 
-        <com.google.android.material.slider.Slider
-            android:id="@+id/slider_line_playing_progress"
+        <com.google.android.exoplayer2.ui.PlayerControlView
+            app:controller_layout_id="@layout/audio_time_bar_game"
+            android:id="@+id/player_view_line"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.7"
             android:layout_marginTop="4dp"
-            app:layout_constraintEnd_toEndOf="@id/btn_change_line"
-            app:layout_constraintStart_toStartOf="@id/btn_select_hint"
+            app:show_timeout="0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_pager_poster" />
 
         <TextView
@@ -74,25 +77,26 @@
             android:maxLines="2"
             android:text="범죄 국가 ❌"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toTopOf="@id/btn_play"
+            app:layout_constraintBottom_toTopOf="@id/btn_play_stop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_pager_poster"
             app:layout_constraintVertical_chainStyle="spread" />
 
         <ImageButton
-            android:id="@+id/btn_play"
+            android:id="@+id/btn_play_stop"
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:background="@drawable/circle_button"
             android:elevation="4dp"
-            android:padding="12dp"
+            android:padding="16dp"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_play_24"
             app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_feedback" />
+            app:layout_constraintTop_toBottomOf="@id/tv_feedback"
+            tools:src="@drawable/icon_play_24" />
 
         <TextView
             android:id="@+id/tv_available_hint_count"
@@ -113,8 +117,8 @@
             android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/description_select_hint"
             android:src="@drawable/icon_hint_24"
-            app:layout_constraintBottom_toBottomOf="@id/btn_play"
-            app:layout_constraintEnd_toStartOf="@id/btn_play"
+            app:layout_constraintBottom_toBottomOf="@id/btn_play_stop"
+            app:layout_constraintEnd_toStartOf="@id/btn_play_stop"
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -127,10 +131,10 @@
             android:maxLines="1"
             android:padding="0dp"
             android:text="대사1"
-            app:layout_constraintBottom_toBottomOf="@id/btn_play"
+            app:layout_constraintBottom_toBottomOf="@id/btn_play_stop"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btn_play"
+            app:layout_constraintStart_toEndOf="@id/btn_play_stop"
             app:layout_constraintTop_toTopOf="@id/btn_select_hint" />
 
         <EditText

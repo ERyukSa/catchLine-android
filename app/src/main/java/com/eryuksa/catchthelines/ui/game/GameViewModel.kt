@@ -28,10 +28,6 @@ class GameViewModel : ViewModel() {
     val availableHintCount: LiveData<Int>
         get() = _availableHintCount
 
-    private val _isLinePlaying = MutableLiveData<Boolean>(false)
-    val isLinePlaying: LiveData<Boolean>
-        get() = _isLinePlaying
-
     init {
         viewModelScope.launch {
             _gameItems.value = repository.getGameItems()
