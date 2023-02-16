@@ -5,7 +5,15 @@
     <string name="see_record">기록 보기</string>
     <string name="exit">종료 하기</string>
 
-    <string name="hint_input_title">제목을 입력하세요</string>
-    <string name="description_select_hint">힌트 선택</string>
-    <string name="description_change_line">대사 변경</string>
+    <string name="game_listen_and_guess">대사를 듣고 제목을 맞혀보세요!</string>
+    <string name="game_input_title">제목을 입력하세요</string>
+    <string name="game_description_select_hint">힌트 선택</string>
+    <string name="game_description_change_line">대사 변경</string>
+    <string name="game_description_play_line">대사 재생하기</string>
+    <string name="game_line1">대사1</string>
+    <string name="game_line2">대사2</string>
+    <string name="game_characters_count">글자수</string>
+    <string name="game_first_character">첫글자</string>
+    <string name="game_clearer_poster">선명함</string>
+    <string name="game_description_submit">제출하기</string>
 </resources>
