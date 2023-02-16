@@ -1,7 +1,6 @@
 package com.eryuksa.catchthelines.ui.game
 
 import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.common.removeOverScroll
-import com.eryuksa.catchthelines.data.dto.GameItem
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
@@ -27,7 +25,7 @@ class GameFragment : Fragment() {
     private val viewModel: GameViewModel by viewModels()
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
-        PosterViewPagerAdapter(this)
+        PosterViewPagerAdapter()
     }
 
     private val audioPlayer: ExoPlayer by lazy {
@@ -37,8 +35,7 @@ class GameFragment : Fragment() {
 
     private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            stopLineAudioProcess()
-            audioPlayer.seekTo(position, 0)
+            viewModel.changePage(position)
         }
     }
     var isHintOpen = false
@@ -82,6 +79,10 @@ class GameFragment : Fragment() {
                 false -> startLineAudioProcess()
             }
         }
+
+        binding.btnHintClearerPoster.setOnClickListener {
+            viewModel.changeCurrentPosterBlurDegree(2)
+        }
     }
 
     private fun ViewPager2.setHorizontalPadding(padding: Int) {
@@ -113,7 +114,7 @@ class GameFragment : Fragment() {
     private fun observeData() {
         with(viewModel) {
             gameItems.observe(viewLifecycleOwner) { gameItems ->
-                posterAdapter.posterUrls = gameItems.map(GameItem::posterUrl)
+                posterAdapter.submitList(gameItems)
                 this@GameFragment.gameItems = gameItems
                 audioPlayer.setUpLines()
             }
@@ -129,46 +130,33 @@ class GameFragment : Fragment() {
             availableHintCount.observe(viewLifecycleOwner) { hintCount ->
                 binding.tvAvailableHintCount.text = hintCount.toString()
             }
+
+            currentPagePosition.observe(viewLifecycleOwner) { position ->
+                stopLineAudioProcess()
+                audioPlayer.seekTo(position, 0)
+            }
         }
 
-        val anim1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", -230f).setDuration(500)
-        val anim12 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", -400f).setDuration(500)
-        val anim13 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", -570f).setDuration(500)
-        val anim14 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", -710f).setDuration(500)
-        val anim1In = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", 0f).setDuration(500)
-
-        val txOut = PropertyValuesHolder.ofFloat("translationX", 150f)
-        val txIn = PropertyValuesHolder.ofFloat("translationX", 0f)
-        val tyOut = PropertyValuesHolder.ofFloat("translationY", -230f)
-        val tyIn = PropertyValuesHolder.ofFloat("translationY", 0f)
-        val anim2 = ObjectAnimator.ofPropertyValuesHolder(binding.btnHintCharactersCount, txOut, tyOut).setDuration(500)
-        val anim2In = ObjectAnimator.ofPropertyValuesHolder(binding.btnHintCharactersCount, txIn, tyIn).setDuration(500)
-
-        val txOut2 = PropertyValuesHolder.ofFloat("translationX", 300f)
-        val txOut2In = PropertyValuesHolder.ofFloat("translationX", 0f)
-        val tyOut2 = PropertyValuesHolder.ofFloat("translationY", -230f)
-        val tyOut2In = PropertyValuesHolder.ofFloat("translationY", 0f)
-        val anim3 = ObjectAnimator.ofPropertyValuesHolder(binding.btnHintFirstCharacter, txOut2, tyOut2).setDuration(500)
-        val anim3In = ObjectAnimator.ofPropertyValuesHolder(binding.btnHintFirstCharacter, txOut2In, tyOut2In).setDuration(500)
-
-        val txOut3 = PropertyValuesHolder.ofFloat("translationX", 450f)
-        val txOut3In = PropertyValuesHolder.ofFloat("translationX", 0f)
-        val tyOut3 = PropertyValuesHolder.ofFloat("translationY", -230f)
-        val tyOut3In = PropertyValuesHolder.ofFloat("translationY", 0f)
-        val anim4 = ObjectAnimator.ofPropertyValuesHolder(binding.btnHintClearerPoster, txOut3, tyOut3).setDuration(500)
-        val anim4In = ObjectAnimator.ofPropertyValuesHolder(binding.btnHintClearerPoster, txOut3In, tyOut3In).setDuration(500)
+        val animOut1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", -180f).setDuration(400)
+        val animOut2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", -360f).setDuration(400)
+        val animOut3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", -540f).setDuration(400)
+        val animOut4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", -720f).setDuration(400)
+        val anim1In1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", 0f).setDuration(400)
+        val anim1In2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", 0f).setDuration(400)
+        val anim1In3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", 0f).setDuration(400)
+        val anim1In4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", 0f).setDuration(400)
 
         binding.btnSelectHint.setOnClickListener {
             if (isHintOpen) {
-                anim1In.start()
-                anim2In.start()
-                anim3In.start()
-                anim4In.start()
+                anim1In1.start()
+                anim1In2.start()
+                anim1In3.start()
+                anim1In4.start()
             } else {
-                anim1.start()
-                anim12.start()
-                anim13.start()
-                anim14.start()
+                animOut1.start()
+                animOut2.start()
+                animOut3.start()
+                animOut4.start()
             }
             isHintOpen = isHintOpen.not()
         }

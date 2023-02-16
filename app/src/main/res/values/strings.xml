@@ -16,4 +16,6 @@
     <string name="game_first_character">첫글자</string>
     <string name="game_clearer_poster">선명함</string>
     <string name="game_description_submit">제출하기</string>
+    
+    <string name="poster_description">컨텐츠의 메인 포스터</string>
 </resources>
