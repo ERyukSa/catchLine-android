@@ -53,7 +53,6 @@ class GameFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             playerViewLine.player = audioPlayer
         }
-        binding.playerViewLine.player = audioPlayer
         initPosterViewPager()
         initOnClickListener()
         return binding.root
@@ -91,6 +90,42 @@ class GameFragment : Fragment() {
         binding.btnHintClearerPoster.setOnClickListener {
             viewModel.useHintClearerPoster()
         }
+        binding.btnHintFirstCharacter.setOnClickListener {
+            binding.tvHint.text = getString(
+                R.string.game_hint_text_first_character,
+                gameItems[viewModel.currentPagePosition].title.first()
+            )
+        }
+        binding.btnHintCharactersCount.setOnClickListener {
+            binding.tvHint.text = getString(
+                R.string.game_hint_text_characters_count,
+                gameItems[viewModel.currentPagePosition].title.length
+            )
+        }
+
+        val animOut1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", -168f).setDuration(400)
+        val animOut2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", -340f).setDuration(400)
+        val animOut3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", -520f).setDuration(400)
+        val animOut4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", -700f).setDuration(400)
+        val anim1In1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", 0f).setDuration(400)
+        val anim1In2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", 0f).setDuration(400)
+        val anim1In3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", 0f).setDuration(400)
+        val anim1In4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", 0f).setDuration(400)
+
+        binding.btnSelectHint.setOnClickListener {
+            if (isHintOpen) {
+                anim1In1.start()
+                anim1In2.start()
+                anim1In3.start()
+                anim1In4.start()
+            } else {
+                animOut1.start()
+                animOut2.start()
+                animOut3.start()
+                animOut4.start()
+            }
+            isHintOpen = isHintOpen.not()
+        }
     }
 
     private fun ViewPager2.setHorizontalPadding(padding: Int) {
@@ -126,37 +161,9 @@ class GameFragment : Fragment() {
                 audioPlayer.setUpLines()
             }
 
-            hintText.observe(viewLifecycleOwner) { hintText ->
-                binding.tvHint.text = hintText
-            }
-
             feedbackText.observe(viewLifecycleOwner) { feedbackText ->
                 binding.tvFeedback.text = feedbackText
             }
-        }
-
-        val animOut1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", -180f).setDuration(400)
-        val animOut2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", -360f).setDuration(400)
-        val animOut3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", -540f).setDuration(400)
-        val animOut4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", -720f).setDuration(400)
-        val anim1In1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", 0f).setDuration(400)
-        val anim1In2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", 0f).setDuration(400)
-        val anim1In3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", 0f).setDuration(400)
-        val anim1In4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", 0f).setDuration(400)
-
-        binding.btnSelectHint.setOnClickListener {
-            if (isHintOpen) {
-                anim1In1.start()
-                anim1In2.start()
-                anim1In3.start()
-                anim1In4.start()
-            } else {
-                animOut1.start()
-                animOut2.start()
-                animOut3.start()
-                animOut4.start()
-            }
-            isHintOpen = isHintOpen.not()
         }
     }
 

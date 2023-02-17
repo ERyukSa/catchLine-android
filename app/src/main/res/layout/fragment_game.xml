@@ -58,16 +58,16 @@
             app:layout_constraintTop_toBottomOf="@id/tv_hint" />
 
         <com.google.android.exoplayer2.ui.PlayerControlView
-            app:controller_layout_id="@layout/audio_time_bar_game"
             android:id="@+id/player_view_line"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintWidth_percent="0.7"
             android:layout_marginTop="4dp"
-            app:show_timeout="0"
+            app:controller_layout_id="@layout/audio_time_bar_game"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/view_pager_poster" />
+            app:layout_constraintTop_toBottomOf="@id/view_pager_poster"
+            app:layout_constraintWidth_percent="0.7"
+            app:show_timeout="0" />
 
         <TextView
             android:id="@+id/tv_feedback"
@@ -88,11 +88,11 @@
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:background="@drawable/circle_button"
+            android:contentDescription="@string/game_description_play_line"
             android:elevation="4dp"
             android:padding="16dp"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_play_24"
-            android:contentDescription="@string/game_description_play_line"
             app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -113,17 +113,17 @@
 
         <TextView
             android:id="@+id/tv_available_hint_count"
+            hintCount="@{viewModel.availableHintCount}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            hintCount="@{viewModel.availableHintCount}"
-            tools:text="남은 힌트: 10개"
             android:textColor="@color/black"
             android:textSize="11sp"
-            android:layout_marginTop="4dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_select_hint"
             app:layout_constraintEnd_toEndOf="@id/btn_select_hint"
-            app:layout_constraintStart_toStartOf="@id/btn_select_hint" />
+            app:layout_constraintStart_toStartOf="@id/btn_select_hint"
+            app:layout_constraintTop_toBottomOf="@id/btn_select_hint"
+            tools:text="남은 힌트: 10개" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_change_line"
@@ -161,8 +161,8 @@
             android:id="@+id/btn_submit_title"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:src="@drawable/icon_submit_24"
             android:contentDescription="@string/game_description_submit"
+            android:src="@drawable/icon_submit_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
@@ -174,66 +174,66 @@
             android:background="@drawable/circle_button"
             android:elevation="4dp"
             android:maxLines="1"
-            android:padding="0dp"
-            android:text="@string/game_line2"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            app:layout_constraintTop_toTopOf="@id/btn_select_hint"
-            app:layout_constraintBottom_toBottomOf="@id/btn_select_hint"
-            app:layout_constraintDimensionRatio="w,1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_select_hint"
-            app:layout_constraintStart_toStartOf="@id/btn_select_hint"/>
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_line2"
+            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_characters_count"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/circle_button"
             android:elevation="4dp"
             android:maxLines="1"
-            android:padding="0dp"
-            android:text="@string/game_characters_count"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/btn_hint_line2"
-            app:layout_constraintTop_toTopOf="@id/btn_hint_line2"
-            app:layout_constraintDimensionRatio="w,1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_hint_line2"
-            app:layout_constraintStart_toStartOf="@id/btn_hint_line2"/>
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_characters_count"
+            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_first_character"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/circle_button"
             android:contentDescription="@string/game_description_change_line"
             android:elevation="4dp"
             android:maxLines="1"
-            android:padding="0dp"
-            android:text="@string/game_first_character"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/btn_hint_line2"
-            app:layout_constraintTop_toTopOf="@id/btn_hint_line2"
-            app:layout_constraintDimensionRatio="w,1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_hint_line2"
-            app:layout_constraintStart_toStartOf="@id/btn_hint_line2"/>
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_first_character"
+            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_clearer_poster"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/circle_button"
             android:elevation="4dp"
             android:maxLines="1"
-            android:padding="0dp"
-            android:text="@string/game_clearer_poster"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/btn_hint_line2"
-            app:layout_constraintTop_toTopOf="@id/btn_hint_line2"
-            app:layout_constraintDimensionRatio="w,1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_hint_line2"
-            app:layout_constraintStart_toStartOf="@id/btn_hint_line2"/>
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_clearer_poster"
+            app:layout_constraintBottom_toBottomOf="@id/btn_select_hint"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_select_hint"
+            app:layout_constraintStart_toStartOf="@id/btn_select_hint"
+            app:layout_constraintTop_toTopOf="@id/btn_select_hint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

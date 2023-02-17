@@ -20,10 +20,6 @@ class GameViewModel : ViewModel() {
     private val gameItemsForEasyAccess: List<GameItem>
         get() = _gameItems.value ?: emptyList()
 
-    private val _hintText = MutableLiveData<String>()
-    val hintText: LiveData<String>
-        get() = _hintText
-
     private val _feedbackText = MutableLiveData<String>()
     val feedbackText: LiveData<String>
         get() = _feedbackText

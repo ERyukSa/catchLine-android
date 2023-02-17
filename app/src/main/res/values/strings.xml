@@ -6,6 +6,8 @@
     <string name="exit">종료 하기</string>
 
     <string name="game_listen_and_guess">대사를 듣고 제목을 맞혀보세요!</string>
+    <string name="game_hint_text_first_character">첫 글자: %c</string>
+    <string name="game_hint_text_characters_count">글자 수: %d</string>
     <string name="game_input_title">제목을 입력하세요</string>
     <string name="game_description_select_hint">힌트 선택</string>
     <string name="game_description_change_line">대사 변경</string>
