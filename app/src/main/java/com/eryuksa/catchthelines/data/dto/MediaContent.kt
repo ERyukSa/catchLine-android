@@ -1,9 +1,9 @@
 package com.eryuksa.catchthelines.data.dto
 
-import com.eryuksa.catchthelines.ui.game.GameItem
+import com.eryuksa.catchthelines.ui.game.model.GameItem
 import com.google.gson.annotations.SerializedName
 
-data class Contents(
+data class MediaContent(
     @SerializedName("id") val id: String,
     @SerializedName("title") val title: String,
     @SerializedName("posterUrl") val posterUrl: String,

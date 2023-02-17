@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.data.remote
+package com.eryuksa.catchthelines.data.datasource
 
 import com.eryuksa.catchline_android.BuildConfig
 import com.google.gson.GsonBuilder

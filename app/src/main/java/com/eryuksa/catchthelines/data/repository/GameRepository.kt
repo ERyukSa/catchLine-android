@@ -1,18 +1,21 @@
 package com.eryuksa.catchthelines.data.repository
 
-import com.eryuksa.catchthelines.data.dto.Contents
-import com.eryuksa.catchthelines.data.remote.Retrofit
+import com.eryuksa.catchthelines.data.datasource.GameLocalDataSource
+import com.eryuksa.catchthelines.data.datasource.GameRemoteDataSource
+import com.eryuksa.catchthelines.data.dto.MediaContent
+import kotlinx.coroutines.flow.Flow
 
-class GameRepository {
+class GameRepository(
+    private val remoteDataSource: GameRemoteDataSource,
+    private val localDataSource: GameLocalDataSource
+) {
 
-    private val gameApi = Retrofit.getApi(RetrofitGameApi::class.java)
+    suspend fun getMediaContents(): List<MediaContent> =
+        remoteDataSource.getMediaContents()
 
-    suspend fun getGameItems(): List<Contents> {
-        val response = gameApi.getGameItems()
-        return if (response.isSuccessful) {
-            response.body()?.values?.toList() ?: emptyList()
-        } else {
-            emptyList()
-        }
-    }
+    suspend fun getAvailableHintCount(): Flow<Int> =
+        localDataSource.getAvailableHintCount()
+
+    suspend fun decreaseHintCount() =
+        localDataSource.decreaseHintCount()
 }

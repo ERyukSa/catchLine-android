@@ -13,6 +13,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.common.removeOverScroll
+import com.eryuksa.catchthelines.di.GameViewModelFactory
+import com.eryuksa.catchthelines.ui.game.model.GameItem
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
@@ -22,7 +24,7 @@ class GameFragment : Fragment() {
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding!!
-    private val viewModel: GameViewModel by viewModels()
+    private val viewModel: GameViewModel by viewModels { GameViewModelFactory(requireContext()) }
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
         PosterViewPagerAdapter()
@@ -103,14 +105,22 @@ class GameFragment : Fragment() {
             )
         }
 
-        val animOut1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", -168f).setDuration(400)
-        val animOut2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", -340f).setDuration(400)
-        val animOut3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", -520f).setDuration(400)
-        val animOut4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", -700f).setDuration(400)
-        val anim1In1 = ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", 0f).setDuration(400)
-        val anim1In2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", 0f).setDuration(400)
-        val anim1In3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", 0f).setDuration(400)
-        val anim1In4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", 0f).setDuration(400)
+        val animOut1 =
+            ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", -168f).setDuration(400)
+        val animOut2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", -340f)
+            .setDuration(400)
+        val animOut3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", -520f)
+            .setDuration(400)
+        val animOut4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", -700f)
+            .setDuration(400)
+        val anim1In1 =
+            ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", 0f).setDuration(400)
+        val anim1In2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", 0f)
+            .setDuration(400)
+        val anim1In3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", 0f)
+            .setDuration(400)
+        val anim1In4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", 0f)
+            .setDuration(400)
 
         binding.btnSelectHint.setOnClickListener {
             if (isHintOpen) {

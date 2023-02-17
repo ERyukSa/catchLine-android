@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eryuksa.catchthelines.data.dto.Contents
+import com.eryuksa.catchthelines.data.dto.MediaContent
 import com.eryuksa.catchthelines.data.repository.GameRepository
+import com.eryuksa.catchthelines.ui.game.model.GameItem
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class GameViewModel : ViewModel() {
-
-    private val repository = GameRepository()
+class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
     var currentPagePosition = 0
 
@@ -30,7 +30,8 @@ class GameViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _gameItems.value = repository.getGameItems().map(Contents::toGameItem)
+            _gameItems.value = repository.getMediaContents().map(MediaContent::toGameItem)
+            repository.getAvailableHintCount().collectLatest { _availableHintCount.value = it }
         }
     }
 
@@ -38,10 +39,10 @@ class GameViewModel : ViewModel() {
         availableHintCount.value?.let { hintCount ->
             if (hintCount <= 0) return
 
+            viewModelScope.launch { repository.decreaseHintCount() }
             val changedGameItem =
                 gameItemsForEasyAccess[currentPagePosition].copy(blurDegree = CLEARER_BLUR_DEGREE)
             _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
-            _availableHintCount.value = hintCount - 1
         }
     }
 

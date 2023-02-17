@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.ui.game
+package com.eryuksa.catchthelines.ui.game.model
 
 data class GameItem(
     val id: String,
