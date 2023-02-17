@@ -12,14 +12,12 @@ class GameViewModel : ViewModel() {
 
     private val repository = GameRepository()
 
-    private val _currentPagePosition = MutableLiveData<Int>()
-    val currentPagePosition: LiveData<Int>
-        get() = _currentPagePosition
+    var currentPagePosition = 0
 
     private val _gameItems = MutableLiveData<List<GameItem>>()
     val gameItems: LiveData<List<GameItem>>
         get() = _gameItems
-    private val gameItemsForEasyAccess
+    private val gameItemsForEasyAccess: List<GameItem>
         get() = _gameItems.value ?: emptyList()
 
     private val _hintText = MutableLiveData<String>()
@@ -30,7 +28,7 @@ class GameViewModel : ViewModel() {
     val feedbackText: LiveData<String>
         get() = _feedbackText
 
-    private val _availableHintCount = MutableLiveData<Int>()
+    private val _availableHintCount = MutableLiveData<Int>(10)
     val availableHintCount: LiveData<Int>
         get() = _availableHintCount
 
@@ -40,19 +38,24 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun changePage(position: Int) {
-        _currentPagePosition.value = position
-    }
+    fun useHintClearerPoster() {
+        availableHintCount.value?.let { hintCount ->
+            if (hintCount <= 0) return
 
-    fun changeCurrentPosterBlurDegree(degree: Int) {
-        val currentPosition = _currentPagePosition.value ?: throw IllegalStateException()
-        val changedGameItem = gameItemsForEasyAccess.getOrNull(currentPosition)
-            ?.copy(blurDegree = degree) ?: throw IllegalStateException()
-        _gameItems.value = gameItemsForEasyAccess.map { originalItem ->
-            if (originalItem.id == changedGameItem.id) changedGameItem else originalItem
+            val changedGameItem =
+                gameItemsForEasyAccess[currentPagePosition].copy(blurDegree = CLEARER_BLUR_DEGREE)
+            _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
+            _availableHintCount.value = hintCount - 1
         }
     }
 
+    private fun List<GameItem>.replaceOldItem(newItem: GameItem): List<GameItem> =
+        this.map { oldItem -> if (oldItem.id == newItem.id) newItem else oldItem }
+
     fun checkUserInputMatchedWithAnswer() {
+    }
+
+    companion object {
+        private const val CLEARER_BLUR_DEGREE = 2
     }
 }

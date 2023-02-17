@@ -36,7 +36,9 @@ class GameFragment : Fragment() {
 
     private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            viewModel.changePage(position)
+            stopLineAudioProcess()
+            audioPlayer.seekTo(position, 0)
+            viewModel.currentPagePosition = position
         }
     }
     var isHintOpen = false
@@ -46,7 +48,11 @@ class GameFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentGameBinding.inflate(inflater, container, false)
+        _binding = FragmentGameBinding.inflate(inflater, container, false).apply {
+            viewModel = this@GameFragment.viewModel
+            lifecycleOwner = viewLifecycleOwner
+            playerViewLine.player = audioPlayer
+        }
         binding.playerViewLine.player = audioPlayer
         initPosterViewPager()
         initOnClickListener()
@@ -59,9 +65,10 @@ class GameFragment : Fragment() {
     }
 
     private fun initPosterViewPager() {
-        binding.viewPagerPoster.apply {
+        binding.viewPagerPoster.run {
             offscreenPageLimit = 3
             adapter = posterAdapter
+            this.setCurrentItem(viewModel.currentPagePosition, false)
             this.removeOverScroll()
             this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
             setPageTransformer(buildPageTransformer())
@@ -82,7 +89,7 @@ class GameFragment : Fragment() {
         }
 
         binding.btnHintClearerPoster.setOnClickListener {
-            viewModel.changeCurrentPosterBlurDegree(2)
+            viewModel.useHintClearerPoster()
         }
     }
 
@@ -125,15 +132,6 @@ class GameFragment : Fragment() {
 
             feedbackText.observe(viewLifecycleOwner) { feedbackText ->
                 binding.tvFeedback.text = feedbackText
-            }
-
-            availableHintCount.observe(viewLifecycleOwner) { hintCount ->
-                binding.tvAvailableHintCount.text = hintCount.toString()
-            }
-
-            currentPagePosition.observe(viewLifecycleOwner) { position ->
-                stopLineAudioProcess()
-                audioPlayer.seekTo(position, 0)
             }
         }
 
