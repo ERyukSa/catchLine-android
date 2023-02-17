@@ -31,7 +31,8 @@ class GameFragment : Fragment() {
     private val audioPlayer: ExoPlayer by lazy {
         ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
     }
-    private var gameItems: List<GameItem> = emptyList()
+    private val gameItems: List<GameItem>
+        get() = viewModel.gameItems.value ?: emptyList()
 
     private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
@@ -113,9 +114,8 @@ class GameFragment : Fragment() {
 
     private fun observeData() {
         with(viewModel) {
-            gameItems.observe(viewLifecycleOwner) { gameItems ->
-                posterAdapter.submitList(gameItems)
-                this@GameFragment.gameItems = gameItems
+            gameItems.observe(viewLifecycleOwner) { items ->
+                posterAdapter.submitList(items)
                 audioPlayer.setUpLines()
             }
 

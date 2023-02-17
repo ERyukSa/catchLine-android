@@ -16,10 +16,11 @@ class GameViewModel : ViewModel() {
     val currentPagePosition: LiveData<Int>
         get() = _currentPagePosition
 
-    private var gameItemList = emptyList<GameItem>()
     private val _gameItems = MutableLiveData<List<GameItem>>()
     val gameItems: LiveData<List<GameItem>>
         get() = _gameItems
+    private val gameItemsForEasyAccess
+        get() = _gameItems.value ?: emptyList()
 
     private val _hintText = MutableLiveData<String>()
     val hintText: LiveData<String>
@@ -35,8 +36,7 @@ class GameViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            gameItemList = repository.getGameItems().map(Contents::toGameItem)
-            _gameItems.value = gameItemList
+            _gameItems.value = repository.getGameItems().map(Contents::toGameItem)
         }
     }
 
@@ -46,11 +46,11 @@ class GameViewModel : ViewModel() {
 
     fun changeCurrentPosterBlurDegree(degree: Int) {
         val currentPosition = _currentPagePosition.value ?: throw IllegalStateException()
-        val changedGameItem = gameItemList.getOrNull(currentPosition)?.copy(blurDegree = degree) ?: throw IllegalStateException()
-        gameItemList = gameItemList.map { item ->
-            if (item.id == changedGameItem.id) changedGameItem else item
+        val changedGameItem = gameItemsForEasyAccess.getOrNull(currentPosition)
+            ?.copy(blurDegree = degree) ?: throw IllegalStateException()
+        _gameItems.value = gameItemsForEasyAccess.map { originalItem ->
+            if (originalItem.id == changedGameItem.id) changedGameItem else originalItem
         }
-        _gameItems.value = gameItemList
     }
 
     fun checkUserInputMatchedWithAnswer() {
