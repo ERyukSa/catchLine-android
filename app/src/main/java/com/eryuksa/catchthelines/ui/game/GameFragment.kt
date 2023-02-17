@@ -36,14 +36,7 @@ class GameFragment : Fragment() {
     private val gameItems: List<GameItem>
         get() = viewModel.gameItems.value ?: emptyList()
 
-    private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
-        override fun onPageSelected(position: Int) {
-            stopLineAudioProcess()
-            audioPlayer.seekTo(position, 0)
-            viewModel.currentPagePosition = position
-        }
-    }
-    var isHintOpen = false
+    private var isHintOpen = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -138,8 +131,29 @@ class GameFragment : Fragment() {
         }
     }
 
+    private fun observeData() {
+        with(viewModel) {
+            gameItems.observe(viewLifecycleOwner) { items ->
+                posterAdapter.submitList(items)
+                audioPlayer.setUpLines()
+            }
+
+            feedbackText.observe(viewLifecycleOwner) { feedbackText ->
+                binding.tvFeedback.text = feedbackText
+            }
+        }
+    }
+
     private fun ViewPager2.setHorizontalPadding(padding: Int) {
         this.setPadding(padding, 0, padding, 0)
+    }
+
+    private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            stopLineAudioProcess()
+            audioPlayer.seekTo(position, 0)
+            viewModel.currentPagePosition = position
+        }
     }
 
     private fun buildPageTransformer(): CompositePageTransformer {
@@ -162,19 +176,6 @@ class GameFragment : Fragment() {
     private fun startLineAudioProcess() {
         audioPlayer.play()
         binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24)
-    }
-
-    private fun observeData() {
-        with(viewModel) {
-            gameItems.observe(viewLifecycleOwner) { items ->
-                posterAdapter.submitList(items)
-                audioPlayer.setUpLines()
-            }
-
-            feedbackText.observe(viewLifecycleOwner) { feedbackText ->
-                binding.tvFeedback.text = feedbackText
-            }
-        }
     }
 
     private fun ExoPlayer.setUpLines() {

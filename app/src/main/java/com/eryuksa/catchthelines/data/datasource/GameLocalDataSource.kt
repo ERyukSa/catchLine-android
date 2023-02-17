@@ -16,13 +16,17 @@ class GameLocalDataSource(private val context: Context) {
 
     suspend fun getAvailableHintCount(): Flow<Int> =
         context.hintDataStore.data.map { preference ->
-            preference[HINT_COUNT_KEY] ?: 10
+            preference[HINT_COUNT_KEY] ?: MAX_HINT_COUNT
         }
 
     suspend fun decreaseHintCount() {
         context.hintDataStore.edit { preference ->
-            val hintCount = preference[HINT_COUNT_KEY] ?: return@edit
+            val hintCount = preference[HINT_COUNT_KEY] ?: MAX_HINT_COUNT
             preference[HINT_COUNT_KEY] = hintCount - 1
         }
+    }
+
+    companion object {
+        private const val MAX_HINT_COUNT = 10
     }
 }
