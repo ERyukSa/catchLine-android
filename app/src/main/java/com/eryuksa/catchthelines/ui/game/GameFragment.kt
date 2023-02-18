@@ -12,9 +12,9 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
-import com.eryuksa.catchthelines.common.removeOverScroll
+import com.eryuksa.catchthelines.data.dto.GameItem
 import com.eryuksa.catchthelines.di.GameViewModelFactory
-import com.eryuksa.catchthelines.ui.game.model.GameItem
+import com.eryuksa.catchthelines.ui.removeOverScroll
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
@@ -24,7 +24,9 @@ class GameFragment : Fragment() {
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding!!
-    private val viewModel: GameViewModel by viewModels { GameViewModelFactory(requireContext()) }
+    private val viewModel: GameViewModel by viewModels {
+        GameViewModelFactory(requireContext().applicationContext)
+    }
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
         PosterViewPagerAdapter()
@@ -179,11 +181,11 @@ class GameFragment : Fragment() {
     }
 
     private fun ExoPlayer.setUpLines() {
-        audioPlayer.addMediaItems(
+        this.addMediaItems(
             gameItems.map { item ->
                 MediaItem.fromUri(item.lineAudioUrls[0])
             }
         )
-        audioPlayer.prepare()
+        this.prepare()
     }
 }

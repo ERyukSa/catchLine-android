@@ -1,6 +1,5 @@
 package com.eryuksa.catchthelines.data.dto
 
-import com.eryuksa.catchthelines.ui.game.model.GameItem
 import com.google.gson.annotations.SerializedName
 
 data class MediaContent(

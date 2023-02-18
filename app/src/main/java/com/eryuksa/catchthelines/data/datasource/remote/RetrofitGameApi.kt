@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.data.datasource
+package com.eryuksa.catchthelines.data.datasource.remote
 
 import com.eryuksa.catchthelines.data.dto.MediaContent
 import retrofit2.Response
