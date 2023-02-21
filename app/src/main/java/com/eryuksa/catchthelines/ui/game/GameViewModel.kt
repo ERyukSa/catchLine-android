@@ -57,10 +57,12 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
     fun checkUserCatchTheLine(userInput: String) {
         val gameItem = gameItemsForEasyAccess[currentPagePosition.value ?: return]
-        _feedbackUiState.value = if (userInput.contains(gameItem.title)) {
-            UserCaughtTheLine(R.string.game_feedback_catch_the_line, gameItem.title)
+        if (userInput.contains(gameItem.title)) {
+            _gameItems.value = gameItemsForEasyAccess.replaceOldItem(gameItem.copy(blurDegree = 0))
+            _feedbackUiState.value =
+                UserCaughtTheLine(R.string.game_feedback_catch_the_line, gameItem.title)
         } else {
-            UserInputWrong(R.string.game_feedback_wrong, userInput)
+            _feedbackUiState.value = UserInputWrong(R.string.game_feedback_wrong, userInput)
         }
     }
 

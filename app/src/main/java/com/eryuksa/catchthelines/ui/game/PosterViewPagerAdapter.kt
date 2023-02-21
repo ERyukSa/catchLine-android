@@ -30,11 +30,15 @@ class PosterViewPagerAdapter :
         fun bind(gameItem: GameItem) {
             Glide.with(itemView.context)
                 .load(gameItem.posterUrl)
-                .apply(
-                    RequestOptions.bitmapTransform(
-                        BlurTransformation(25, gameItem.blurDegree)
-                    )
-                )
+                .apply {
+                    if (gameItem.blurDegree > 0) {
+                        this.apply(
+                            RequestOptions.bitmapTransform(
+                                BlurTransformation(25, 6)
+                            )
+                        )
+                    }
+                }
                 .into(binding.ivPoster)
         }
     }

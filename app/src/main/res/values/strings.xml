@@ -19,8 +19,8 @@
     <string name="game_clearer_poster">선명함</string>
     <string name="game_available_hint_count">남은 힌트: %d개</string>
     <string name="game_description_submit">제출하기</string>
-    <string name="game_feedback_catch_the_line">\'%s\' ✅</string>
-    <string name="game_feedback_wrong">\`%s\` ❌</string>
+    <string name="game_feedback_catch_the_line">%s ✅</string>
+    <string name="game_feedback_wrong">%s ❌</string>
 
     <string name="poster_description">컨텐츠의 메인 포스터</string>
 </resources>
