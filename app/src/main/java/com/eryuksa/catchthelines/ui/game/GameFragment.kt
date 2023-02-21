@@ -67,7 +67,6 @@ class GameFragment : Fragment() {
         binding.viewPagerPoster.run {
             offscreenPageLimit = 3
             adapter = posterAdapter
-            this.setCurrentItem(viewModel.currentPagePosition, false)
             this.removeOverScroll()
             this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
             setPageTransformer(buildPageTransformer())
@@ -89,13 +88,13 @@ class GameFragment : Fragment() {
 
     private fun initOnClickListener() {
         binding.btnSubmitTitle.setOnClickListener {
-            viewModel.checkUserInputMatchedWithAnswer()
+            viewModel.checkUserCatchTheLine(binding.edittextInputTitle.text.toString())
         }
 
         binding.btnPlayStop.setOnClickListener {
             when (audioPlayer.isPlaying) {
-                true -> stopLineAudioProcess()
-                false -> startLineAudioProcess()
+                true -> stopLineAudio()
+                false -> startLineAudio()
             }
         }
 
@@ -103,16 +102,16 @@ class GameFragment : Fragment() {
             viewModel.useHintClearerPoster()
         }
         binding.btnHintFirstCharacter.setOnClickListener {
-            binding.tvHint.text = getString(
+/*            binding.tvHint.text = getString(
                 R.string.game_hint_text_first_character,
                 gameItems[viewModel.currentPagePosition].title.first()
-            )
+            )*/
         }
         binding.btnHintCharactersCount.setOnClickListener {
-            binding.tvHint.text = getString(
+/*            binding.tvHint.text = getString(
                 R.string.game_hint_text_characters_count,
                 gameItems[viewModel.currentPagePosition].title.length
-            )
+            )*/
         }
 
         binding.btnOpenHint.setOnClickListener {
@@ -132,8 +131,15 @@ class GameFragment : Fragment() {
                 audioPlayer.setUpLines()
             }
 
-            feedbackText.observe(viewLifecycleOwner) { feedbackText ->
-                binding.tvFeedback.text = feedbackText
+            feedbackUiState.observe(viewLifecycleOwner) { feedbackUiState ->
+                with(feedbackUiState) {
+                    binding.tvFeedback.text = getString(stringResId, stringParam)
+                }
+            }
+
+            currentPagePosition.observe(viewLifecycleOwner) { position ->
+                stopLineAudio()
+                audioPlayer.seekTo(position, 0)
             }
         }
     }
@@ -144,9 +150,7 @@ class GameFragment : Fragment() {
 
     private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            stopLineAudioProcess()
-            audioPlayer.seekTo(position, 0)
-            viewModel.currentPagePosition = position
+            viewModel.movePagePosition(position)
         }
     }
 
@@ -162,12 +166,12 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun stopLineAudioProcess() {
+    private fun stopLineAudio() {
         audioPlayer.pause()
         binding.btnPlayStop.setImageResource(R.drawable.icon_play_24)
     }
 
-    private fun startLineAudioProcess() {
+    private fun startLineAudio() {
         audioPlayer.play()
         binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24)
     }
