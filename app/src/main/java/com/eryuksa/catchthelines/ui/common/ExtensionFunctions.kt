@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.ui
+package com.eryuksa.catchthelines.ui.common
 
 import android.view.View
 import androidx.viewpager2.widget.ViewPager2

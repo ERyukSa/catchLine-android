@@ -1,10 +1,10 @@
 package com.eryuksa.catchthelines.ui.game
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.CompositePageTransformer
@@ -14,7 +14,8 @@ import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.data.dto.GameItem
 import com.eryuksa.catchthelines.di.GameViewModelFactory
-import com.eryuksa.catchthelines.ui.removeOverScroll
+import com.eryuksa.catchthelines.ui.common.ButtonOpener
+import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
@@ -38,6 +39,7 @@ class GameFragment : Fragment() {
     private val gameItems: List<GameItem>
         get() = viewModel.gameItems.value ?: emptyList()
 
+    private lateinit var hintButtonsOpener: ButtonOpener
     private var isHintOpen = false
 
     override fun onCreateView(
@@ -52,6 +54,7 @@ class GameFragment : Fragment() {
         }
         initPosterViewPager()
         initOnClickListener()
+        initHintButtonsAnimation()
         return binding.root
     }
 
@@ -69,6 +72,18 @@ class GameFragment : Fragment() {
             this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
             setPageTransformer(buildPageTransformer())
             registerOnPageChangeCallback(switchAudioLineOnPageChange)
+        }
+    }
+
+    private fun initHintButtonsAnimation() {
+        binding.btnOpenHint.doOnLayout {
+            hintButtonsOpener = ButtonOpener(initialCeilHeight = binding.btnOpenHint.height, margin = 20, duration = 400)
+            hintButtonsOpener.run {
+                addInnerButton(binding.btnHintClearerPoster)
+                addInnerButton(binding.btnHintFirstCharacter)
+                addInnerButton(binding.btnHintCharactersCount)
+                addInnerButton(binding.btnHintAnotherLine)
+            }
         }
     }
 
@@ -100,34 +115,11 @@ class GameFragment : Fragment() {
             )
         }
 
-        val animOut1 =
-            ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", -168f).setDuration(400)
-        val animOut2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", -340f)
-            .setDuration(400)
-        val animOut3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", -520f)
-            .setDuration(400)
-        val animOut4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", -700f)
-            .setDuration(400)
-        val anim1In1 =
-            ObjectAnimator.ofFloat(binding.btnHintLine2, "TranslationY", 0f).setDuration(400)
-        val anim1In2 = ObjectAnimator.ofFloat(binding.btnHintCharactersCount, "TranslationY", 0f)
-            .setDuration(400)
-        val anim1In3 = ObjectAnimator.ofFloat(binding.btnHintFirstCharacter, "TranslationY", 0f)
-            .setDuration(400)
-        val anim1In4 = ObjectAnimator.ofFloat(binding.btnHintClearerPoster, "TranslationY", 0f)
-            .setDuration(400)
-
-        binding.btnSelectHint.setOnClickListener {
+        binding.btnOpenHint.setOnClickListener {
             if (isHintOpen) {
-                anim1In1.start()
-                anim1In2.start()
-                anim1In3.start()
-                anim1In4.start()
+                hintButtonsOpener.closeButtons()
             } else {
-                animOut1.start()
-                animOut2.start()
-                animOut3.start()
-                animOut4.start()
+                hintButtonsOpener.openButtons()
             }
             isHintOpen = isHintOpen.not()
         }
