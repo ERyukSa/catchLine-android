@@ -21,6 +21,7 @@
     <string name="game_description_submit">제출하기</string>
     <string name="game_feedback_catch_the_line">%s ✅</string>
     <string name="game_feedback_wrong">%s ❌</string>
+    <string name="game_feedback_no_input" />
 
     <string name="poster_description">컨텐츠의 메인 포스터</string>
 </resources>

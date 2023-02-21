@@ -1,5 +1,6 @@
 package com.eryuksa.catchthelines.data.dto
 
+import com.eryuksa.catchthelines.ui.game.uistate.NoInput
 import com.google.gson.annotations.SerializedName
 
 data class MediaContent(
@@ -10,5 +11,5 @@ data class MediaContent(
 ) {
 
     fun toGameItem(): GameItem =
-        GameItem(id, title, posterUrl, lineAudioUrls)
+        GameItem(id, title, posterUrl, lineAudioUrls, blurDegree = 6, feedbackUiState = NoInput)
 }

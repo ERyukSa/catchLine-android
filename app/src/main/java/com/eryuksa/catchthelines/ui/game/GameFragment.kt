@@ -16,6 +16,9 @@ import com.eryuksa.catchthelines.data.dto.GameItem
 import com.eryuksa.catchthelines.di.GameViewModelFactory
 import com.eryuksa.catchthelines.ui.common.ButtonOpener
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
+import com.eryuksa.catchthelines.ui.game.uistate.NoInput
+import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
+import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
@@ -132,9 +135,15 @@ class GameFragment : Fragment() {
             }
 
             feedbackUiState.observe(viewLifecycleOwner) { feedbackUiState ->
-                with(feedbackUiState) {
-                    binding.tvFeedback.text = getString(stringResId, stringParam)
+                binding.tvFeedback.text = when (feedbackUiState) {
+                    is UserCaughtTheLine ->
+                        getString(R.string.game_feedback_catch_the_line, feedbackUiState.title)
+                    is UserInputWrong ->
+                        getString(R.string.game_feedback_wrong, feedbackUiState.userInput)
+                    is NoInput -> ""
                 }
+
+                binding.btnSubmitTitle.isEnabled = (feedbackUiState is UserCaughtTheLine).not()
             }
 
             currentPagePosition.observe(viewLifecycleOwner) { position ->

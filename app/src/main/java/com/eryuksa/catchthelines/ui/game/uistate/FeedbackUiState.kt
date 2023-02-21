@@ -1,13 +1,7 @@
 package com.eryuksa.catchthelines.ui.game.uistate
 
-import androidx.annotation.StringRes
+sealed interface FeedbackUiState
 
-sealed class FeedbackUiState(
-    @StringRes val stringResId: Int,
-    val stringParam: String
-)
-
-class UserCaughtTheLine(@StringRes stringResId: Int, stringParam: String) :
-    FeedbackUiState(stringResId, stringParam)
-class UserInputWrong(@StringRes stringResId: Int, stringParam: String) :
-    FeedbackUiState(stringResId, stringParam)
+class UserCaughtTheLine(val title: String) : FeedbackUiState
+class UserInputWrong(val userInput: String) : FeedbackUiState
+object NoInput : FeedbackUiState
