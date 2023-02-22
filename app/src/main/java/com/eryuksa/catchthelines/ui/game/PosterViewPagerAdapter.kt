@@ -11,7 +11,7 @@ import com.eryuksa.catchline_android.databinding.ItemPosterBinding
 import com.eryuksa.catchthelines.ui.game.uistate.GameItem
 import jp.wasabeef.glide.transformations.BlurTransformation
 
-class PosterViewPagerAdapter :
+class PosterViewPagerAdapter(private val onClickPoster: (position: Int) -> Unit) :
     ListAdapter<GameItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
@@ -24,10 +24,18 @@ class PosterViewPagerAdapter :
         holder.bind(getItem(position))
     }
 
-    class PosterViewHolder(private val binding: ItemPosterBinding) :
+    inner class PosterViewHolder(private val binding: ItemPosterBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        init {
+            binding.ivPoster.setOnClickListener {
+                onClickPoster(layoutPosition)
+            }
+        }
+
         fun bind(gameItem: GameItem) {
+            binding.ivPoster.isClickable = gameItem.isClickable
+
             Glide.with(itemView.context)
                 .load(gameItem.posterUrl)
                 .apply {

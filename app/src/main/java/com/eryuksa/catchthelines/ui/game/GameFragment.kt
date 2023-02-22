@@ -35,7 +35,9 @@ class GameFragment : Fragment() {
     }
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
-        PosterViewPagerAdapter()
+        PosterViewPagerAdapter { position ->
+            viewModel.onPosterClick()
+        }
     }
 
     private val audioPlayer: ExoPlayer by lazy {

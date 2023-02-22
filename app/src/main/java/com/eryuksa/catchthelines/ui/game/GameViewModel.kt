@@ -1,5 +1,6 @@
 package com.eryuksa.catchthelines.ui.game
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -86,6 +87,13 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
         }
         _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
     }
+
+    fun onPosterClick() {
+        viewModelScope.launch {
+            val a = repository.getContentDetail(343611)
+            Log.d("로그", "ContentDetail: $a")
+        }
+    }
 }
 
 private fun MediaContent.toGameItem(): GameItem =
@@ -95,7 +103,7 @@ private fun MediaContent.toGameItem(): GameItem =
         posterUrl,
         lineAudioUrls,
         feedbackUiState = NoInput,
-        usedHints = emptySet()
+        usedHints = emptySet(),
     )
 
 private fun List<GameItem>.replaceOldItem(newItem: GameItem): List<GameItem> =
