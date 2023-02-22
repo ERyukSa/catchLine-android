@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:maxLines="2"
-            android:text="범죄 국가 ❌"
+            tools:text="범죄 국가 ❌"
             android:textColor="@color/black"
             app:layout_constraintBottom_toTopOf="@id/btn_play_stop"
             app:layout_constraintEnd_toEndOf="parent"
@@ -99,6 +99,75 @@
             app:layout_constraintTop_toBottomOf="@id/tv_feedback"
             tools:src="@drawable/icon_play_24" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_hint_another_line"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/circle_button"
+            android:elevation="4dp"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_line2"
+            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_hint_characters_count"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@drawable/circle_button"
+            android:elevation="4dp"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_characters_count"
+            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_hint_first_character"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@drawable/circle_button"
+            android:contentDescription="@string/game_description_change_line"
+            android:elevation="4dp"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_first_character"
+            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
+            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_hint_clearer_poster"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@drawable/game_unused_hint_circle_button"
+            android:elevation="4dp"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:text="@string/game_clearer_poster"
+            app:layout_constraintBottom_toBottomOf="@id/btn_open_hint"
+            app:layout_constraintDimensionRatio="h, 1:1"
+            app:layout_constraintEnd_toEndOf="@id/btn_open_hint"
+            app:layout_constraintStart_toStartOf="@id/btn_open_hint"
+            app:layout_constraintTop_toTopOf="@id/btn_open_hint" />
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_open_hint"
             android:layout_width="wrap_content"
@@ -106,6 +175,7 @@
             android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/game_description_select_hint"
             android:src="@drawable/icon_hint_24"
+            app:borderWidth="0dp"
             app:layout_constraintBottom_toBottomOf="@id/btn_play_stop"
             app:layout_constraintEnd_toStartOf="@id/btn_play_stop"
             app:layout_constraintHorizontal_bias="0.543"
@@ -166,74 +236,5 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_hint_another_line"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/circle_button"
-            android:elevation="4dp"
-            android:maxLines="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:padding="8dp"
-            android:text="@string/game_line2"
-            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintDimensionRatio="h, 1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_hint_characters_count"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:background="@drawable/circle_button"
-            android:elevation="4dp"
-            android:maxLines="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:padding="8dp"
-            android:text="@string/game_characters_count"
-            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintDimensionRatio="h, 1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_hint_first_character"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:background="@drawable/circle_button"
-            android:contentDescription="@string/game_description_change_line"
-            android:elevation="4dp"
-            android:maxLines="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:padding="8dp"
-            android:text="@string/game_first_character"
-            app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintDimensionRatio="h, 1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintStart_toStartOf="@id/btn_hint_clearer_poster"
-            app:layout_constraintTop_toTopOf="@id/btn_hint_clearer_poster" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_hint_clearer_poster"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:background="@drawable/circle_button"
-            android:elevation="4dp"
-            android:maxLines="1"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:padding="8dp"
-            android:text="@string/game_clearer_poster"
-            app:layout_constraintBottom_toBottomOf="@id/btn_open_hint"
-            app:layout_constraintDimensionRatio="h, 1:1"
-            app:layout_constraintEnd_toEndOf="@id/btn_open_hint"
-            app:layout_constraintStart_toStartOf="@id/btn_open_hint"
-            app:layout_constraintTop_toTopOf="@id/btn_open_hint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

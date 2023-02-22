@@ -9,25 +9,27 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GameLocalDataSource(private val context: Context) {
+private val HINT_COUNT_KEY = intPreferencesKey("hint_count")
+private val Context.hintDataStore: DataStore<Preferences> by preferencesDataStore(name = "temp")
 
-    private val HINT_COUNT_KEY = intPreferencesKey("hint_count")
-    private val Context.hintDataStore: DataStore<Preferences> by preferencesDataStore(name = "temp")
+class GameLocalDataSource(private val appContext: Context) {
 
-    fun getAvailableHintCount(): Flow<Int> =
-        context.hintDataStore.data.map { preference ->
+    fun getAvailableHintCount(): Flow<Int> {
+        return appContext.hintDataStore.data.map { preference ->
+            increaseHintCount()
             preference[HINT_COUNT_KEY] ?: MAX_HINT_COUNT
         }
+    }
 
     suspend fun decreaseHintCount() {
-        context.hintDataStore.edit { preference ->
+        appContext.hintDataStore.edit { preference ->
             val hintCount = preference[HINT_COUNT_KEY] ?: MAX_HINT_COUNT
             preference[HINT_COUNT_KEY] = (hintCount - 1).coerceAtLeast(0)
         }
     }
 
     suspend fun increaseHintCount() {
-        context.hintDataStore.edit { preference ->
+        appContext.hintDataStore.edit { preference ->
             val hintCount = preference[HINT_COUNT_KEY] ?: MAX_HINT_COUNT
             preference[HINT_COUNT_KEY] = (hintCount + 1).coerceAtMost(MAX_HINT_COUNT)
         }

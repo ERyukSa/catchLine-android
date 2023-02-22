@@ -5,10 +5,12 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eryuksa.catchthelines.data.dto.GameItem
 import com.eryuksa.catchthelines.data.dto.MediaContent
 import com.eryuksa.catchthelines.data.repository.GameRepository
 import com.eryuksa.catchthelines.ui.game.uistate.FeedbackUiState
+import com.eryuksa.catchthelines.ui.game.uistate.GameItem
+import com.eryuksa.catchthelines.ui.game.uistate.Hint
+import com.eryuksa.catchthelines.ui.game.uistate.NoInput
 import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
 import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
 import kotlinx.coroutines.flow.collectLatest
@@ -39,6 +41,19 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
     val feedbackUiState: LiveData<FeedbackUiState>
         get() = _feedbackUiState
 
+    private val _usedHintState = MediatorLiveData<Set<Hint>>().apply {
+        addSource(_currentPagePosition) { position ->
+            val gameItems = _gameItems.value ?: return@addSource
+            value = gameItems.findUsedHintStateAt(position)
+        }
+        addSource(_gameItems) { items ->
+            val position = _currentPagePosition.value ?: return@addSource
+            value = items.findUsedHintStateAt(position)
+        }
+    }
+    val usedHintState: LiveData<Set<Hint>>
+        get() = _usedHintState
+
     private val _availableHintCount = MutableLiveData<Int>(10)
     val availableHintCount: LiveData<Int>
         get() = _availableHintCount
@@ -57,7 +72,12 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
     fun useHintClearerPoster() {
         val currentPosition = currentPagePosition.value ?: return
         val changedGameItem =
-            gameItemsForEasyAccess[currentPosition].copy(blurDegree = CLEARER_BLUR_DEGREE)
+            with(gameItemsForEasyAccess[currentPosition]) {
+                this.copy(
+                    blurDegree = CLEARER_BLUR_DEGREE,
+                    usedHints = usedHints.toMutableSet().apply { add(Hint.CLEARER_POSTER) }
+                )
+            }
         _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
     }
 
@@ -71,16 +91,33 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
         _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
     }
 
-    private fun List<GameItem>.replaceOldItem(newItem: GameItem): List<GameItem> =
-        this.map { oldItem -> if (oldItem.id == newItem.id) newItem else oldItem }
-
-    private fun List<GameItem>.findFeedbackUiStateAt(index: Int): FeedbackUiState =
-        this.asSequence()
-            .filterIndexed { i, _ -> i == index }
-            .map { it.feedbackUiState }
-            .toList()[0]
-
     companion object {
         private const val CLEARER_BLUR_DEGREE = 2
     }
 }
+
+private fun MediaContent.toGameItem(): GameItem =
+    GameItem(
+        id,
+        title,
+        posterUrl,
+        lineAudioUrls,
+        blurDegree = 6,
+        feedbackUiState = NoInput,
+        usedHints = emptySet()
+    )
+
+private fun List<GameItem>.replaceOldItem(newItem: GameItem): List<GameItem> =
+    this.map { oldItem -> if (oldItem.id == newItem.id) newItem else oldItem }
+
+private fun List<GameItem>.findFeedbackUiStateAt(index: Int): FeedbackUiState =
+    this.asSequence()
+        .filterIndexed { i, _ -> i == index }
+        .map { it.feedbackUiState }
+        .toList()[0]
+
+private fun List<GameItem>.findUsedHintStateAt(index: Int): Set<Hint> =
+    this.asSequence()
+        .filterIndexed { i, _ -> i == index }
+        .map { it.usedHints }
+        .toList()[0]

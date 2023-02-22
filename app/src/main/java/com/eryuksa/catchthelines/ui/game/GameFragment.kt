@@ -7,15 +7,17 @@ import android.view.ViewGroup
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Transformations
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchline_android.R
 import com.eryuksa.catchline_android.databinding.FragmentGameBinding
-import com.eryuksa.catchthelines.data.dto.GameItem
 import com.eryuksa.catchthelines.di.GameViewModelFactory
 import com.eryuksa.catchthelines.ui.common.ButtonOpener
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
+import com.eryuksa.catchthelines.ui.game.uistate.GameItem
+import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import com.eryuksa.catchthelines.ui.game.uistate.NoInput
 import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
 import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
@@ -134,7 +136,7 @@ class GameFragment : Fragment() {
                 audioPlayer.setUpLines()
             }
 
-            feedbackUiState.observe(viewLifecycleOwner) { feedbackUiState ->
+            Transformations.distinctUntilChanged(feedbackUiState).observe(viewLifecycleOwner) { feedbackUiState ->
                 binding.tvFeedback.text = when (feedbackUiState) {
                     is UserCaughtTheLine ->
                         getString(R.string.game_feedback_catch_the_line, feedbackUiState.title)
@@ -149,6 +151,13 @@ class GameFragment : Fragment() {
             currentPagePosition.observe(viewLifecycleOwner) { position ->
                 stopLineAudio()
                 audioPlayer.seekTo(position, 0)
+            }
+
+            Transformations.distinctUntilChanged(usedHintState).observe(viewLifecycleOwner) { usedHints ->
+                when (usedHints.contains(Hint.CLEARER_POSTER)) {
+                    true -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.circle_button)
+                    false -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.game_unused_hint_circle_button)
+                }
             }
         }
     }

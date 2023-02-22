@@ -10,15 +10,15 @@ class GameRepository(
     private val localDataSource: GameLocalDataSource
 ) {
 
-    // private var lastHintCount = 10
-
     suspend fun getMediaContents(): List<MediaContent> =
         remoteDataSource.getMediaContents()
 
-    suspend fun getAvailableHintCount(): Flow<Int> =
+    fun getAvailableHintCount(): Flow<Int> =
         localDataSource.getAvailableHintCount()
 
-    suspend fun decreaseHintCount() {
+    suspend fun decreaseHintCount() =
         localDataSource.decreaseHintCount()
-    }
+
+    suspend fun increaseHintCount() =
+        localDataSource.increaseHintCount()
 }

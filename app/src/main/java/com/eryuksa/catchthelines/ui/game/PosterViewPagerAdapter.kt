@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchline_android.databinding.ItemPosterBinding
-import com.eryuksa.catchthelines.data.dto.GameItem
+import com.eryuksa.catchthelines.ui.game.uistate.GameItem
 import jp.wasabeef.glide.transformations.BlurTransformation
 
 class PosterViewPagerAdapter :
@@ -34,7 +34,7 @@ class PosterViewPagerAdapter :
                     if (gameItem.blurDegree > 0) {
                         this.apply(
                             RequestOptions.bitmapTransform(
-                                BlurTransformation(25, 6)
+                                BlurTransformation(25, gameItem.blurDegree)
                             )
                         )
                     }
@@ -46,7 +46,7 @@ class PosterViewPagerAdapter :
     companion object {
         val diffUtil = object : DiffUtil.ItemCallback<GameItem>() {
             override fun areContentsTheSame(oldItem: GameItem, newItem: GameItem) =
-                oldItem == newItem
+                oldItem.blurDegree == newItem.blurDegree && oldItem.posterUrl == newItem.posterUrl
 
             override fun areItemsTheSame(oldItem: GameItem, newItem: GameItem) =
                 oldItem.id == newItem.id
