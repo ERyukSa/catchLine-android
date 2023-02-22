@@ -71,28 +71,20 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
 
     fun useHintClearerPoster() {
         val currentPosition = currentPagePosition.value ?: return
-        val changedGameItem =
-            with(gameItemsForEasyAccess[currentPosition]) {
-                this.copy(
-                    blurDegree = CLEARER_BLUR_DEGREE,
-                    usedHints = usedHints.toMutableSet().apply { add(Hint.CLEARER_POSTER) }
-                )
-            }
+        val changedGameItem = with(gameItemsForEasyAccess[currentPosition]) {
+            copy(usedHints = this.usedHints.toMutableSet().apply { add(Hint.CLEARER_POSTER) })
+        }
         _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
     }
 
     fun checkUserCatchTheLine(userInput: String) {
         val gameItem = gameItemsForEasyAccess[currentPagePosition.value ?: return]
         val changedGameItem = if (userInput.contains(gameItem.title)) {
-            gameItem.copy(blurDegree = 0, feedbackUiState = UserCaughtTheLine(gameItem.title))
+            gameItem.copy(feedbackUiState = UserCaughtTheLine(gameItem.title))
         } else {
             gameItem.copy(feedbackUiState = UserInputWrong(userInput))
         }
         _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
-    }
-
-    companion object {
-        private const val CLEARER_BLUR_DEGREE = 2
     }
 }
 
@@ -102,7 +94,6 @@ private fun MediaContent.toGameItem(): GameItem =
         title,
         posterUrl,
         lineAudioUrls,
-        blurDegree = 6,
         feedbackUiState = NoInput,
         usedHints = emptySet()
     )

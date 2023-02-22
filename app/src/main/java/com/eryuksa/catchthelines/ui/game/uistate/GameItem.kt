@@ -5,7 +5,20 @@ data class GameItem(
     val title: String,
     val posterUrl: String,
     val lineAudioUrls: List<String>,
-    val blurDegree: Int,
     val feedbackUiState: FeedbackUiState,
     val usedHints: Set<Hint>
-)
+) {
+    val blurDegree: Int
+        get() {
+            return when {
+                feedbackUiState is UserCaughtTheLine -> 0
+                usedHints.contains(Hint.CLEARER_POSTER) -> CLEARER_BLUR_DEGREE
+                else -> DEFAULT_BLUR_DEGREE
+            }
+        }
+
+    companion object {
+        private const val CLEARER_BLUR_DEGREE = 2
+        private const val DEFAULT_BLUR_DEGREE = 6
+    }
+}
