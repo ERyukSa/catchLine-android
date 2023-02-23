@@ -1,7 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_backdrop_poster"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="배경 포스터"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.35"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0"
+        tools:src="@drawable/movie" />
+
+    <ImageView
+        android:id="@+id/iv_main_poster"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="메인 포스터"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4"
+        app:layout_constraintWidth_percent="0.35"
+        tools:src="@drawable/movie" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:maxLines="2"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_genres"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_main_poster"
+        app:layout_constraintTop_toBottomOf="@id/iv_backdrop_poster"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="잭 리처: 네버 고 백" />
+
+    <TextView
+        android:id="@+id/tv_genres"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_release_date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        tools:text="액션, 드라마, SF, 모험, 판타지" />
+
+    <TextView
+        android:id="@+id/tv_release_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/btn_line1"
+        app:layout_constraintEnd_toStartOf="@id/iv_clock"
+        app:layout_constraintStart_toStartOf="@id/tv_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_genres"
+        tools:text="2022-12-14 개봉" />
+
+    <ImageView
+        android:id="@+id/iv_clock"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/icon_running_time_20"
+        app:layout_constraintBottom_toBottomOf="@id/tv_release_date"
+        app:layout_constraintEnd_toStartOf="@id/tv_running_time"
+        app:layout_constraintStart_toEndOf="@id/tv_release_date"
+        app:layout_constraintTop_toTopOf="@id/tv_release_date" />
+
+    <TextView
+        android:id="@+id/tv_running_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:maxLines="1"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_clock"
+        app:layout_constraintTop_toTopOf="@id/tv_release_date"
+        tools:text="3시간 3분" />
+
+    <Button
+        android:id="@+id/btn_line1"
+        style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:text="대사1"
+        android:textAppearance="@null"
+        android:textSize="12sp"
+        app:icon="@drawable/icon_play_24"
+        app:layout_constraintBottom_toBottomOf="@id/iv_main_poster"
+        app:layout_constraintEnd_toStartOf="@id/btn_line2"
+        app:layout_constraintStart_toEndOf="@id/iv_main_poster"
+        app:layout_constraintTop_toBottomOf="@id/tv_release_date"
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/btn_line2"
+        style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/icon_play_24"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:text="대사2"
+        android:textAppearance="@null"
+        android:textSize="12sp"
+        app:icon="@drawable/icon_play_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_line1"
+        app:layout_constraintTop_toTopOf="@id/btn_line1" />
+
+    <TextView
+        android:id="@+id/tv_short_summary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.1"
+        android:maxLines="2"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_main_poster"
+        tools:text="“판도라의 바다, 새로운 세계가 펼쳐진다”" />
+
+    <TextView
+        android:id="@+id/tv_overview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:lineSpacingMultiplier="1.25"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_short_summary"
+        tools:text="판도라 행성에서 제이크 설리와 네이티리가 이룬 가족이 겪게 되는 무자비한 위협과 살아남기 위해 떠나야 하는 긴 여정과 전투, 그리고 견뎌내야 할 상처에 대한 이야기를 그렸다. 살아남기 위해 설리 가족이 숲에서 바다로 터전을 옮기면서 겪게 되는 화합의 과정, 그리고 곳곳에서 도사리는 새로운 위협까지 역경 속에서 더 아름답게 펼쳐진다." />
 </androidx.constraintlayout.widget.ConstraintLayout>
