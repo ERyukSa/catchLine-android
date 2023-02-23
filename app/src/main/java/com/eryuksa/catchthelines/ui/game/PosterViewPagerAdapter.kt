@@ -12,7 +12,7 @@ import com.eryuksa.catchthelines.databinding.ItemPosterBinding
 import com.eryuksa.catchthelines.ui.game.uistate.GameItem
 import jp.wasabeef.glide.transformations.BlurTransformation
 
-class PosterViewPagerAdapter(private val onClickPoster: (position: Int) -> Unit) :
+class PosterViewPagerAdapter(private val onClickPoster: (contentId: Int) -> Unit) :
     ListAdapter<GameItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
@@ -30,7 +30,7 @@ class PosterViewPagerAdapter(private val onClickPoster: (position: Int) -> Unit)
 
         init {
             binding.ivPoster.setOnClickListener {
-                onClickPoster(layoutPosition)
+                onClickPoster(getItem(layoutPosition).id)
             }
         }
 

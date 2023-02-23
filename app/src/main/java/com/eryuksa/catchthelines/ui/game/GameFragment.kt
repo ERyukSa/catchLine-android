@@ -34,9 +34,9 @@ class GameFragment : Fragment() {
     private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
-        PosterViewPagerAdapter { position ->
+        PosterViewPagerAdapter { contentId: Int ->
             findNavController().navigate(
-                GameFragmentDirections.gameToDetail(gameItems[position].id)
+                GameFragmentDirections.gameToDetail(contentId)
             )
         }
     }
@@ -44,8 +44,6 @@ class GameFragment : Fragment() {
     private val audioPlayer: ExoPlayer by lazy {
         ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
     }
-    private val gameItems: List<GameItem>
-        get() = viewModel.gameItems.value ?: emptyList()
 
     private lateinit var hintButtonsOpener: ButtonOpener
     private var isHintOpen = false
@@ -136,7 +134,10 @@ class GameFragment : Fragment() {
         with(viewModel) {
             gameItems.observe(viewLifecycleOwner) { items ->
                 posterAdapter.submitList(items)
-                audioPlayer.setUpLines()
+            }
+
+            lineAudioUrls.observe(viewLifecycleOwner) { audioUrls ->
+                audioPlayer.setUpLines(audioUrls.map { urls -> urls[0] })
             }
 
             Transformations.distinctUntilChanged(feedbackUiState).observe(viewLifecycleOwner) { feedbackUiState ->
@@ -197,11 +198,9 @@ class GameFragment : Fragment() {
         binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24)
     }
 
-    private fun ExoPlayer.setUpLines() {
+    private fun ExoPlayer.setUpLines(audioUrls: List<String>) {
         this.addMediaItems(
-            gameItems.map { item ->
-                MediaItem.fromUri(item.lineAudioUrls[0])
-            }
+            audioUrls.map { url -> MediaItem.fromUri(url) }
         )
         this.prepare()
     }

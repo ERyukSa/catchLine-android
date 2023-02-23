@@ -3,6 +3,7 @@ package com.eryuksa.catchthelines.ui.game
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.dto.MediaContent
@@ -27,6 +28,14 @@ class GameViewModel(private val repository: ContentRepository) : ViewModel() {
         get() = _gameItems
     private val gameItemsForEasyAccess: List<GameItem>
         get() = _gameItems.value ?: emptyList()
+
+    val lineAudioUrls: LiveData<List<List<String>>> = run {
+        Transformations.map(_gameItems) { items ->
+            items.map { it.lineAudioUrls }
+        }.also { audioUrls ->
+            Transformations.distinctUntilChanged(audioUrls)
+        }
+    }
 
     private val _feedbackUiState = MediatorLiveData<FeedbackUiState>().apply {
         addSource(_currentPagePosition) { position ->
