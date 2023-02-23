@@ -3,7 +3,7 @@ package com.eryuksa.catchthelines.data.dto
 import com.google.gson.annotations.SerializedName
 
 data class MediaContent(
-    @SerializedName("id") val id: String,
+    @SerializedName("id") val id: Int,
     @SerializedName("title") val title: String,
     @SerializedName("posterUrl") val posterUrl: String,
     @SerializedName("lineAudioUrls") val lineAudioUrls: List<String>

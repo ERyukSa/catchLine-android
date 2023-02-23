@@ -14,9 +14,9 @@ class DetailViewModel(private val repository: ContentRepository) : ViewModel() {
     val contentDetail: LiveData<ContentDetail>
         get() = _contentDetail
 
-    init {
+    fun showContentDetail(id: Int) {
         viewModelScope.launch {
-            _contentDetail.value = repository.getContentDetail(343611) ?: return@launch
+            _contentDetail.value = repository.getContentDetail(id) ?: return@launch
         }
     }
 }

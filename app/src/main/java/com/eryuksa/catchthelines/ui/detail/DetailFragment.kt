@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.databinding.FragmentDetailBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
@@ -17,6 +18,13 @@ class DetailFragment : Fragment() {
         get() = _binding!!
 
     private val viewModel: DetailViewModel by viewModels { ContentViewModelFactory.getInstance() }
+
+    private val args: DetailFragmentArgs by navArgs()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.showContentDetail(args.contentId)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

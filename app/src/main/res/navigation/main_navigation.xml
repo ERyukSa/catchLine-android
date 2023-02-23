@@ -14,7 +14,7 @@
             app:popUpTo="@id/entryFragment" />
         <action
             android:id="@+id/entry_to_guide"
-            app:destination="@id/aboutFragment"
+            app:destination="@id/guideFragment"
             app:popUpTo="@id/entryFragment" />
         <action
             android:id="@+id/entry_to_record"
@@ -33,9 +33,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/aboutFragment"
+        android:id="@+id/guideFragment"
         android:name="com.eryuksa.catchthelines.ui.guide.GuideFragment"
-        android:label="AboutFragment" />
+        android:label="GuideFragment" />
     <fragment
         android:id="@+id/recordFragment"
         android:name="com.eryuksa.catchthelines.ui.record.RecordFragment"
@@ -49,5 +49,9 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.eryuksa.catchthelines.ui.detail.DetailFragment"
-        android:label="DetailFragment" />
+        android:label="DetailFragment" >
+        <argument
+            android:name="contentId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

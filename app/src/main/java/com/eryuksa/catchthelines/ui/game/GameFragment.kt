@@ -35,7 +35,9 @@ class GameFragment : Fragment() {
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
         PosterViewPagerAdapter { position ->
-            findNavController().navigate(R.id.game_to_detail)
+            findNavController().navigate(
+                GameFragmentDirections.gameToDetail(gameItems[position].id)
+            )
         }
     }
 
