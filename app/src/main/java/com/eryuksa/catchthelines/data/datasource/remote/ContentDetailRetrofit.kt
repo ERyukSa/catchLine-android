@@ -7,9 +7,11 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object Retrofit {
+object ContentDetailRetrofit {
 
-    private const val BASE_URL = "https://catchthelines-debc4-default-rtdb.firebaseio.com"
+    private const val BASE_URL = "https://api.themoviedb.org"
+    private const val API_KEY = "312d719efb84a68ee202a8ce06eec62d"
+
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -29,6 +31,13 @@ object Retrofit {
                     }
                 }
             )
+            .addInterceptor { chain ->
+                var request = chain.request()
+                val url =
+                    request.url.newBuilder().addQueryParameter("api_key", API_KEY).addQueryParameter("language", "ko-KR").build()
+                request = request.newBuilder().url(url).build()
+                chain.proceed(request)
+            }
             .build()
     }
 

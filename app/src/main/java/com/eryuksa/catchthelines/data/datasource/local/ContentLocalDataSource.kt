@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 private val HINT_COUNT_KEY = intPreferencesKey("hint_count")
 private val Context.hintDataStore: DataStore<Preferences> by preferencesDataStore(name = "temp")
 
-class GameLocalDataSource(private val appContext: Context) {
+class ContentLocalDataSource(private val appContext: Context) {
 
     fun getAvailableHintCount(): Flow<Int> {
         return appContext.hintDataStore.data.map { preference ->

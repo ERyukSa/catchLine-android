@@ -3,8 +3,8 @@ package com.eryuksa.catchthelines.data.datasource.remote
 import com.eryuksa.catchthelines.data.dto.ContentDetail
 import com.eryuksa.catchthelines.data.dto.MediaContent
 
-class GameRemoteDataSource(
-    private val gameApi: GameRetrofitApi,
+class ContentRemoteDataSource(
+    private val gameApi: ContentRetrofitApi,
     private val contentDetailApi: ContentDetailRetrofitApi
 ) {
 

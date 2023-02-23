@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.eryuksa.catchline_android.R
+import com.eryuksa.catchthelines.R
 
 class RecordFragment : Fragment() {
 

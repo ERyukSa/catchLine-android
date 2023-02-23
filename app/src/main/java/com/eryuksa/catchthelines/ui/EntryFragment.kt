@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.eryuksa.catchline_android.R
-import com.eryuksa.catchline_android.databinding.FragmentEntryBinding
+import com.eryuksa.catchthelines.R
+import com.eryuksa.catchthelines.databinding.FragmentEntryBinding
 
 class EntryFragment : Fragment() {
 

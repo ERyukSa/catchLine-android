@@ -1,5 +1,6 @@
 package com.eryuksa.catchthelines.ui.game
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -7,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.eryuksa.catchline_android.databinding.ItemPosterBinding
+import com.eryuksa.catchthelines.databinding.ItemPosterBinding
 import com.eryuksa.catchthelines.ui.game.uistate.GameItem
 import jp.wasabeef.glide.transformations.BlurTransformation
 
@@ -33,6 +34,7 @@ class PosterViewPagerAdapter(private val onClickPoster: (position: Int) -> Unit)
             }
         }
 
+        @SuppressLint("CheckResult")
         fun bind(gameItem: GameItem) {
             binding.ivPoster.isClickable = gameItem.isClickable
 

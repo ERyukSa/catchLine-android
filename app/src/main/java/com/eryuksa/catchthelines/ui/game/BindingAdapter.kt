@@ -2,7 +2,7 @@ package com.eryuksa.catchthelines.ui.game
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.eryuksa.catchline_android.R
+import com.eryuksa.catchthelines.R
 
 @BindingAdapter("hintCount")
 fun setHintCountText(textView: TextView, hintCount: Int) {

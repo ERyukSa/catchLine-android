@@ -1,14 +1,14 @@
 package com.eryuksa.catchthelines.data.repository
 
-import com.eryuksa.catchthelines.data.datasource.local.GameLocalDataSource
-import com.eryuksa.catchthelines.data.datasource.remote.GameRemoteDataSource
+import com.eryuksa.catchthelines.data.datasource.local.ContentLocalDataSource
+import com.eryuksa.catchthelines.data.datasource.remote.ContentRemoteDataSource
 import com.eryuksa.catchthelines.data.dto.ContentDetail
 import com.eryuksa.catchthelines.data.dto.MediaContent
 import kotlinx.coroutines.flow.Flow
 
-class GameRepository(
-    private val remoteDataSource: GameRemoteDataSource,
-    private val localDataSource: GameLocalDataSource
+class ContentRepository(
+    private val remoteDataSource: ContentRemoteDataSource,
+    private val localDataSource: ContentLocalDataSource
 ) {
 
     suspend fun getMediaContents(): List<MediaContent> =

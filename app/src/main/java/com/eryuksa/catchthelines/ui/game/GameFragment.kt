@@ -8,12 +8,13 @@ import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Transformations
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
-import com.eryuksa.catchline_android.R
-import com.eryuksa.catchline_android.databinding.FragmentGameBinding
-import com.eryuksa.catchthelines.di.GameViewModelFactory
+import com.eryuksa.catchthelines.R
+import com.eryuksa.catchthelines.databinding.FragmentGameBinding
+import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.ButtonOpener
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.game.uistate.GameItem
@@ -30,13 +31,11 @@ class GameFragment : Fragment() {
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding!!
-    private val viewModel: GameViewModel by viewModels {
-        GameViewModelFactory(requireContext().applicationContext)
-    }
+    private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
         PosterViewPagerAdapter { position ->
-            viewModel.onPosterClick()
+            findNavController().navigate(R.id.game_to_detail)
         }
     }
 

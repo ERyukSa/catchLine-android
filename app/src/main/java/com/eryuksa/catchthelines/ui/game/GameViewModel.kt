@@ -1,13 +1,12 @@
 package com.eryuksa.catchthelines.ui.game
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.dto.MediaContent
-import com.eryuksa.catchthelines.data.repository.GameRepository
+import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.ui.game.uistate.FeedbackUiState
 import com.eryuksa.catchthelines.ui.game.uistate.GameItem
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
@@ -17,7 +16,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class GameViewModel(private val repository: GameRepository) : ViewModel() {
+class GameViewModel(private val repository: ContentRepository) : ViewModel() {
 
     private val _currentPagePosition = MutableLiveData(0)
     val currentPagePosition: LiveData<Int>
@@ -87,13 +86,6 @@ class GameViewModel(private val repository: GameRepository) : ViewModel() {
         }
         _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
     }
-
-    fun onPosterClick() {
-        viewModelScope.launch {
-            val a = repository.getContentDetail(343611)
-            Log.d("로그", "ContentDetail: $a")
-        }
-    }
 }
 
 private fun MediaContent.toGameItem(): GameItem =
@@ -103,7 +95,7 @@ private fun MediaContent.toGameItem(): GameItem =
         posterUrl,
         lineAudioUrls,
         feedbackUiState = NoInput,
-        usedHints = emptySet(),
+        usedHints = emptySet()
     )
 
 private fun List<GameItem>.replaceOldItem(newItem: GameItem): List<GameItem> =
