@@ -8,7 +8,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.eryuksa.catchline_android"
+        applicationId "com.eryuksa.catchthelines"
         minSdk 21
         targetSdk 33
         versionCode 1
@@ -34,7 +34,7 @@ android {
         viewBinding true
         dataBinding true
     }
-    namespace 'com.eryuksa.catchline_android'
+    namespace 'com.eryuksa.catchthelines'
 }
 
 dependencies {
