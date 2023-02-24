@@ -13,7 +13,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -52,6 +54,7 @@
             android:layout_height="0dp"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:elevation="7dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.45"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,13 +78,12 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:maxLines="2"
-            tools:text="범죄 국가 ❌"
             android:textColor="@color/black"
             app:layout_constraintBottom_toTopOf="@id/btn_play_stop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_pager_poster"
-            app:layout_constraintVertical_chainStyle="spread" />
+            tools:text="범죄 국가 ❌" />
 
         <ImageButton
             android:id="@+id/btn_play_stop"
@@ -236,5 +238,27 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparentBlack"
+            android:elevation="7dp"
+            android:visibility="invisible" />
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/circle_button"
+            android:elevation="8dp"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_check_24"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

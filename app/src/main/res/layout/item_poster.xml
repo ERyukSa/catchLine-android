@@ -12,4 +12,15 @@
         android:layout_height="match_parent"
         android:scaleType="fitXY"
         android:contentDescription="@string/poster_description" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btn_go_to_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:padding="8dp"
+        android:backgroundTint="@android:color/transparent"
+        android:src="@drawable/icon_info_24"
+        android:layout_gravity="end|top" />
 </androidx.cardview.widget.CardView>
