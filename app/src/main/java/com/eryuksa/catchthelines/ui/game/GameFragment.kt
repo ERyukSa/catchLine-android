@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Transformations
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -17,8 +16,9 @@ import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.ButtonOpener
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
-import com.eryuksa.catchthelines.ui.game.uistate.GameItem
-import com.eryuksa.catchthelines.ui.game.uistate.Hint
+import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
+import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
+import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
 import com.eryuksa.catchthelines.ui.game.uistate.NoInput
 import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
 import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
@@ -105,19 +105,13 @@ class GameFragment : Fragment() {
         }
 
         binding.btnHintClearerPoster.setOnClickListener {
-            viewModel.useHintClearerPoster()
+            viewModel.useHint(ClearerPosterHint)
         }
         binding.btnHintFirstCharacter.setOnClickListener {
-/*            binding.tvHint.text = getString(
-                R.string.game_hint_text_first_character,
-                gameItems[viewModel.currentPagePosition].title.first()
-            )*/
+            viewModel.useHint(FirstCharacterHint)
         }
         binding.btnHintCharactersCount.setOnClickListener {
-/*            binding.tvHint.text = getString(
-                R.string.game_hint_text_characters_count,
-                gameItems[viewModel.currentPagePosition].title.length
-            )*/
+            viewModel.useHint(CharacterCountHint)
         }
 
         binding.btnOpenHint.setOnClickListener {
@@ -140,7 +134,7 @@ class GameFragment : Fragment() {
                 audioPlayer.setUpLines(audioUrls.map { urls -> urls[0] })
             }
 
-            Transformations.distinctUntilChanged(feedbackUiState).observe(viewLifecycleOwner) { feedbackUiState ->
+            feedbackUiState.observe(viewLifecycleOwner) { feedbackUiState ->
                 binding.tvFeedback.text = when (feedbackUiState) {
                     is UserCaughtTheLine ->
                         getString(R.string.game_feedback_catch_the_line, feedbackUiState.title)
@@ -157,11 +151,23 @@ class GameFragment : Fragment() {
                 audioPlayer.seekTo(position, 0)
             }
 
-            Transformations.distinctUntilChanged(usedHintState).observe(viewLifecycleOwner) { usedHints ->
-                when (usedHints.contains(Hint.CLEARER_POSTER)) {
+            usedHintState.observe(viewLifecycleOwner) { usedHints ->
+                when (usedHints.contains(ClearerPosterHint)) {
                     true -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.circle_button)
                     false -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.game_unused_hint_circle_button)
                 }
+                when (usedHints.contains(FirstCharacterHint)) {
+                    true -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.circle_button)
+                    false -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.game_unused_hint_circle_button)
+                }
+                when (usedHints.contains(CharacterCountHint)) {
+                    true -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.circle_button)
+                    false -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.game_unused_hint_circle_button)
+                }
+            }
+
+            hintText.observe(viewLifecycleOwner) { text ->
+                binding.tvHint.text = text
             }
         }
     }
