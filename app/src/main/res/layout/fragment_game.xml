@@ -240,17 +240,19 @@
             app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
 
         <View
+            android:id="@+id/dark_background_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/transparentBlack"
             android:elevation="7dp"
             android:visibility="invisible" />
 
-        <ImageButton
+        <ImageView
+            android:id="@+id/iv_remove_content"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
-            android:background="@drawable/circle_button"
+            android:background="@drawable/outlined_circle_button"
             android:elevation="8dp"
             android:padding="4dp"
             android:scaleType="centerCrop"

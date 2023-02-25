@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -26,7 +27,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
 
-class GameFragment : Fragment() {
+class GameFragment : Fragment(), PosterEventListener {
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
@@ -34,11 +35,7 @@ class GameFragment : Fragment() {
     private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
-        PosterViewPagerAdapter { contentId: Int ->
-            findNavController().navigate(
-                GameFragmentDirections.gameToDetail(contentId)
-            )
-        }
+        PosterViewPagerAdapter(eventListener = this)
     }
 
     private val audioPlayer: ExoPlayer by lazy {
@@ -77,6 +74,7 @@ class GameFragment : Fragment() {
             this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
             setPageTransformer(buildPageTransformer())
             registerOnPageChangeCallback(switchAudioLineOnPageChange)
+            scheduleLayoutAnimation()
         }
     }
 
@@ -144,6 +142,7 @@ class GameFragment : Fragment() {
                 }
 
                 binding.btnSubmitTitle.isEnabled = (feedbackUiState is UserCaughtTheLine).not()
+                binding.viewPagerPoster.isUserInputEnabled = (feedbackUiState is UserCaughtTheLine).not()
             }
 
             currentPagePosition.observe(viewLifecycleOwner) { position ->
@@ -210,4 +209,36 @@ class GameFragment : Fragment() {
         )
         this.prepare()
     }
+
+    override fun onClickPoster(contentId: Int) =
+        findNavController().navigate(
+            GameFragmentDirections.gameToDetail(contentId)
+        )
+
+    override fun onStartDrag() {
+        binding.darkBackgroundCover.isVisible = true
+        binding.ivRemoveContent.isVisible = true
+    }
+
+    override fun onDraggingPoster(y: Float) {
+        when (isContentInRemoveRange(y)) {
+            true -> binding.ivRemoveContent.setBackgroundResource(R.drawable.circle_button)
+            false -> binding.ivRemoveContent.setBackgroundResource(R.drawable.outlined_circle_button)
+        }
+    }
+
+    override fun isPosterRemovable(y: Float): Boolean =
+        isContentInRemoveRange(y)
+
+    override fun onFinishDrag(lastY: Float) {
+        binding.darkBackgroundCover.isVisible = false
+        binding.ivRemoveContent.isVisible = false
+        if (isContentInRemoveRange(lastY)) {
+            viewModel.removeCaughtContent()
+        }
+    }
+
+    private fun isContentInRemoveRange(y: Float): Boolean =
+        binding.ivRemoveContent.y + binding.ivRemoveContent.height * 0.65 >=
+            binding.viewPagerPoster.y + y
 }

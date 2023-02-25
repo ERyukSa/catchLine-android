@@ -18,9 +18,6 @@ data class GameItem(
             }
         }
 
-    val isClickable: Boolean
-        get() = feedbackUiState is UserCaughtTheLine
-
     companion object {
         private const val CLEARER_BLUR_DEGREE = 2
         private const val DEFAULT_BLUR_DEGREE = 6

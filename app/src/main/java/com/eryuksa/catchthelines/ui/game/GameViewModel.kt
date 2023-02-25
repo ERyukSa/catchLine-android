@@ -135,6 +135,11 @@ class GameViewModel(
         _gameItems.value = gameItemsForEasyAccess.replaceOldItem(changedGameItem)
     }
 
+    fun removeCaughtContent() {
+        val gameItem = gameItemsForEasyAccess[currentPagePosition.value ?: return]
+        _gameItems.value = gameItemsForEasyAccess.filterNot { it.id == gameItem.id }
+    }
+
     private fun mapToGameItem(mediaContent: MediaContent): GameItem =
         GameItem(
             mediaContent.id,

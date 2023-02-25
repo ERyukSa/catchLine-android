@@ -10,6 +10,7 @@ import com.eryuksa.catchthelines.data.datasource.remote.ContentRemoteDataSource
 import com.eryuksa.catchthelines.data.datasource.remote.ContentRetrofitApi
 import com.eryuksa.catchthelines.data.datasource.remote.Retrofit
 import com.eryuksa.catchthelines.data.repository.ContentRepository
+import com.eryuksa.catchthelines.ui.common.StringProvider
 import com.eryuksa.catchthelines.ui.detail.DetailViewModel
 import com.eryuksa.catchthelines.ui.game.GameViewModel
 
@@ -28,7 +29,7 @@ class ContentViewModelFactory private constructor() :
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GameViewModel::class.java)) {
-            return GameViewModel(contentRepository) as T
+            return GameViewModel(contentRepository, StringProvider.getInstance()) as T
         } else if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
             return DetailViewModel(contentRepository) as T
         }
