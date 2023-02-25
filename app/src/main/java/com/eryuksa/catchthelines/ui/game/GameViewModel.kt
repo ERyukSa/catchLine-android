@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.dto.MediaContent
 import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.ui.common.StringProvider
+import com.eryuksa.catchthelines.ui.game.uistate.AllKilled
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FeedbackUiState
@@ -136,8 +137,17 @@ class GameViewModel(
     }
 
     fun removeCaughtContent() {
-        val gameItem = gameItemsForEasyAccess[currentPagePosition.value ?: return]
-        _gameItems.value = gameItemsForEasyAccess.filterNot { it.id == gameItem.id }
+        val currentPage = currentPagePosition.value ?: throw IllegalStateException()
+        if (currentPage == 0 && gameItemsForEasyAccess.size == 1) {
+            _gameItems.value = emptyList()
+            _feedbackUiState.value = AllKilled
+        } else if (currentPage == gameItemsForEasyAccess.lastIndex) {
+            _currentPagePosition.value = currentPage - 1
+            _gameItems.value = gameItemsForEasyAccess.subList(0, gameItemsForEasyAccess.size - 1)
+        } else {
+            _gameItems.value = gameItemsForEasyAccess.subList(0, currentPage) +
+                gameItemsForEasyAccess.subList(currentPage + 1, gameItemsForEasyAccess.size)
+        }
     }
 
     private fun mapToGameItem(mediaContent: MediaContent): GameItem =
@@ -155,20 +165,27 @@ class GameViewModel(
 private fun List<GameItem>.replaceOldItem(newItem: GameItem): List<GameItem> =
     this.map { oldItem -> if (oldItem.id == newItem.id) newItem else oldItem }
 
-private fun List<GameItem>.findFeedbackUiStateAt(index: Int): FeedbackUiState =
-    this.asSequence()
+private fun List<GameItem>.findFeedbackUiStateAt(index: Int): FeedbackUiState {
+    if (this.isEmpty()) return NoInput
+    return this.asSequence()
         .filterIndexed { i, _ -> i == index }
         .map { it.feedbackUiState }
         .toList()[0]
+}
 
-private fun List<GameItem>.findUsedHintStateAt(index: Int): Set<Hint> =
-    this.asSequence()
+private fun List<GameItem>.findUsedHintStateAt(index: Int): Set<Hint> {
+    if (this.isEmpty()) return emptySet()
+    return this.asSequence()
         .filterIndexed { i, _ -> i == index }
         .map { it.usedHints }
         .toList()[0]
+}
 
-private fun List<GameItem>.findHintTextAt(index: Int): String =
-    this.asSequence()
+private fun List<GameItem>.findHintTextAt(index: Int): String {
+    if (this.isEmpty()) return ""
+    return this.asSequence()
         .filterIndexed { i, _ -> i == index }
         .map { it.hintText }
         .toList()[0]
+}
+

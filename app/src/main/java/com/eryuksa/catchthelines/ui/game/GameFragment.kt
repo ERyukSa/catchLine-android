@@ -17,6 +17,7 @@ import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.ButtonOpener
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
+import com.eryuksa.catchthelines.ui.game.uistate.AllKilled
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
@@ -80,7 +81,11 @@ class GameFragment : Fragment(), PosterEventListener {
 
     private fun initHintButtonsAnimation() {
         binding.btnOpenHint.doOnLayout {
-            hintButtonsOpener = ButtonOpener(initialCeilHeight = binding.btnOpenHint.height, margin = 20, duration = 400)
+            hintButtonsOpener = ButtonOpener(
+                initialCeilHeight = binding.btnOpenHint.height,
+                margin = 20,
+                duration = 400
+            )
             hintButtonsOpener.run {
                 addInnerButton(binding.btnHintClearerPoster)
                 addInnerButton(binding.btnHintFirstCharacter)
@@ -93,6 +98,7 @@ class GameFragment : Fragment(), PosterEventListener {
     private fun initOnClickListener() {
         binding.btnSubmitTitle.setOnClickListener {
             viewModel.checkUserCatchTheLine(binding.edittextInputTitle.text.toString())
+            binding.edittextInputTitle.text.clear()
         }
 
         binding.btnPlayStop.setOnClickListener {
@@ -139,6 +145,7 @@ class GameFragment : Fragment(), PosterEventListener {
                     is UserInputWrong ->
                         getString(R.string.game_feedback_wrong, feedbackUiState.userInput)
                     is NoInput -> ""
+                    is AllKilled -> getString(R.string.game_feedback_all_killed)
                 }
 
                 binding.btnSubmitTitle.isEnabled = (feedbackUiState is UserCaughtTheLine).not()
@@ -152,16 +159,16 @@ class GameFragment : Fragment(), PosterEventListener {
 
             usedHintState.observe(viewLifecycleOwner) { usedHints ->
                 when (usedHints.contains(ClearerPosterHint)) {
-                    true -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.circle_button)
-                    false -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.game_unused_hint_circle_button)
+                    true -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.game_white_filled_circle_button)
+                    false -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
                 }
                 when (usedHints.contains(FirstCharacterHint)) {
-                    true -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.circle_button)
-                    false -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.game_unused_hint_circle_button)
+                    true -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.game_white_filled_circle_button)
+                    false -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
                 }
                 when (usedHints.contains(CharacterCountHint)) {
-                    true -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.circle_button)
-                    false -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.game_unused_hint_circle_button)
+                    true -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.game_white_filled_circle_button)
+                    false -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
                 }
             }
 
@@ -222,8 +229,8 @@ class GameFragment : Fragment(), PosterEventListener {
 
     override fun onDraggingPoster(y: Float) {
         when (isContentInRemoveRange(y)) {
-            true -> binding.ivRemoveContent.setBackgroundResource(R.drawable.circle_button)
-            false -> binding.ivRemoveContent.setBackgroundResource(R.drawable.outlined_circle_button)
+            true -> binding.ivRemoveContent.setBackgroundResource(R.drawable.game_white_filled_circle_button)
+            false -> binding.ivRemoveContent.setBackgroundResource(R.drawable.game_outlined_circle_button)
         }
     }
 
