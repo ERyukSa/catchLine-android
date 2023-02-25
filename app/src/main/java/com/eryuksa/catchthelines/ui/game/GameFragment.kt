@@ -5,10 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -28,7 +26,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
 
-class GameFragment : Fragment(), PosterEventListener {
+class GameFragment : Fragment() {
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
@@ -36,7 +34,9 @@ class GameFragment : Fragment(), PosterEventListener {
     private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
     private val posterAdapter: PosterViewPagerAdapter by lazy {
-        PosterViewPagerAdapter(eventListener = this)
+        PosterViewPagerAdapter(
+            eventListener = PosterEventHandler(this, binding, viewModel::removeCaughtContent)
+        )
     }
 
     private val audioPlayer: ExoPlayer by lazy {
@@ -216,36 +216,4 @@ class GameFragment : Fragment(), PosterEventListener {
         )
         this.prepare()
     }
-
-    override fun onClickPoster(contentId: Int) =
-        findNavController().navigate(
-            GameFragmentDirections.gameToDetail(contentId)
-        )
-
-    override fun onStartDrag() {
-        binding.darkBackgroundCover.isVisible = true
-        binding.ivRemoveContent.isVisible = true
-    }
-
-    override fun onDraggingPoster(y: Float) {
-        when (isContentInRemoveRange(y)) {
-            true -> binding.ivRemoveContent.setBackgroundResource(R.drawable.game_white_filled_circle_button)
-            false -> binding.ivRemoveContent.setBackgroundResource(R.drawable.game_outlined_circle_button)
-        }
-    }
-
-    override fun isPosterRemovable(y: Float): Boolean =
-        isContentInRemoveRange(y)
-
-    override fun onFinishDrag(lastY: Float) {
-        binding.darkBackgroundCover.isVisible = false
-        binding.ivRemoveContent.isVisible = false
-        if (isContentInRemoveRange(lastY)) {
-            viewModel.removeCaughtContent()
-        }
-    }
-
-    private fun isContentInRemoveRange(y: Float): Boolean =
-        binding.ivRemoveContent.y + binding.ivRemoveContent.height * 0.65 >=
-            binding.viewPagerPoster.y + y
 }
