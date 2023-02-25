@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
-import com.eryuksa.catchthelines.ui.game.uistate.GameItem
+import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
 import jp.wasabeef.glide.transformations.BlurTransformation
 
@@ -27,7 +27,7 @@ interface PosterEventListener {
 }
 
 class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
-    ListAdapter<GameItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
+    ListAdapter<GameUiState, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
         val binding = ItemPosterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -66,7 +66,7 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
 
         init {
             binding.btnGoToDetail.setOnClickListener {
-                eventListener.onClickPoster(getItem(layoutPosition).id)
+                eventListener.onClickPoster(getItem(layoutPosition).mediaContent.id)
             }
             binding.root.setOnTouchListener { rootView, event ->
                 if (isTouchable.not()) {
@@ -102,23 +102,23 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
         }
 
         @SuppressLint("CheckResult")
-        fun bind(gameItem: GameItem) {
+        fun bind(uiState: GameUiState) {
             initialX = binding.root.x
             initialY = binding.root.y
 
-            (gameItem.feedbackUiState is UserCaughtTheLine).also { isCaught ->
+            (uiState.feedbackUiState is UserCaughtTheLine).also { isCaught ->
                 binding.root.isClickable = isCaught
                 binding.btnGoToDetail.isVisible = isCaught
                 isTouchable = isCaught
             }
 
             Glide.with(itemView.context)
-                .load(gameItem.posterUrl)
+                .load(uiState.mediaContent.posterUrl)
                 .apply {
-                    if (gameItem.blurDegree > 0) {
+                    if (uiState.blurDegree > 0) {
                         this.apply(
                             RequestOptions.bitmapTransform(
-                                BlurTransformation(25, gameItem.blurDegree)
+                                BlurTransformation(25, uiState.blurDegree)
                             )
                         )
                     }
@@ -133,12 +133,13 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<GameItem>() {
-            override fun areContentsTheSame(oldItem: GameItem, newItem: GameItem) =
-                oldItem.blurDegree == newItem.blurDegree && oldItem.posterUrl == newItem.posterUrl
+        val diffUtil = object : DiffUtil.ItemCallback<GameUiState>() {
+            override fun areContentsTheSame(oldState: GameUiState, newState: GameUiState) =
+                oldState.blurDegree == newState.blurDegree &&
+                    oldState.mediaContent.posterUrl == newState.mediaContent.posterUrl
 
-            override fun areItemsTheSame(oldItem: GameItem, newItem: GameItem) =
-                oldItem.id == newItem.id
+            override fun areItemsTheSame(oldState: GameUiState, newState: GameUiState) =
+                oldState.mediaContent.id == newState.mediaContent.id
         }
     }
 }

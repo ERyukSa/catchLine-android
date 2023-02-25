@@ -6,7 +6,7 @@ import androidx.core.view.doOnLayout
 
 class ButtonOpener(initialCeilHeight: Int, private val margin: Int, private val duration: Long) {
 
-    private var innerButtons: List<InnerButton> = emptyList()
+    private val innerButtons = mutableListOf<InnerButton>()
     private var ceil = initialCeilHeight.toFloat()
 
     fun addInnerButton(button: Button) {

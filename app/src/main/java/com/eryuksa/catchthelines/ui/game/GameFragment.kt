@@ -52,8 +52,11 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGameBinding.inflate(inflater, container, false).apply {
-            viewModel = this@GameFragment.viewModel
             lifecycleOwner = viewLifecycleOwner
+            viewModel = this@GameFragment.viewModel
+            clearerPosterHint = ClearerPosterHint
+            firstCharacterHint = FirstCharacterHint
+            characterCountHint = CharacterCountHint
             playerViewLine.player = audioPlayer
         }
         initPosterViewPager()
@@ -108,16 +111,6 @@ class GameFragment : Fragment() {
             }
         }
 
-        binding.btnHintClearerPoster.setOnClickListener {
-            viewModel.useHint(ClearerPosterHint)
-        }
-        binding.btnHintFirstCharacter.setOnClickListener {
-            viewModel.useHint(FirstCharacterHint)
-        }
-        binding.btnHintCharactersCount.setOnClickListener {
-            viewModel.useHint(CharacterCountHint)
-        }
-
         binding.btnOpenHint.setOnClickListener {
             if (isHintOpen) {
                 hintButtonsOpener.closeButtons()
@@ -130,11 +123,11 @@ class GameFragment : Fragment() {
 
     private fun observeData() {
         with(viewModel) {
-            gameItems.observe(viewLifecycleOwner) { items ->
-                posterAdapter.submitList(items)
+            uiStates.observe(viewLifecycleOwner) { uiStates ->
+                posterAdapter.submitList(uiStates)
             }
 
-            lineAudioUrls.observe(viewLifecycleOwner) { audioUrls ->
+            groupedLineAudioUrls.observe(viewLifecycleOwner) { audioUrls ->
                 audioPlayer.setUpLines(audioUrls.map { urls -> urls[0] })
             }
 
@@ -148,28 +141,19 @@ class GameFragment : Fragment() {
                     is AllKilled -> getString(R.string.game_feedback_all_killed)
                 }
 
-                binding.btnSubmitTitle.isEnabled = (feedbackUiState is UserCaughtTheLine).not()
-                binding.viewPagerPoster.isUserInputEnabled = (feedbackUiState is UserCaughtTheLine).not()
+                (feedbackUiState is UserCaughtTheLine).not().also { userInputEnabled ->
+                    binding.btnSubmitTitle.isEnabled = userInputEnabled
+                    binding.viewPagerPoster.isUserInputEnabled = userInputEnabled
+                    binding.viewPagerPoster.elevation = when (userInputEnabled) {
+                        true -> 0f
+                        false -> resources.getDimension(R.dimen.game_viewpager_caught_state_elevation)
+                    }
+                }
             }
 
             currentPagePosition.observe(viewLifecycleOwner) { position ->
                 stopLineAudio()
                 audioPlayer.seekTo(position, 0)
-            }
-
-            usedHintState.observe(viewLifecycleOwner) { usedHints ->
-                when (usedHints.contains(ClearerPosterHint)) {
-                    true -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.game_white_filled_circle_button)
-                    false -> binding.btnHintClearerPoster.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
-                }
-                when (usedHints.contains(FirstCharacterHint)) {
-                    true -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.game_white_filled_circle_button)
-                    false -> binding.btnHintFirstCharacter.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
-                }
-                when (usedHints.contains(CharacterCountHint)) {
-                    true -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.game_white_filled_circle_button)
-                    false -> binding.btnHintCharactersCount.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
-                }
             }
 
             hintText.observe(viewLifecycleOwner) { text ->

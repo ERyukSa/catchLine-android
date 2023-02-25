@@ -1,10 +1,9 @@
 package com.eryuksa.catchthelines.ui.game.uistate
 
-data class GameItem(
-    val id: Int,
-    val title: String,
-    val posterUrl: String,
-    val lineAudioUrls: List<String>,
+import com.eryuksa.catchthelines.data.dto.MediaContent
+
+data class GameUiState(
+    val mediaContent: MediaContent,
     val feedbackUiState: FeedbackUiState,
     val usedHints: Set<Hint>,
     val hintText: String

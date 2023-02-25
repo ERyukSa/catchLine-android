@@ -9,6 +9,17 @@
             name="viewModel"
             type="com.eryuksa.catchthelines.ui.game.GameViewModel" />
 
+        <variable
+            name="clearerPosterHint"
+            type="com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint" />
+
+        <variable
+            name="firstCharacterHint"
+            type="com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint" />
+
+        <variable
+            name="characterCountHint"
+            type="com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,7 +65,6 @@
             android:layout_height="0dp"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:elevation="7dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.45"
             app:layout_constraintStart_toStartOf="parent"
@@ -120,6 +130,8 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_characters_count"
+            myHintType="@{characterCountHint}"
+            usedHints="@{viewModel.usedHints}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_circle_button"
@@ -127,6 +139,7 @@
             android:maxLines="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
+            android:onClick="@{() -> viewModel.useHint(characterCountHint)}"
             android:padding="8dp"
             android:text="@string/game_characters_count"
             app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
@@ -137,6 +150,8 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_first_character"
+            myHintType="@{firstCharacterHint}"
+            usedHints="@{viewModel.usedHints}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_circle_button"
@@ -145,6 +160,7 @@
             android:maxLines="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
+            android:onClick="@{() -> viewModel.useHint(firstCharacterHint)}"
             android:padding="8dp"
             android:text="@string/game_first_character"
             app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
@@ -155,6 +171,8 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_clearer_poster"
+            myHintType="@{clearerPosterHint}"
+            usedHints="@{viewModel.usedHints}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_stroked_circle_button"
@@ -162,6 +180,7 @@
             android:maxLines="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
+            android:onClick="@{() -> viewModel.useHint(clearerPosterHint)}"
             android:padding="8dp"
             android:text="@string/game_clearer_poster"
             app:layout_constraintBottom_toBottomOf="@id/btn_open_hint"
@@ -198,7 +217,7 @@
             tools:text="남은 힌트: 10개" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_change_line"
+            android:id="@+id/btn_switch_line"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_circle_button"
