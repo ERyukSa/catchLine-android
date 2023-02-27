@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.dto.MediaContent
 import com.eryuksa.catchthelines.data.repository.ContentRepository
+import com.eryuksa.catchthelines.data.repository.HintCountRepository
 import com.eryuksa.catchthelines.ui.common.StringProvider
 import com.eryuksa.catchthelines.ui.game.uistate.AllKilled
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
@@ -24,7 +25,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class GameViewModel(
-    private val repository: ContentRepository,
+    private val contentRepository: ContentRepository,
+    private val hintRepository: HintCountRepository,
     private val stringProvider: StringProvider
 ) : ViewModel() {
 
@@ -83,14 +85,14 @@ class GameViewModel(
     }
     val hintText: LiveData<String> = Transformations.distinctUntilChanged(_hintText)
 
-    private val _availableHintCount = MutableLiveData<Int>(10)
+    private val _availableHintCount = MutableLiveData<Int>()
     val availableHintCount: LiveData<Int>
         get() = _availableHintCount
 
     init {
         viewModelScope.launch {
-            _uiStates.value = repository.getMediaContents().map(::mapToGameItem)
-            repository.getAvailableHintCount().collectLatest { _availableHintCount.value = it }
+            _uiStates.value = contentRepository.getMediaContents().map(::mapToGameItem)
+            hintRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
     }
 
@@ -100,6 +102,8 @@ class GameViewModel(
 
     fun useHint(hint: Hint) {
         val currentPosition = currentPagePosition.value ?: return
+        viewModelScope.launch { hintRepository.decreaseHintCount() }
+
         val changedGameItem = when (hint) {
             is ClearerPosterHint -> with(uiStatesForEasyAccess[currentPosition]) {
                 copy(usedHints = this.usedHints.toMutableSet().apply { add(hint) })
