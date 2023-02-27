@@ -13,7 +13,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
-import com.eryuksa.catchthelines.ui.common.ButtonOpener
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.game.uistate.AllKilled
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
@@ -33,10 +32,11 @@ class GameFragment : Fragment() {
         get() = _binding!!
     private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
+    private val posterEventHandler: PosterEventHandler by lazy {
+        PosterEventHandler(this, binding, viewModel::removeCaughtContent)
+    }
     private val posterAdapter: PosterViewPagerAdapter by lazy {
-        PosterViewPagerAdapter(
-            eventListener = PosterEventHandler(this, binding, viewModel::removeCaughtContent)
-        )
+        PosterViewPagerAdapter(posterEventHandler)
     }
 
     private val audioPlayer: ExoPlayer by lazy {
@@ -44,7 +44,6 @@ class GameFragment : Fragment() {
     }
 
     private lateinit var hintButtonsOpener: ButtonOpener
-    private var isHintOpen = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,12 +111,8 @@ class GameFragment : Fragment() {
         }
 
         binding.btnOpenHint.setOnClickListener {
-            if (isHintOpen) {
-                hintButtonsOpener.closeButtons()
-            } else {
-                hintButtonsOpener.openButtons()
-            }
-            isHintOpen = isHintOpen.not()
+            hintButtonsOpener.openButtons()
+            binding.darkBackgroundCoverForHint.visibility = View.VISIBLE
         }
     }
 
@@ -146,7 +141,7 @@ class GameFragment : Fragment() {
                     binding.viewPagerPoster.isUserInputEnabled = userInputEnabled
                     binding.viewPagerPoster.elevation = when (userInputEnabled) {
                         true -> 0f
-                        false -> resources.getDimension(R.dimen.game_viewpager_caught_state_elevation)
+                        false -> resources.getDimension(R.dimen.game_poster_elevation_over_dark_cover)
                     }
                 }
             }
@@ -158,6 +153,12 @@ class GameFragment : Fragment() {
 
             hintText.observe(viewLifecycleOwner) { text ->
                 binding.tvHint.text = text
+            }
+
+            usedHints.observe(viewLifecycleOwner) {
+                if (this@GameFragment::hintButtonsOpener.isInitialized.not()) return@observe
+                hintButtonsOpener.closeButtons()
+                binding.darkBackgroundCoverForHint.visibility = View.INVISIBLE
             }
         }
     }

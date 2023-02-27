@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="game_poster_margin">16dp</dimen>
-    <dimen name="game_viewpager_caught_state_elevation">8dp</dimen>
+    <dimen name="game_poster_elevation_over_dark_cover">8dp</dimen>
+    <dimen name="game_hint_elevation_over_dark_cover">4dp</dimen>
 </resources>

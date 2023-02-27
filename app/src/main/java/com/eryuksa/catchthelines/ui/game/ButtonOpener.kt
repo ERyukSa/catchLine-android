@@ -1,10 +1,15 @@
-package com.eryuksa.catchthelines.ui.common
+package com.eryuksa.catchthelines.ui.game
 
 import android.animation.ObjectAnimator
 import android.widget.Button
 import androidx.core.view.doOnLayout
+import com.eryuksa.catchthelines.R
 
-class ButtonOpener(initialCeilHeight: Int, private val margin: Int, private val duration: Long) {
+class ButtonOpener(
+    initialCeilHeight: Int,
+    private val margin: Int,
+    private val duration: Long
+) {
 
     private val innerButtons = mutableListOf<InnerButton>()
     private var ceil = initialCeilHeight.toFloat()
@@ -15,13 +20,17 @@ class ButtonOpener(initialCeilHeight: Int, private val margin: Int, private val 
                 .setDuration(duration)
             val closeAnimator = ObjectAnimator.ofFloat(button, "TranslationY", 0f)
                 .setDuration(duration)
-            innerButtons += InnerButton(openAnimator, closeAnimator)
+            innerButtons += InnerButton(button, openAnimator, closeAnimator)
             ceil += (button.height + margin)
         }
     }
 
     fun openButtons() {
-        innerButtons.forEach(InnerButton::open)
+        innerButtons.forEach {
+            it.open()
+            it.button.elevation =
+                it.button.resources.getDimension(R.dimen.game_hint_elevation_over_dark_cover)
+        }
     }
 
     fun closeButtons() {
@@ -29,13 +38,16 @@ class ButtonOpener(initialCeilHeight: Int, private val margin: Int, private val 
     }
 
     private class InnerButton(
+        val button: Button,
         private val openAnimator: ObjectAnimator,
         private val closeAnimator: ObjectAnimator
     ) {
-        fun open() =
+        fun open() {
             openAnimator.start()
+        }
 
-        fun close() =
+        fun close() {
             closeAnimator.start()
+        }
     }
 }

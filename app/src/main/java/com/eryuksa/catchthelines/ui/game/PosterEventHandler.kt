@@ -1,5 +1,6 @@
 package com.eryuksa.catchthelines.ui.game
 
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.eryuksa.catchthelines.R
@@ -17,7 +18,7 @@ class PosterEventHandler(
         )
 
     override fun onStartDrag() {
-        binding.darkBackgroundCover.isVisible = true
+        binding.darkBackgroundCoverForPoster.visibility = View.VISIBLE
         binding.ivRemoveContent.isVisible = true
     }
 
@@ -32,7 +33,7 @@ class PosterEventHandler(
         isContentInRemoveRange(y)
 
     override fun onFinishDrag(lastY: Float) {
-        binding.darkBackgroundCover.isVisible = false
+        binding.darkBackgroundCoverForPoster.visibility = View.INVISIBLE
         binding.ivRemoveContent.isVisible = false
         if (isContentInRemoveRange(lastY)) {
             removeCaughtContent()

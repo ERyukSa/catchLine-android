@@ -101,7 +101,7 @@
             android:layout_height="72dp"
             android:background="@drawable/game_white_filled_circle_button"
             android:contentDescription="@string/game_description_play_line"
-            android:elevation="4dp"
+            android:elevation="3dp"
             android:padding="16dp"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_play_24"
@@ -196,6 +196,7 @@
             android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/game_description_select_hint"
             android:src="@drawable/icon_hint_24"
+            app:elevation="4dp"
             app:borderWidth="0dp"
             app:layout_constraintBottom_toBottomOf="@id/btn_play_stop"
             app:layout_constraintEnd_toStartOf="@id/btn_play_stop"
@@ -259,11 +260,11 @@
             app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
 
         <View
-            android:id="@+id/dark_background_cover"
+            android:id="@+id/dark_background_cover_for_poster"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/transparentBlack"
-            android:elevation="7dp"
+            android:elevation="6dp"
             android:visibility="invisible" />
 
         <ImageView
@@ -281,5 +282,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <View
+            android:id="@+id/dark_background_cover_for_hint"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparentBlack"
+            android:elevation="4dp"
+            android:visibility="gone" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
