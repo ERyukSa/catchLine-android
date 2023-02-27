@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.CompositePageTransformer
@@ -48,7 +49,7 @@ class GameFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        outState: Bundle?
     ): View {
         _binding = FragmentGameBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
@@ -60,7 +61,7 @@ class GameFragment : Fragment() {
         }
         initPosterViewPager()
         initOnClickListener()
-        initHintButtonsAnimation()
+        initHintButtonsAnimation(outState?.getBoolean(HINT_IS_OPEN_KEY) ?: false)
         return binding.root
     }
 
@@ -81,12 +82,13 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun initHintButtonsAnimation() {
-        binding.btnOpenHint.doOnLayout {
+    private fun initHintButtonsAnimation(isHintOpen: Boolean) {
+        binding.root.doOnLayout {
             hintButtonsOpener = ButtonOpener(
                 initialCeilHeight = binding.btnOpenHint.height,
                 margin = 20,
-                duration = 400
+                duration = 400,
+                isHintOpen
             )
             hintButtonsOpener.run {
                 addInnerButton(binding.btnHintClearerPoster)
@@ -111,8 +113,9 @@ class GameFragment : Fragment() {
         }
 
         binding.btnOpenHint.setOnClickListener {
-            hintButtonsOpener.openButtons()
-            binding.darkBackgroundCoverForHint.visibility = View.VISIBLE
+            hintButtonsOpener.switchOpenState()
+            binding.darkBackgroundCoverForHint.isVisible =
+                binding.darkBackgroundCoverForHint.isVisible.not()
         }
     }
 
@@ -136,7 +139,8 @@ class GameFragment : Fragment() {
                     is AllKilled -> getString(R.string.game_feedback_all_killed)
                 }
 
-                (feedbackUiState is UserCaughtTheLine).not().also { userInputEnabled ->
+                feedbackUiState.isUserInputEnabled.also { userInputEnabled ->
+                    binding.btnOpenHint.isClickable = userInputEnabled
                     binding.btnSubmitTitle.isEnabled = userInputEnabled
                     binding.viewPagerPoster.isUserInputEnabled = userInputEnabled
                     binding.viewPagerPoster.elevation = when (userInputEnabled) {
@@ -157,7 +161,7 @@ class GameFragment : Fragment() {
 
             usedHints.observe(viewLifecycleOwner) {
                 if (this@GameFragment::hintButtonsOpener.isInitialized.not()) return@observe
-                hintButtonsOpener.closeButtons()
+                hintButtonsOpener.switchOpenState()
                 binding.darkBackgroundCoverForHint.visibility = View.INVISIBLE
             }
         }
@@ -200,5 +204,14 @@ class GameFragment : Fragment() {
             audioUrls.map { url -> MediaItem.fromUri(url) }
         )
         this.prepare()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(HINT_IS_OPEN_KEY, hintButtonsOpener.isOpen)
+    }
+
+    companion object {
+        private const val HINT_IS_OPEN_KEY = "HINT_IS_OPEN_KEY"
     }
 }
