@@ -1,9 +1,9 @@
 package com.eryuksa.catchthelines.ui.game.uistate
 
-import com.eryuksa.catchthelines.data.dto.MediaContent
+import com.eryuksa.catchthelines.data.dto.Content
 
 data class GameUiState(
-    val mediaContent: MediaContent,
+    val mediaContent: Content,
     val feedbackUiState: FeedbackUiState,
     val usedHints: Set<Hint>,
     val hintText: String

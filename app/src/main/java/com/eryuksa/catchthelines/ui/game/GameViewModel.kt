@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eryuksa.catchthelines.data.dto.MediaContent
+import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.data.repository.HintCountRepository
 import com.eryuksa.catchthelines.ui.common.StringProvider
@@ -134,6 +134,9 @@ class GameViewModel(
     fun checkUserCatchTheLine(userInput: String) {
         val uiState = uiStatesForEasyAccess[currentPagePosition.value ?: return]
         val changedGameItem = if (userInput.contains(uiState.mediaContent.title)) {
+            viewModelScope.launch {
+                contentRepository.saveCaughtContent(uiState.mediaContent)
+            }
             uiState.copy(feedbackUiState = UserCaughtTheLine(uiState.mediaContent.title))
         } else {
             uiState.copy(feedbackUiState = UserInputWrong(userInput))
@@ -155,7 +158,7 @@ class GameViewModel(
         }
     }
 
-    private fun mapToGameItem(mediaContent: MediaContent): GameUiState =
+    private fun mapToGameItem(mediaContent: Content): GameUiState =
         GameUiState(
             mediaContent = mediaContent,
             feedbackUiState = NoInput,

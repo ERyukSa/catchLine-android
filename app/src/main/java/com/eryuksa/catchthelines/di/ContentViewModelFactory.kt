@@ -9,6 +9,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.eryuksa.catchthelines.data.datasource.local.ContentDatabase
+import com.eryuksa.catchthelines.data.datasource.local.ContentLocalDataSource
 import com.eryuksa.catchthelines.data.datasource.remote.ContentDetailRetrofit
 import com.eryuksa.catchthelines.data.datasource.remote.ContentDetailRetrofitApi
 import com.eryuksa.catchthelines.data.datasource.remote.ContentRemoteDataSource
@@ -26,8 +28,14 @@ class ContentViewModelFactory private constructor() :
     private val gameApi = Retrofit.getApi(ContentRetrofitApi::class.java)
     private val contentDetailApi =
         ContentDetailRetrofit.getApi(ContentDetailRetrofitApi::class.java)
+    private val contentLocalDatabase: ContentDatabase by lazy {
+        ContentDatabase.getInstance(application.applicationContext)
+    }
     private val contentRepository: ContentRepository by lazy {
-        ContentRepository(ContentRemoteDataSource(gameApi, contentDetailApi))
+        ContentRepository(
+            ContentRemoteDataSource(gameApi, contentDetailApi),
+            ContentLocalDataSource(contentLocalDatabase.contentDao())
+        )
     }
 
     private val Context.hintDataStore: DataStore<Preferences> by preferencesDataStore(name = "hint")
