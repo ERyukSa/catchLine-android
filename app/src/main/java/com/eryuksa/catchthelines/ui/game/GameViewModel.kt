@@ -91,7 +91,7 @@ class GameViewModel(
 
     init {
         viewModelScope.launch {
-            _uiStates.value = contentRepository.getMediaContents().map(::mapToGameItem)
+            _uiStates.value = contentRepository.getContents().map(::mapToGameItem)
             hintRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
     }

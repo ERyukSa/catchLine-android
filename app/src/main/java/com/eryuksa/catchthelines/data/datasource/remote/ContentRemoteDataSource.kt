@@ -8,7 +8,7 @@ class ContentRemoteDataSource(
     private val contentDetailApi: ContentDetailRetrofitApi
 ) {
 
-    suspend fun getMediaContents(): List<Content> {
+    suspend fun getContents(): List<Content> {
         val response = gameApi.getMediaContents()
         return if (response.isSuccessful) {
             response.body()?.values?.toList() ?: emptyList()
