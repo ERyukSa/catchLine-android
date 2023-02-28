@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
 import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
-import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
 import jp.wasabeef.glide.transformations.BlurTransformation
 
 interface PosterEventListener {
@@ -39,11 +38,6 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
         holder.bind(getItem(position))
     }
 
-    override fun onViewRecycled(holder: PosterViewHolder) {
-        super.onViewRecycled(holder)
-        holder.rollBackToInitialPosition()
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     inner class PosterViewHolder(private val binding: ItemPosterBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -53,52 +47,67 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
         private var initialY = 0f
         private var lastTouchedRawX = 0f
         private var lastTouchedRawY = 0f
-        private var lastX = 0F
         private var lastY = 0f
 
         private val removeAnimator: ObjectAnimator by lazy {
-            ObjectAnimator.ofFloat(binding.root, "translationY", -3000f).setDuration(500).also {
-                it.doOnEnd { _ ->
-                    eventListener.onFinishDrag(lastY)
+            ObjectAnimator.ofFloat(binding.root, "translationY", -3000f)
+                .setDuration(500).also {
+                    it.doOnEnd {
+                        eventListener.onFinishDrag(lastY)
+                        rollBackToInitialPosition()
+                    }
+                }
+        }
+
+        init {
+            binding.btnNavigateToDetail.setOnClickListener {
+                eventListener.onClickPoster(getItem(layoutPosition).mediaContent.id)
+            }
+            binding.root.setOnTouchListener { _, event ->
+                if (isTouchable) {
+                    dragOnTouch(event)
+                }
+                true
+            }
+        }
+
+        private fun dragOnTouch(event: MotionEvent) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    eventListener.onStartDrag()
+                    saveLastTouchedRawPoint(event.rawX, event.rawY)
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    dragPoster(event.rawX - lastTouchedRawX, event.rawY - lastTouchedRawY)
+                    saveLastTouchedRawPoint(event.rawX, event.rawY)
+                    eventListener.onDraggingPoster(binding.root.y)
+                }
+                MotionEvent.ACTION_UP -> {
+                    lastY = binding.root.y
+                    if (eventListener.isPosterRemovable(lastY)) {
+                        removeAnimator.start()
+                        // removeAnimator.doOnEnd{}에서 else문 진행
+                    } else {
+                        eventListener.onFinishDrag(lastY)
+                        rollBackToInitialPosition()
+                    }
                 }
             }
         }
 
-        init {
-            binding.btnGoToDetail.setOnClickListener {
-                eventListener.onClickPoster(getItem(layoutPosition).mediaContent.id)
-            }
-            binding.root.setOnTouchListener { rootView, event ->
-                if (isTouchable.not()) {
-                    return@setOnTouchListener true
-                }
+        private fun saveLastTouchedRawPoint(rawX: Float, rawY: Float) {
+            lastTouchedRawX = rawX
+            lastTouchedRawY = rawY
+        }
 
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        eventListener.onStartDrag()
-                        lastTouchedRawX = event.rawX
-                        lastTouchedRawY = event.rawY
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        rootView.x += event.rawX - lastTouchedRawX
-                        rootView.y += event.rawY - lastTouchedRawY
-                        eventListener.onDraggingPoster(rootView.y)
-                        lastTouchedRawX = event.rawX
-                        lastTouchedRawY = event.rawY
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        lastX = rootView.x
-                        lastY = rootView.y
-                        if (eventListener.isPosterRemovable(lastY)) {
-                            removeAnimator.start()
-                        } else {
-                            eventListener.onFinishDrag(lastY)
-                        }
-                        rollBackToInitialPosition()
-                    }
-                }
-                true
-            }
+        private fun dragPoster(dx: Float, dy: Float) {
+            binding.root.x += dx
+            binding.root.y += dy
+        }
+
+        private fun rollBackToInitialPosition() {
+            binding.root.x = initialX
+            binding.root.y = initialY
         }
 
         @SuppressLint("CheckResult")
@@ -106,10 +115,10 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
             initialX = binding.root.x
             initialY = binding.root.y
 
-            (uiState.feedbackUiState is UserCaughtTheLine).also { isCaught ->
-                binding.root.isClickable = isCaught
-                binding.btnGoToDetail.isVisible = isCaught
-                isTouchable = isCaught
+            uiState.feedbackUiState.isUserInputEnabled.also { isTouchable ->
+                this.isTouchable = isTouchable
+                binding.root.isClickable = isTouchable
+                binding.btnNavigateToDetail.isVisible = isTouchable
             }
 
             Glide.with(itemView.context)
@@ -124,11 +133,6 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
                     }
                 }
                 .into(binding.ivPoster)
-        }
-
-        fun rollBackToInitialPosition() {
-            binding.root.x = initialX
-            binding.root.y = initialY
         }
     }
 

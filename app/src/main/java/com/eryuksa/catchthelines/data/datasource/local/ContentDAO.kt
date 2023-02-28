@@ -23,7 +23,7 @@ interface ContentDAO {
     @Query("SELECT * FROM content WHERE id = :id")
     suspend fun getContent(id: Int): Content
 
-    @Insert
+    @Insert(onConflict = REPLACE)
     suspend fun insert(caughtContent: CaughtContent)
 
     @Query(
