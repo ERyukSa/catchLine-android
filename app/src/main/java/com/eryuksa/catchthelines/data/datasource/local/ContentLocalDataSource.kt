@@ -18,6 +18,6 @@ class ContentLocalDataSource(
         dao.insert(caughtContent)
     }
 
-    suspend fun getCaughtContents(): List<Content> =
-        dao.getCaughtContents()
+    suspend fun getCaughtContents(limit: Int, offset: Int): List<Content> =
+        dao.getCaughtContents(limit, offset)
 }

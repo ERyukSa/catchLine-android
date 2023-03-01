@@ -23,5 +23,13 @@
     <string name="game_feedback_wrong">%s ❌</string>
     <string name="game_feedback_all_killed">올킬하셨습니다! 💯</string>
 
-    <string name="poster_description">컨텐츠의 메인 포스터</string>
+    <string name="main_poster_description">메인 포스터 이미지</string>
+    <string name="backdrop_poster_description">배경 포스터 이미지</string>
+
+    <string name="record_title">게임 기록</string>
+    <string name="record_caught_contents">캐치한 컨텐츠</string>
+    <string name="record_description_btn_navigate_to_caught_contents">캐치한 컨텐츠 보기 버튼</string>
+    <string name="record_catch_count">캐치: %d개</string>
+    <string name="record_try_count">시도: %d개</string>
+    <string name="record_statistics">%d / %d</string>
 </resources>

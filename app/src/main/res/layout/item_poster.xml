@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:contentDescription="@string/poster_description" />
+        android:contentDescription="@string/main_poster_description" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btn_navigate_to_detail"
@@ -20,6 +20,7 @@
         android:minHeight="0dp"
         android:minWidth="0dp"
         android:padding="8dp"
+        android:visibility="gone"
         android:backgroundTint="@android:color/transparent"
         android:src="@drawable/icon_info_24"
         android:layout_gravity="end|top" />

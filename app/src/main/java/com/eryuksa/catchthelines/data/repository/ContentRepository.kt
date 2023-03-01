@@ -36,12 +36,15 @@ class ContentRepository(
     suspend fun getContentDetail(id: Int): ContentDetail? =
         remoteDataSource.getContentDetail(id)
 
+    suspend fun getCaughtContents(size: Int, offset: Int): List<Content> {
+        return withContext(Dispatchers.IO) {
+            localDataSource.getCaughtContents(size, offset)
+        }
+    }
+
     suspend fun saveCaughtContent(content: Content) {
         withContext(Dispatchers.IO) {
             localDataSource.saveCaughtContent(CaughtContent(content.id, System.currentTimeMillis()))
-
-            val a = localDataSource.getCaughtContents()
-            Log.d("로그", "caughtContents: $a")
         }
     }
 }

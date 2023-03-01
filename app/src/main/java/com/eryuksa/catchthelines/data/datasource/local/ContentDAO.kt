@@ -28,9 +28,9 @@ interface ContentDAO {
 
     @Query(
         "SELECT * FROM content INNER JOIN caught_content on content.id = caught_content.id " +
-            "ORDER BY caught_content.updatedTime DESC"
+            "ORDER BY caught_content.updatedTime DESC LIMIT :limit OFFSET :offset"
     )
-    suspend fun getCaughtContents(): List<Content>
+    suspend fun getCaughtContents(limit: Int, offset: Int): List<Content>
 
     @Insert(onConflict = REPLACE)
     suspend fun insert(contentDetail: ContentDetail)

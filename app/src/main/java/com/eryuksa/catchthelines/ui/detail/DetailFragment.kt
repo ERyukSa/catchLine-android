@@ -32,6 +32,7 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
+        binding.ivMainPoster.clipToOutline = true
         return binding.root
     }
 

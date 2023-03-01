@@ -21,6 +21,7 @@ import com.eryuksa.catchthelines.data.repository.HintCountRepository
 import com.eryuksa.catchthelines.ui.common.StringProvider
 import com.eryuksa.catchthelines.ui.detail.DetailViewModel
 import com.eryuksa.catchthelines.ui.game.GameViewModel
+import com.eryuksa.catchthelines.ui.record.RecordViewModel
 
 class ContentViewModelFactory private constructor() :
     ViewModelProvider.Factory {
@@ -54,6 +55,8 @@ class ContentViewModelFactory private constructor() :
             return GameViewModel(contentRepository, hintRepository, StringProvider.getInstance()) as T
         } else if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
             return DetailViewModel(contentRepository) as T
+        } else if (modelClass.isAssignableFrom(RecordViewModel::class.java)) {
+            return RecordViewModel(contentRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel Class")

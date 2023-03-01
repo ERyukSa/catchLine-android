@@ -1,8 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/arrow_back_24"
+        app:title="@string/record_title" />
 
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <TextView
+        android:id="@+id/tv_statistics"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintDimensionRatio="h, 1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintWidth_percent="0.3"
+        tools:text="8 / 21" />
+
+    <View
+        android:id="@+id/divider_catch_count"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toBottomOf="@id/tv_statistics"
+        app:layout_constraintEnd_toStartOf="@id/tv_statistics"
+        app:layout_constraintHeight_percent="0.05"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_statistics"
+        app:layout_constraintVertical_bias="0" />
+
+    <TextView
+        android:id="@+id/tv_caught_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="캐치: 4개"
+        app:layout_constraintBottom_toBottomOf="@id/divider_catch_count"
+        app:layout_constraintEnd_toStartOf="@id/tv_statistics"
+        app:layout_constraintStart_toEndOf="@id/divider_catch_count"
+        app:layout_constraintTop_toTopOf="@id/divider_catch_count" />
+
+    <TextView
+        android:id="@+id/tv_try_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="시도: 7개"
+        app:layout_constraintBottom_toBottomOf="@id/divider_try_count"
+        app:layout_constraintEnd_toEndOf="@id/tv_caught_count"
+        app:layout_constraintStart_toStartOf="@id/tv_caught_count"
+        app:layout_constraintTop_toTopOf="@id/divider_try_count" />
+
+    <View
+        android:id="@+id/divider_try_count"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toBottomOf="@id/tv_statistics"
+        app:layout_constraintHeight_percent="0.05"
+        app:layout_constraintStart_toStartOf="@id/divider_catch_count"
+        app:layout_constraintTop_toTopOf="@id/tv_statistics"
+        app:layout_constraintVertical_bias="1" />
+
+    <TextView
+        android:id="@+id/tv_title_caught_contents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48sp"
+        android:text="@string/record_caught_contents"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider_try_count" />
+
+    <ImageButton
+        android:id="@+id/btn_navigate_to_caught_contents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="@string/record_description_btn_navigate_to_caught_contents"
+        android:src="@drawable/icon_arrow_forward_24"
+        app:layout_constraintBottom_toBottomOf="@id/tv_title_caught_contents"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_title_caught_contents" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_caught_contents"
+        android:paddingHorizontal="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        tools:listitem="@layout/item_caught_content"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title_caught_contents" />
 </androidx.constraintlayout.widget.ConstraintLayout>
