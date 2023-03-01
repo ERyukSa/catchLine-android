@@ -30,7 +30,7 @@ class EntryFragment : Fragment() {
             findNavController().navigate(R.id.entry_to_game)
         }
         binding.btnGuide.setOnClickListener {
-            findNavController().navigate(R.id.entry_to_guide)
+            // findNavController().navigate(R.id.entry_to_guide)
         }
         binding.btnRecord.setOnClickListener {
             findNavController().navigate(R.id.entry_to_record)

@@ -8,6 +8,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -58,6 +59,9 @@ class GameFragment : Fragment() {
             firstCharacterHint = FirstCharacterHint
             characterCountHint = CharacterCountHint
             playerViewLine.player = audioPlayer
+            toolbar.setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
         }
         initPosterViewPager()
         initOnClickListener()
