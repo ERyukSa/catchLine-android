@@ -1,6 +1,5 @@
 package com.eryuksa.catchthelines.data.repository
 
-import android.util.Log
 import com.eryuksa.catchthelines.data.datasource.local.ContentLocalDataSource
 import com.eryuksa.catchthelines.data.datasource.remote.ContentRemoteDataSource
 import com.eryuksa.catchthelines.data.dto.CaughtContent
@@ -28,8 +27,6 @@ class ContentRepository(
                 localDataSource.saveContents(contentsFromRemote)
             }
             return@withContext contentsFromRemote
-        }.also {
-            Log.d("로그", "getContents: ${localDataSource.getContents()}")
         }
     }
 

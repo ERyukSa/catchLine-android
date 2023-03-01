@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.databinding.ItemCaughtContentBinding
 
-class CaughtContentsAdapter(private val onClick: (contentId: Int) -> Unit) :
+class CaughtContentsAdapter(private val onClick: (content: Content) -> Unit) :
     RecyclerView.Adapter<CaughtContentsAdapter.ViewHolder>() {
 
     var contents: List<Content> = emptyList()
@@ -33,7 +33,7 @@ class CaughtContentsAdapter(private val onClick: (contentId: Int) -> Unit) :
 
         init {
             itemView.setOnClickListener {
-                onClick(contents[layoutPosition].id)
+                onClick(contents[layoutPosition])
             }
             binding.ivPoster.clipToOutline = true
         }

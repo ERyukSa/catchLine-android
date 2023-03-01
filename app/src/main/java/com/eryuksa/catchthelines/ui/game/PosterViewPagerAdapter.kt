@@ -18,7 +18,7 @@ import jp.wasabeef.glide.transformations.BlurTransformation
 
 interface PosterEventListener {
 
-    fun onClickPoster(contentId: Int)
+    fun onClickPoster(uiState: GameUiState)
     fun onStartDrag()
     fun onDraggingPoster(y: Float)
     fun isPosterRemovable(y: Float): Boolean
@@ -42,7 +42,7 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
     inner class PosterViewHolder(private val binding: ItemPosterBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private var isTouchable = false
+        private var isDraggable = false
         private var initialX = 0f
         private var initialY = 0f
         private var lastTouchedRawX = 0f
@@ -61,10 +61,10 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
 
         init {
             binding.btnNavigateToDetail.setOnClickListener {
-                eventListener.onClickPoster(getItem(layoutPosition).mediaContent.id)
+                eventListener.onClickPoster(getItem(layoutPosition))
             }
             binding.root.setOnTouchListener { _, event ->
-                if (isTouchable) {
+                if (isDraggable) {
                     dragOnTouch(event)
                 }
                 true
@@ -115,10 +115,10 @@ class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
             initialX = binding.root.x
             initialY = binding.root.y
 
-            uiState.feedbackUiState.isUserInputEnabled.also { isTouchable ->
-                this.isTouchable = isTouchable
-                binding.root.isClickable = isTouchable
-                binding.btnNavigateToDetail.isVisible = isTouchable
+            uiState.feedbackUiState.isPosterDraggable.also { isDraggable ->
+                this.isDraggable = isDraggable
+                binding.root.isClickable = isDraggable
+                binding.btnNavigateToDetail.isVisible = isDraggable
             }
 
             Glide.with(itemView.context)

@@ -21,9 +21,9 @@ class RecordFragment : Fragment() {
     private val viewModel: RecordViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
     private val contentsAdapter: CaughtContentsAdapter by lazy {
-        CaughtContentsAdapter { contentId ->
+        CaughtContentsAdapter { content ->
             findNavController().navigate(
-                RecordFragmentDirections.recordToDetail(contentId)
+                RecordFragmentDirections.recordToDetail(content.id, content.lineAudioUrls.toTypedArray())
             )
         }
     }

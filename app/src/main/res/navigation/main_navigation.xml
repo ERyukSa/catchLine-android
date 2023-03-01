@@ -53,5 +53,8 @@
         <argument
             android:name="contentId"
             app:argType="integer" />
+        <argument
+            android:name="audioUrls"
+            app:argType="string[]" />
     </fragment>
 </navigation>

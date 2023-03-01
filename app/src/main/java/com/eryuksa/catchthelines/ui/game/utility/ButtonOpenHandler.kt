@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.ui.game
+package com.eryuksa.catchthelines.ui.game.utility
 
 import android.animation.ObjectAnimator
 import android.widget.Button
@@ -6,7 +6,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import com.eryuksa.catchthelines.R
 
-class ButtonOpener(
+class ButtonOpenHandler(
     initialCeilHeight: Int,
     private val margin: Int,
     private val duration: Long,

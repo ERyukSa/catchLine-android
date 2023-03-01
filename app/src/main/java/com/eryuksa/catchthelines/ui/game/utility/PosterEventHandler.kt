@@ -1,10 +1,14 @@
-package com.eryuksa.catchthelines.ui.game
+package com.eryuksa.catchthelines.ui.game.utility
 
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
+import com.eryuksa.catchthelines.ui.game.GameFragment
+import com.eryuksa.catchthelines.ui.game.GameFragmentDirections
+import com.eryuksa.catchthelines.ui.game.PosterEventListener
+import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 
 class PosterEventHandler(
     private val fragment: GameFragment,
@@ -12,9 +16,12 @@ class PosterEventHandler(
     private val removeCaughtContent: () -> Unit
 ) : PosterEventListener {
 
-    override fun onClickPoster(contentId: Int) =
+    override fun onClickPoster(uiState: GameUiState) =
         fragment.findNavController().navigate(
-            GameFragmentDirections.gameToDetail(contentId)
+            GameFragmentDirections.gameToDetail(
+                uiState.mediaContent.id,
+                uiState.mediaContent.lineAudioUrls.toTypedArray()
+            )
         )
 
     override fun onStartDrag() {

@@ -23,6 +23,8 @@ import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
 import com.eryuksa.catchthelines.ui.game.uistate.NoInput
 import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
 import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
+import com.eryuksa.catchthelines.ui.game.utility.ButtonOpenHandler
+import com.eryuksa.catchthelines.ui.game.utility.PosterEventHandler
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
@@ -45,7 +47,7 @@ class GameFragment : Fragment() {
         ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
     }
 
-    private lateinit var hintButtonsOpener: ButtonOpener
+    private lateinit var hintButtonsOpener: ButtonOpenHandler
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -88,7 +90,7 @@ class GameFragment : Fragment() {
 
     private fun initHintButtonsAnimation(isHintOpen: Boolean) {
         binding.root.doOnLayout {
-            hintButtonsOpener = ButtonOpener(
+            hintButtonsOpener = ButtonOpenHandler(
                 initialCeilHeight = binding.btnOpenHint.height,
                 margin = 20,
                 duration = 400,
@@ -143,7 +145,7 @@ class GameFragment : Fragment() {
                     is AllKilled -> getString(R.string.game_feedback_all_killed)
                 }
 
-                feedbackUiState.isUserInputEnabled.also { userInputEnabled ->
+                feedbackUiState.gameCanContinue.also { userInputEnabled ->
                     binding.btnOpenHint.isClickable = userInputEnabled
                     binding.btnSubmitTitle.isEnabled = userInputEnabled
                     binding.viewPagerPoster.isUserInputEnabled = userInputEnabled

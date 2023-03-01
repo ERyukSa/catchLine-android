@@ -53,7 +53,7 @@
             android:gravity="center"
             android:paddingVertical="16dp"
             android:text="@string/game_listen_and_guess"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorPrimaryVariant"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -86,13 +86,15 @@
             android:id="@+id/tv_feedback"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
             android:gravity="center"
             android:maxLines="2"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toTopOf="@id/btn_play_stop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/view_pager_poster"
+            app:layout_constraintTop_toBottomOf="@id/player_view_line"
+            app:layout_constraintVertical_bias="0"
             tools:text="범죄 국가 ❌" />
 
         <ImageButton
@@ -109,6 +111,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_feedback"
+
             tools:src="@drawable/icon_play_24" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -121,7 +124,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:padding="8dp"
-            android:text="@string/game_line2"
+            android:text="@string/all_line2"
             app:layout_constraintBottom_toBottomOf="@id/btn_hint_clearer_poster"
             app:layout_constraintDimensionRatio="h, 1:1"
             app:layout_constraintEnd_toEndOf="@id/btn_hint_clearer_poster"
@@ -196,8 +199,8 @@
             android:backgroundTint="?attr/colorSurface"
             android:contentDescription="@string/game_description_select_hint"
             android:src="@drawable/icon_hint_24"
-            app:elevation="4dp"
             app:borderWidth="0dp"
+            app:elevation="4dp"
             app:layout_constraintBottom_toBottomOf="@id/btn_play_stop"
             app:layout_constraintEnd_toStartOf="@id/btn_play_stop"
             app:layout_constraintHorizontal_bias="0.543"
@@ -226,7 +229,7 @@
             android:elevation="4dp"
             android:maxLines="1"
             android:padding="0dp"
-            android:text="@string/game_line1"
+            android:text="@string/all_line1"
             app:layout_constraintBottom_toBottomOf="@id/btn_play_stop"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -253,7 +256,9 @@
             android:id="@+id/btn_submit_title"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:backgroundTint="@android:color/transparent"
             android:contentDescription="@string/game_description_submit"
+            android:elevation="0dp"
             android:src="@drawable/icon_submit_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
