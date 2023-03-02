@@ -25,7 +25,7 @@ interface PosterEventListener {
     fun onFinishDrag(lastY: Float)
 }
 
-class PosterViewPagerAdapter(private val eventListener: PosterEventListener) :
+class PosterViewPagerAdapter(var eventListener: PosterEventListener) :
     ListAdapter<GameUiState, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {

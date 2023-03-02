@@ -39,12 +39,8 @@ class GameFragment : Fragment() {
         get() = _binding!!
     private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
-    private val posterEventHandler: PosterEventHandler by lazy {
-        PosterEventHandler(this, binding, viewModel::removeCaughtContent)
-    }
-    private val posterAdapter: PosterViewPagerAdapter by lazy {
-        PosterViewPagerAdapter(posterEventHandler)
-    }
+    private lateinit var posterEventHandler: PosterEventHandler
+    private lateinit var posterAdapter: PosterViewPagerAdapter
 
     private val audioPlayer: ExoPlayer by lazy {
         ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
@@ -82,7 +78,14 @@ class GameFragment : Fragment() {
     private fun initPosterViewPager() {
         binding.viewPagerPoster.run {
             offscreenPageLimit = 3
-            adapter = posterAdapter
+            posterEventHandler = PosterEventHandler(
+                this@GameFragment,
+                binding,
+                removeCaughtContent = viewModel::removeCaughtContent
+            )
+            adapter = PosterViewPagerAdapter(posterEventHandler).also {
+                this@GameFragment.posterAdapter = it
+            }
             this.removeOverScroll()
             this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
             setPageTransformer(buildPageTransformer())
