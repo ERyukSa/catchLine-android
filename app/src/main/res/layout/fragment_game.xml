@@ -106,8 +106,8 @@
             android:elevation="3dp"
             android:padding="16dp"
             android:scaleType="centerCrop"
+            android:layout_marginTop="48dp"
             android:src="@drawable/icon_play_24"
-            app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_feedback"
@@ -247,10 +247,10 @@
             android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:imeOptions="actionDone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_submit_title"
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageButton
@@ -261,7 +261,7 @@
             android:contentDescription="@string/game_description_submit"
             android:elevation="0dp"
             android:src="@drawable/icon_submit_24"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/edittext_input_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
 

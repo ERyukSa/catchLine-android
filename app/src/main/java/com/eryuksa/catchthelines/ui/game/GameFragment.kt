@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -108,8 +110,8 @@ class GameFragment : Fragment() {
 
     private fun initViewListener() {
         binding.btnSubmitTitle.setOnClickListener {
-            viewModel.checkUserCatchTheLine(binding.edittextInputTitle.text.toString())
-            binding.edittextInputTitle.text.clear()
+            submitUserInputAndClearText()
+            hideInputMethod()
         }
 
         binding.btnPlayStop.setOnClickListener {
@@ -125,9 +127,9 @@ class GameFragment : Fragment() {
                 binding.darkBackgroundCoverForHint.isVisible.not()
         }
 
-        binding.edittextInputTitle.setOnEditorActionListener { textView, actionId, _ ->
+        binding.edittextInputTitle.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                viewModel.checkUserCatchTheLine(textView.text.toString())
+                submitUserInputAndClearText()
             }
             true
         }
@@ -218,6 +220,17 @@ class GameFragment : Fragment() {
             audioUrls.map { url -> MediaItem.fromUri(url) }
         )
         this.prepare()
+    }
+
+    private fun submitUserInputAndClearText() {
+        viewModel.checkUserCatchTheLine(binding.edittextInputTitle.text.toString())
+        binding.edittextInputTitle.text?.clear()
+    }
+
+    private fun hideInputMethod() {
+        val inputManager =
+            getSystemService(requireContext(), InputMethodManager::class.java) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
