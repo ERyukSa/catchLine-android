@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.doOnLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -26,7 +24,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
 import com.eryuksa.catchthelines.ui.game.uistate.NoInput
 import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
 import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
-import com.eryuksa.catchthelines.ui.game.utility.ButtonOpenHandler
+import com.eryuksa.catchthelines.ui.game.utility.HintButtonAnimationHandler
 import com.eryuksa.catchthelines.ui.game.utility.PosterEventHandler
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -46,7 +44,7 @@ class GameFragment : Fragment() {
         ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
     }
 
-    private lateinit var hintButtonsOpener: ButtonOpenHandler
+    private lateinit var hintAnimationHandler: HintButtonAnimationHandler
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,6 +73,11 @@ class GameFragment : Fragment() {
         observeData()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(HINT_IS_OPEN_KEY, hintAnimationHandler.isHintOpen)
+    }
+
     private fun initPosterViewPager() {
         binding.viewPagerPoster.run {
             offscreenPageLimit = 3
@@ -95,20 +98,17 @@ class GameFragment : Fragment() {
     }
 
     private fun initHintButtonsAnimation(isHintOpen: Boolean) {
-        binding.root.doOnLayout {
-            hintButtonsOpener = ButtonOpenHandler(
-                initialCeilHeight = binding.btnOpenHint.height,
-                margin = 20,
-                duration = 400,
-                isHintOpen
-            )
-            hintButtonsOpener.run {
-                addInnerButton(binding.btnHintClearerPoster)
-                addInnerButton(binding.btnHintFirstCharacter)
-                addInnerButton(binding.btnHintCharactersCount)
-                addInnerButton(binding.btnHintAnotherLine)
-            }
-        }
+        hintAnimationHandler = HintButtonAnimationHandler(
+            hintEntranceButton = binding.btnOpenHint,
+            hintButtons = listOf(
+                binding.btnHintClearerPoster,
+                binding.btnHintFirstCharacter,
+                binding.btnHintCharactersCount,
+                binding.btnHintAnotherLine
+            ),
+            wasHintOpened = isHintOpen,
+            darkBackgroundView = binding.darkBackgroundCoverForHint
+        )
     }
 
     private fun initViewListener() {
@@ -124,17 +124,24 @@ class GameFragment : Fragment() {
             }
         }
 
-        binding.btnOpenHint.setOnClickListener {
-            hintButtonsOpener.switchOpenState()
-            binding.darkBackgroundCoverForHint.isVisible =
-                binding.darkBackgroundCoverForHint.isVisible.not()
-        }
-
         binding.edittextInputTitle.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 submitUserInputAndClearText()
             }
             true
+        }
+
+        binding.btnHintClearerPoster.setOnClickListener {
+            viewModel.useHint(ClearerPosterHint)
+            hintAnimationHandler.closeHintAndDarkBackground()
+        }
+        binding.btnHintFirstCharacter.setOnClickListener {
+            viewModel.useHint(FirstCharacterHint)
+            hintAnimationHandler.closeHintAndDarkBackground()
+        }
+        binding.btnHintCharactersCount.setOnClickListener {
+            viewModel.useHint(CharacterCountHint)
+            hintAnimationHandler.closeHintAndDarkBackground()
         }
     }
 
@@ -172,16 +179,13 @@ class GameFragment : Fragment() {
             currentPagePosition.observe(viewLifecycleOwner) { position ->
                 stopLineAudio()
                 audioPlayer.seekTo(position, 0)
+                if (position != binding.viewPagerPoster.currentItem) {
+                    binding.viewPagerPoster.setCurrentItem(position, false)
+                }
             }
 
             hintText.observe(viewLifecycleOwner) { text ->
                 binding.tvHint.text = text
-            }
-
-            usedHints.observe(viewLifecycleOwner) {
-                if (this@GameFragment::hintButtonsOpener.isInitialized.not()) return@observe
-                hintButtonsOpener.switchOpenState()
-                binding.darkBackgroundCoverForHint.visibility = View.INVISIBLE
             }
         }
     }
@@ -234,11 +238,6 @@ class GameFragment : Fragment() {
         val inputManager =
             getSystemService(requireContext(), InputMethodManager::class.java) as InputMethodManager
         inputManager.hideSoftInputFromWindow(binding.root.windowToken, 0)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(HINT_IS_OPEN_KEY, hintButtonsOpener.isOpen)
     }
 
     companion object {
