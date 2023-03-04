@@ -92,6 +92,6 @@ class HintCountRepository(
 
     companion object {
         private const val MAX_HINT_COUNT = 10
-        private const val PERIOD_IN_MILLIS: Long = 1000 * 5
+        private const val PERIOD_IN_MILLIS: Long = 1000 * 60
     }
 }

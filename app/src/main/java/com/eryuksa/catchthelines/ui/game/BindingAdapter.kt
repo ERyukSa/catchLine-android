@@ -15,7 +15,7 @@ fun setHintCountText(textView: TextView, hintCount: Int) {
 fun setBackgroundResource(button: Button, myHintType: Hint, usedHints: Set<Hint>?) {
     if (usedHints == null) return
     when (usedHints.contains(myHintType)) {
-        true -> button.setBackgroundResource(R.drawable.game_white_filled_circle_button)
-        false -> button.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
+        true -> button.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
+        false -> button.setBackgroundResource(R.drawable.game_white_filled_circle_button)
     }
 }

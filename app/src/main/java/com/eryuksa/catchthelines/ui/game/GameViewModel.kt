@@ -102,7 +102,9 @@ class GameViewModel(
 
     fun useHint(hint: Hint) {
         val currentPosition = currentPagePosition.value ?: return
-        viewModelScope.launch { hintRepository.decreaseHintCount() }
+        if (hint !in (usedHints.value ?: return)) {
+            viewModelScope.launch { hintRepository.decreaseHintCount() }
+        }
 
         val changedGameItem = when (hint) {
             is ClearerPosterHint -> with(uiStatesForEasyAccess[currentPosition]) {
