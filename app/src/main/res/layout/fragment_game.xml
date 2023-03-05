@@ -71,7 +71,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_hint" />
 
         <com.google.android.exoplayer2.ui.PlayerControlView
-            android:id="@+id/player_view_line"
+            android:id="@+id/player_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -93,7 +93,7 @@
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/player_view_line"
+            app:layout_constraintTop_toBottomOf="@id/player_view"
             app:layout_constraintVertical_bias="0"
             tools:text="범죄 국가 ❌" />
 

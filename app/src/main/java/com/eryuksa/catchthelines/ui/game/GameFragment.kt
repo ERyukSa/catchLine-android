@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
+import com.eryuksa.catchthelines.ui.common.AudioPlayer
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.game.uistate.AllKilled
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
@@ -27,7 +28,6 @@ import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonAnimationHandler
 import com.eryuksa.catchthelines.ui.game.utility.PosterEventHandler
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
 import kotlin.math.abs
 
 class GameFragment : Fragment() {
@@ -40,9 +40,7 @@ class GameFragment : Fragment() {
     private lateinit var posterEventHandler: PosterEventHandler
     private lateinit var posterAdapter: PosterViewPagerAdapter
 
-    private val audioPlayer: ExoPlayer by lazy {
-        ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
-    }
+    private lateinit var audioPlayer: AudioPlayer
 
     private lateinit var hintAnimationHandler: HintButtonAnimationHandler
 
@@ -57,7 +55,6 @@ class GameFragment : Fragment() {
             clearerPosterHint = ClearerPosterHint
             firstCharacterHint = FirstCharacterHint
             characterCountHint = CharacterCountHint
-            playerViewLine.player = audioPlayer
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
@@ -78,23 +75,14 @@ class GameFragment : Fragment() {
         outState.putBoolean(HINT_IS_OPEN_KEY, hintAnimationHandler.isHintOpen)
     }
 
-    private fun initPosterViewPager() {
-        binding.viewPagerPoster.run {
-            offscreenPageLimit = 3
-            posterEventHandler = PosterEventHandler(
-                this@GameFragment,
-                binding,
-                removeCaughtContent = viewModel::removeCaughtContent
-            )
-            adapter = PosterViewPagerAdapter(posterEventHandler).also {
-                this@GameFragment.posterAdapter = it
-            }
-            this.removeOverScroll()
-            this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
-            setPageTransformer(buildPageTransformer())
-            registerOnPageChangeCallback(switchAudioLineOnPageChange)
-            scheduleLayoutAnimation()
-        }
+    override fun onStart() {
+        super.onStart()
+        initializeAudioPlayer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        releaseAudioPlayer()
     }
 
     private fun initHintButtonsAnimation(isHintOpen: Boolean) {
@@ -118,10 +106,7 @@ class GameFragment : Fragment() {
         }
 
         binding.btnPlayStop.setOnClickListener {
-            when (audioPlayer.isPlaying) {
-                true -> stopLineAudio()
-                false -> startLineAudio()
-            }
+            audioPlayer.switchPlayingState()
         }
 
         binding.edittextInputTitle.setOnEditorActionListener { _, actionId, _ ->
@@ -152,7 +137,8 @@ class GameFragment : Fragment() {
             }
 
             groupedLineAudioUrls.observe(viewLifecycleOwner) { audioUrls ->
-                audioPlayer.setUpLines(audioUrls.map { urls -> urls[0] })
+                audioPlayer.setUpAudio(audioUrls.map { urls -> urls[0] })
+                audioPlayer.moveTo(viewModel.currentPagePosition.value ?: return@observe)
             }
 
             feedbackUiState.observe(viewLifecycleOwner) { feedbackUiState ->
@@ -177,8 +163,7 @@ class GameFragment : Fragment() {
             }
 
             currentPagePosition.observe(viewLifecycleOwner) { position ->
-                stopLineAudio()
-                audioPlayer.seekTo(position, 0)
+                audioPlayer.moveTo(position)
                 if (position != binding.viewPagerPoster.currentItem) {
                     binding.viewPagerPoster.setCurrentItem(position, false)
                 }
@@ -212,21 +197,37 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun stopLineAudio() {
-        audioPlayer.pause()
-        binding.btnPlayStop.setImageResource(R.drawable.icon_play_24)
+    private fun initPosterViewPager() {
+        binding.viewPagerPoster.run {
+            offscreenPageLimit = 3
+            posterEventHandler = PosterEventHandler(
+                this@GameFragment,
+                binding,
+                removeCaughtContent = viewModel::removeCaughtContent
+            )
+            adapter = PosterViewPagerAdapter(posterEventHandler).also {
+                this@GameFragment.posterAdapter = it
+            }
+            this.removeOverScroll()
+            this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
+            setPageTransformer(buildPageTransformer())
+            registerOnPageChangeCallback(switchAudioLineOnPageChange)
+            scheduleLayoutAnimation()
+        }
     }
 
-    private fun startLineAudio() {
-        audioPlayer.play()
-        binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24)
-    }
-
-    private fun ExoPlayer.setUpLines(audioUrls: List<String>) {
-        this.addMediaItems(
-            audioUrls.map { url -> MediaItem.fromUri(url) }
+    private fun initializeAudioPlayer() {
+        audioPlayer = AudioPlayer(ExoPlayer.Builder(requireContext()).build())
+        audioPlayer.initializePlayer(
+            uris = viewModel.groupedLineAudioUrls.value?.map { it[0] } ?: emptyList(),
+            playerView = binding.playerView,
+            onPlay = { binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24) },
+            onPause = { binding.btnPlayStop.setImageResource(R.drawable.icon_play_24) }
         )
-        this.prepare()
+    }
+
+    private fun releaseAudioPlayer() {
+        audioPlayer.releasePlayer()
     }
 
     private fun submitUserInputAndClearText() {
