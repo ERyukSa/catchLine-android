@@ -7,11 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentRecordBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
+import kotlinx.coroutines.launch
 
 class RecordFragment : Fragment() {
 
@@ -47,13 +51,26 @@ class RecordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            with(uiState) {
-                binding.tvCaughtCount.text = getString(R.string.record_catch_count, caughtContentsCount)
-                binding.tvTryCount.text = getString(R.string.record_try_count, tryContentsCount)
-                binding.tvStatistics.text =
-                    getString(R.string.record_statistics, caughtContentsCount, tryContentsCount)
-                contentsAdapter.contents = caughtContents
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState ->
+                    with(uiState) {
+                        binding.tvCaughtCount.text = getString(
+                            R.string.record_catch_count,
+                            caughtContentsCount
+                        )
+                        binding.tvTryCount.text = getString(
+                            R.string.record_encounter_count,
+                            encounteredContentsCount
+                        )
+                        binding.tvStatistics.text = getString(
+                            R.string.record_statistics,
+                            caughtContentsCount,
+                            encounteredContentsCount
+                        )
+                        contentsAdapter.contents = caughtContents
+                    }
+                }
             }
         }
     }

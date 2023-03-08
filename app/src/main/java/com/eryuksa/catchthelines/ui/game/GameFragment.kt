@@ -142,7 +142,7 @@ class GameFragment : Fragment() {
 
     private fun observeData() {
         with(viewModel) {
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.currentPage }.collect { uiState ->
                         audioPlayer.moveTo(uiState.currentPage)
@@ -150,7 +150,7 @@ class GameFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.contentUiStates }.collect { uiState ->
                         posterAdapter.submitList(uiState.contentUiStates)
@@ -159,7 +159,7 @@ class GameFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.audioUris }.collect { uiState ->
                         audioPlayer.setUpAudio(uiState.audioUris)
@@ -168,7 +168,7 @@ class GameFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.feedbackText }.collect { uiState ->
                         binding.tvFeedback.text = uiState.feedbackText
@@ -176,7 +176,7 @@ class GameFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
                         binding.btnOpenHint.isClickable = uiState.didUserCatchTheLine.not()
@@ -190,7 +190,7 @@ class GameFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.hintText }.collect { uiState ->
                         binding.tvHint.text = uiState.hintText
@@ -198,7 +198,7 @@ class GameFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.hintCount }.collect { uiState ->
                         binding.tvAvailableHintCount.text =
@@ -207,7 +207,7 @@ class GameFragment : Fragment() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState1.distinctUntilChangedBy { it.usedHints }.collect { uiState ->
                         binding.usedHints = uiState.usedHints

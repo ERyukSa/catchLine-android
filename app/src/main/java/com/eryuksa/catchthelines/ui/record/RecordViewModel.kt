@@ -1,22 +1,25 @@
 package com.eryuksa.catchthelines.ui.record
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.repository.ContentRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class RecordViewModel(private val repository: ContentRepository) : ViewModel() {
 
-    private val _uiState = MutableLiveData<RecordUiState>()
-    val uiState: LiveData<RecordUiState>
-        get() = _uiState
+    private val _uiState = MutableStateFlow<RecordUiState>(RecordUiState())
+    val uiState: StateFlow<RecordUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val caughtContents = repository.getCaughtContents(size = CAUGHT_CONTENTS_CHUNK, offset = 0)
-            _uiState.value = RecordUiState(2, 4, caughtContents)
+            _uiState.value = RecordUiState(
+                caughtContents = repository.getCaughtContents(size = CAUGHT_CONTENTS_CHUNK, offset = 0),
+                caughtContentsCount = repository.getCaughtContentsCount(),
+                encounteredContentsCount = repository.getEncounteredContentsCount()
+            )
         }
     }
 

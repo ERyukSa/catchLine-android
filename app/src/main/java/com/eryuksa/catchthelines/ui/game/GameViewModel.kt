@@ -10,6 +10,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
+import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,19 +20,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-data class GameUiState1(
-    val currentPage: Int = 0,
-    val contentUiStates: List<ContentUiState> = emptyList(),
-    val usedHints: Set<Hint> = emptySet(),
-    val hintText: String = "",
-    val feedbackText: String = "",
-    val didUserCatchTheLine: Boolean = false,
-    val hintCount: Int = 10
-) {
-    val audioUris: List<List<String>>
-        get() = contentUiStates.map { it.content.lineAudioUrls }
-}
 
 class GameViewModel(
     private val contentRepository: ContentRepository,
@@ -49,7 +37,7 @@ class GameViewModel(
     private val _didUserCatchTheLine = MutableStateFlow<Boolean>(false)
     private val _availableHintCount = MutableStateFlow<Int>(10)
 
-    val uiState1: StateFlow<GameUiState1> = combine(
+    val uiState1: StateFlow<GameUiState> = combine(
         _currentPage,
         _contentUiStates,
         _usedHints,
@@ -59,7 +47,7 @@ class GameViewModel(
         _availableHintCount
     ) { array: Array<Any> ->
         val currentPage = array[0] as Int
-        GameUiState1(
+        GameUiState(
             currentPage = currentPage,
             contentUiStates = array[1] as List<ContentUiState>,
             usedHints = (array[2] as List<Set<Hint>>)[currentPage],
@@ -71,7 +59,7 @@ class GameViewModel(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
-        initialValue = GameUiState1()
+        initialValue = GameUiState()
     )
 
     init {
@@ -83,6 +71,8 @@ class GameViewModel(
                 _usedHints.value = contents.map { emptySet() }
                 _hintTexts.value = contents.map { stringProvider.getString(R.string.game_listen_and_guess) }
                 _feedbackTexts.value = contents.map { "" }
+
+                contentRepository.saveEncounteredContent(contents.first())
             }
             hintRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
@@ -90,6 +80,9 @@ class GameViewModel(
 
     fun movePageTo(position: Int) {
         _currentPage.value = position
+        viewModelScope.launch {
+            contentRepository.saveEncounteredContent(_contentUiStates.value[position].content)
+        }
     }
 
     fun useHint(hint: Hint) {
@@ -131,24 +124,32 @@ class GameViewModel(
 
     fun checkUserCatchTheLine(userInput: String) {
         val currentContent = _contentUiStates.value[_currentPage.value].content
-        val userCatchTheLineFeedbackText = if (userInput.contains(currentContent.title)) {
+        if (doesUserCatch(userInput, currentContent.title)) {
             viewModelScope.launch {
                 contentRepository.saveCaughtContent(currentContent)
             }
-            _didUserCatchTheLine.value = true
-
-            stringProvider.getString(R.string.game_feedback_catch_the_line, currentContent.title)
+            _didUserCatchTheLine.update { true }
+            _feedbackTexts.update { feedbackTexts ->
+                feedbackTexts.replaceOldItemAt(
+                    i = _currentPage.value,
+                    newItem =
+                    stringProvider.getString(R.string.game_feedback_catch_the_line, currentContent.title)
+                )
+            }
+            _contentUiStates.update { contentUiStates ->
+                contentUiStates.replaceOldItemAt(
+                    i = _currentPage.value,
+                    newItem = _contentUiStates.value[_currentPage.value].copy(blurDegree = 0)
+                )
+            }
         } else {
-            stringProvider.getString(R.string.game_feedback_wrong, userInput)
+            _feedbackTexts.update { feedbackTexts ->
+                feedbackTexts.replaceOldItemAt(
+                    i = _currentPage.value,
+                    newItem = stringProvider.getString(R.string.game_feedback_wrong, userInput)
+                )
+            }
         }
-
-        _feedbackTexts.update { feedbackTexts ->
-            feedbackTexts.replaceOldItemAt(_currentPage.value, userCatchTheLineFeedbackText)
-        }
-        _contentUiStates.value = _contentUiStates.value.replaceOldItemAt(
-            i = _currentPage.value,
-            newItem = _contentUiStates.value[_currentPage.value].copy(blurDegree = 0)
-        )
     }
 
     fun removeCaughtContent() {
@@ -186,8 +187,11 @@ class GameViewModel(
         }
     }
 
+    private fun doesUserCatch(userInput: String, contentTitle: String): Boolean =
+        userInput.contains(contentTitle)
+
     companion object {
-        private const val CLEARER_BLUR_DEGREE = 2
+        private const val CLEARER_BLUR_DEGREE = 3
         private const val DEFAULT_BLUR_DEGREE = 6
     }
 }

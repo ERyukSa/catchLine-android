@@ -1,7 +1,7 @@
 package com.eryuksa.catchthelines.data.datasource.local
 
-import com.eryuksa.catchthelines.data.dto.CaughtContent
 import com.eryuksa.catchthelines.data.dto.Content
+import com.eryuksa.catchthelines.data.dto.EncounteredContent
 
 class ContentLocalDataSource(
     private val dao: ContentDAO
@@ -14,10 +14,16 @@ class ContentLocalDataSource(
         dao.insert(contents)
     }
 
-    suspend fun saveCaughtContent(caughtContent: CaughtContent) {
-        dao.insert(caughtContent)
+    suspend fun saveEncounteredContent(encounteredContent: EncounteredContent) {
+        dao.insert(encounteredContent)
     }
 
     suspend fun getCaughtContents(limit: Int, offset: Int): List<Content> =
         dao.getCaughtContents(limit, offset)
+
+    suspend fun getEncounteredContentsCount(): Int =
+        dao.getEncounteredContentsCount()
+
+    suspend fun getCaughtContentsCount(): Int =
+        dao.getCaughtContentsCount()
 }
