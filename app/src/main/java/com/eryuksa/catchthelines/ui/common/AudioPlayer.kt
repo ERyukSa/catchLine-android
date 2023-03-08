@@ -29,13 +29,11 @@ class AudioPlayer(private val audioPlayer: ExoPlayer) {
     }
 
     fun initializePlayer(
-        uris: List<String>,
         playerView: PlayerControlView,
         onPlay: () -> Unit,
         onPause: () -> Unit
     ) {
         playerView.player = audioPlayer.also { exoPlayer ->
-            setUpAudio(uris)
             exoPlayer.playWhenReady = playWhenReady
             exoPlayer.seekTo(currentItem, playbackPosition)
             exoPlayer.repeatMode = ExoPlayer.REPEAT_MODE_ONE
@@ -55,8 +53,12 @@ class AudioPlayer(private val audioPlayer: ExoPlayer) {
         audioPlayer.release()
     }
 
-    fun setUpAudio(uris: List<String>) {
-        audioPlayer.setMediaItems(uris.map { MediaItem.fromUri(it) })
+    fun setUpAudio(uris: List<List<String>>) {
+        audioPlayer.setMediaItems(
+            uris.map { groupedUris ->
+                MediaItem.fromUri(groupedUris[0])
+            }
+        )
     }
 
     fun switchPlayingState() {

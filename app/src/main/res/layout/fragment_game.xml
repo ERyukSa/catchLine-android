@@ -12,14 +12,18 @@
         <variable
             name="clearerPosterHint"
             type="com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint" />
-
         <variable
             name="firstCharacterHint"
             type="com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint" />
-
         <variable
             name="characterCountHint"
             type="com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint" />
+
+        <import type="com.eryuksa.catchthelines.ui.game.uistate.Hint" />
+        <import type="java.util.Set" />
+        <variable
+            name="usedHints"
+            type="Set&lt;Hint&gt;" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -134,7 +138,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_characters_count"
             myHintType="@{characterCountHint}"
-            usedHints="@{viewModel.usedHints}"
+            usedHints="@{usedHints}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_circle_button"
@@ -153,7 +157,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_first_character"
             myHintType="@{firstCharacterHint}"
-            usedHints="@{viewModel.usedHints}"
+            usedHints="@{usedHints}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_circle_button"
@@ -173,7 +177,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_clearer_poster"
             myHintType="@{clearerPosterHint}"
-            usedHints="@{viewModel.usedHints}"
+            usedHints="@{usedHints}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_stroked_circle_button"
@@ -205,7 +209,6 @@
 
         <TextView
             android:id="@+id/tv_available_hint_count"
-            hintCount="@{viewModel.availableHintCount}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

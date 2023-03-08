@@ -9,6 +9,9 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -18,16 +21,14 @@ import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.AudioPlayer
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
-import com.eryuksa.catchthelines.ui.game.uistate.AllKilled
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
-import com.eryuksa.catchthelines.ui.game.uistate.NoInput
-import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
-import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonAnimationHandler
-import com.eryuksa.catchthelines.ui.game.utility.PosterEventHandler
+import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
 import com.google.android.exoplayer2.ExoPlayer
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class GameFragment : Fragment() {
@@ -37,8 +38,17 @@ class GameFragment : Fragment() {
         get() = _binding!!
     private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
 
-    private lateinit var posterEventHandler: PosterEventHandler
+    private lateinit var posterDragHandler: PosterDragHandler
     private lateinit var posterAdapter: PosterViewPagerAdapter
+    private val onClickPoster = { position: Int ->
+        val currentContent = viewModel.uiState1.value.contentUiStates[position].content
+        findNavController().navigate(
+            GameFragmentDirections.gameToDetail(
+                currentContent.id,
+                currentContent.lineAudioUrls.toTypedArray()
+            )
+        )
+    }
 
     private lateinit var audioPlayer: AudioPlayer
 
@@ -132,45 +142,77 @@ class GameFragment : Fragment() {
 
     private fun observeData() {
         with(viewModel) {
-            uiStates.observe(viewLifecycleOwner) { uiStates ->
-                posterAdapter.submitList(uiStates)
-            }
-
-            groupedLineAudioUrls.observe(viewLifecycleOwner) { audioUrls ->
-                audioPlayer.setUpAudio(audioUrls.map { urls -> urls[0] })
-                audioPlayer.moveTo(viewModel.currentPagePosition.value ?: return@observe)
-            }
-
-            feedbackUiState.observe(viewLifecycleOwner) { feedbackUiState ->
-                binding.tvFeedback.text = when (feedbackUiState) {
-                    is UserCaughtTheLine ->
-                        getString(R.string.game_feedback_catch_the_line, feedbackUiState.title)
-                    is UserInputWrong ->
-                        getString(R.string.game_feedback_wrong, feedbackUiState.userInput)
-                    is NoInput -> ""
-                    is AllKilled -> getString(R.string.game_feedback_all_killed)
-                }
-
-                feedbackUiState.gameCanContinue.also { userInputEnabled ->
-                    binding.btnOpenHint.isClickable = userInputEnabled
-                    binding.btnSubmitTitle.isEnabled = userInputEnabled
-                    binding.viewPagerPoster.isUserInputEnabled = userInputEnabled
-                    binding.viewPagerPoster.elevation = when (userInputEnabled) {
-                        true -> 0f
-                        false -> resources.getDimension(R.dimen.game_poster_elevation_over_dark_cover)
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.currentPage }.collect { uiState ->
+                        audioPlayer.moveTo(uiState.currentPage)
                     }
                 }
             }
 
-            currentPagePosition.observe(viewLifecycleOwner) { position ->
-                audioPlayer.moveTo(position)
-                if (position != binding.viewPagerPoster.currentItem) {
-                    binding.viewPagerPoster.setCurrentItem(position, false)
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.contentUiStates }.collect { uiState ->
+                        posterAdapter.submitList(uiState.contentUiStates)
+                        binding.viewPagerPoster.setCurrentItem(uiState.currentPage, false)
+                    }
                 }
             }
 
-            hintText.observe(viewLifecycleOwner) { text ->
-                binding.tvHint.text = text
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.audioUris }.collect { uiState ->
+                        audioPlayer.setUpAudio(uiState.audioUris)
+                        audioPlayer.moveTo(uiState.currentPage)
+                    }
+                }
+            }
+
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.feedbackText }.collect { uiState ->
+                        binding.tvFeedback.text = uiState.feedbackText
+                    }
+                }
+            }
+
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
+                        binding.btnOpenHint.isClickable = uiState.didUserCatchTheLine.not()
+                        binding.btnSubmitTitle.isEnabled = uiState.didUserCatchTheLine.not()
+                        binding.viewPagerPoster.isUserInputEnabled = uiState.didUserCatchTheLine.not()
+                        binding.viewPagerPoster.elevation = when (uiState.didUserCatchTheLine) {
+                            true -> resources.getDimension(R.dimen.game_poster_elevation_over_dark_cover)
+                            false -> 0f
+                        }
+                    }
+                }
+            }
+
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.hintText }.collect { uiState ->
+                        binding.tvHint.text = uiState.hintText
+                    }
+                }
+            }
+
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.hintCount }.collect { uiState ->
+                        binding.tvAvailableHintCount.text =
+                            getString(R.string.game_available_hint_count, uiState.hintCount)
+                    }
+                }
+            }
+
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState1.distinctUntilChangedBy { it.usedHints }.collect { uiState ->
+                        binding.usedHints = uiState.usedHints
+                    }
+                }
             }
         }
     }
@@ -181,7 +223,7 @@ class GameFragment : Fragment() {
 
     private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            viewModel.movePagePosition(position)
+            viewModel.movePageTo(position)
         }
     }
 
@@ -200,12 +242,11 @@ class GameFragment : Fragment() {
     private fun initPosterViewPager() {
         binding.viewPagerPoster.run {
             offscreenPageLimit = 3
-            posterEventHandler = PosterEventHandler(
-                this@GameFragment,
+            posterDragHandler = PosterDragHandlerImpl(
                 binding,
                 removeCaughtContent = viewModel::removeCaughtContent
             )
-            adapter = PosterViewPagerAdapter(posterEventHandler).also {
+            adapter = PosterViewPagerAdapter(posterDragHandler, onClickPoster).also {
                 this@GameFragment.posterAdapter = it
             }
             this.removeOverScroll()
@@ -219,7 +260,6 @@ class GameFragment : Fragment() {
     private fun initializeAudioPlayer() {
         audioPlayer = AudioPlayer(ExoPlayer.Builder(requireContext()).build())
         audioPlayer.initializePlayer(
-            uris = viewModel.groupedLineAudioUrls.value?.map { it[0] } ?: emptyList(),
             playerView = binding.playerView,
             onPlay = { binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24) },
             onPause = { binding.btnPlayStop.setImageResource(R.drawable.icon_play_24) }

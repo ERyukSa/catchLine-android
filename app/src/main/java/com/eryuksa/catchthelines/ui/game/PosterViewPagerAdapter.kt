@@ -13,20 +13,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
-import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
+import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
 import jp.wasabeef.glide.transformations.BlurTransformation
 
-interface PosterEventListener {
+interface PosterDragHandler {
 
-    fun onClickPoster(uiState: GameUiState)
     fun onStartDrag()
     fun onDraggingPoster(y: Float)
     fun isPosterRemovable(y: Float): Boolean
     fun onFinishDrag(lastY: Float)
 }
 
-class PosterViewPagerAdapter(var eventListener: PosterEventListener) :
-    ListAdapter<GameUiState, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
+class PosterViewPagerAdapter(
+    val dragListener: PosterDragHandler,
+    val onClick: (position: Int) -> Unit
+) :
+    ListAdapter<ContentUiState, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
         val binding = ItemPosterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -53,7 +55,7 @@ class PosterViewPagerAdapter(var eventListener: PosterEventListener) :
             ObjectAnimator.ofFloat(binding.root, "translationY", -3000f)
                 .setDuration(500).also {
                     it.doOnEnd {
-                        eventListener.onFinishDrag(lastY)
+                        dragListener.onFinishDrag(lastY)
                         rollBackToInitialPosition()
                     }
                 }
@@ -61,7 +63,7 @@ class PosterViewPagerAdapter(var eventListener: PosterEventListener) :
 
         init {
             binding.btnNavigateToDetail.setOnClickListener {
-                eventListener.onClickPoster(getItem(layoutPosition))
+                onClick(layoutPosition)
             }
             binding.root.setOnTouchListener { _, event ->
                 if (isDraggable) {
@@ -74,21 +76,21 @@ class PosterViewPagerAdapter(var eventListener: PosterEventListener) :
         private fun dragOnTouch(event: MotionEvent) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    eventListener.onStartDrag()
+                    dragListener.onStartDrag()
                     saveLastTouchedRawPoint(event.rawX, event.rawY)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     dragPoster(event.rawX - lastTouchedRawX, event.rawY - lastTouchedRawY)
                     saveLastTouchedRawPoint(event.rawX, event.rawY)
-                    eventListener.onDraggingPoster(binding.root.y)
+                    dragListener.onDraggingPoster(binding.root.y)
                 }
                 MotionEvent.ACTION_UP -> {
                     lastY = binding.root.y
-                    if (eventListener.isPosterRemovable(lastY)) {
+                    if (dragListener.isPosterRemovable(lastY)) {
                         removeAnimator.start()
                         // removeAnimator.doOnEnd{}에서 else문 진행
                     } else {
-                        eventListener.onFinishDrag(lastY)
+                        dragListener.onFinishDrag(lastY)
                         rollBackToInitialPosition()
                     }
                 }
@@ -111,18 +113,18 @@ class PosterViewPagerAdapter(var eventListener: PosterEventListener) :
         }
 
         @SuppressLint("CheckResult")
-        fun bind(uiState: GameUiState) {
+        fun bind(uiState: ContentUiState) {
             initialX = binding.root.x
             initialY = binding.root.y
 
-            uiState.feedbackUiState.isPosterDraggable.also { isDraggable ->
-                this.isDraggable = isDraggable
-                binding.root.isClickable = isDraggable
-                binding.btnNavigateToDetail.isVisible = isDraggable
+            uiState.canDrag.also { canDrag ->
+                this.isDraggable = canDrag
+                binding.root.isClickable = canDrag
+                binding.btnNavigateToDetail.isVisible = canDrag
             }
 
             Glide.with(itemView.context)
-                .load(uiState.mediaContent.posterUrl)
+                .load(uiState.content.posterUrl)
                 .apply {
                     if (uiState.blurDegree > 0) {
                         this.apply(
@@ -137,13 +139,12 @@ class PosterViewPagerAdapter(var eventListener: PosterEventListener) :
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<GameUiState>() {
-            override fun areContentsTheSame(oldState: GameUiState, newState: GameUiState) =
-                oldState.blurDegree == newState.blurDegree &&
-                    oldState.mediaContent.posterUrl == newState.mediaContent.posterUrl
+        val diffUtil = object : DiffUtil.ItemCallback<ContentUiState>() {
+            override fun areContentsTheSame(oldState: ContentUiState, newState: ContentUiState) =
+                oldState.blurDegree == newState.blurDegree
 
-            override fun areItemsTheSame(oldState: GameUiState, newState: GameUiState) =
-                oldState.mediaContent.id == newState.mediaContent.id
+            override fun areItemsTheSame(oldState: ContentUiState, newState: ContentUiState) =
+                oldState.content.id == newState.content.id
         }
     }
 }

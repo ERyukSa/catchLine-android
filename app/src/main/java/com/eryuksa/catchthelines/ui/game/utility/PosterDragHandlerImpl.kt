@@ -2,27 +2,14 @@ package com.eryuksa.catchthelines.ui.game.utility
 
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.navigation.fragment.findNavController
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
-import com.eryuksa.catchthelines.ui.game.GameFragment
-import com.eryuksa.catchthelines.ui.game.GameFragmentDirections
-import com.eryuksa.catchthelines.ui.game.PosterEventListener
-import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
+import com.eryuksa.catchthelines.ui.game.PosterDragHandler
 
-class PosterEventHandler(
-    private val fragment: GameFragment,
+class PosterDragHandlerImpl(
     private val binding: FragmentGameBinding,
     private val removeCaughtContent: () -> Unit
-) : PosterEventListener {
-
-    override fun onClickPoster(uiState: GameUiState) =
-        fragment.findNavController().navigate(
-            GameFragmentDirections.gameToDetail(
-                uiState.mediaContent.id,
-                uiState.mediaContent.lineAudioUrls.toTypedArray()
-            )
-        )
+) : PosterDragHandler {
 
     override fun onStartDrag() {
         binding.darkBackgroundCoverForPoster.visibility = View.VISIBLE

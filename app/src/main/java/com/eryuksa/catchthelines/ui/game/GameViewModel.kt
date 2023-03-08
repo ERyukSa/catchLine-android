@@ -1,28 +1,37 @@
 package com.eryuksa.catchthelines.ui.game
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eryuksa.catchthelines.data.dto.Content
+import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.data.repository.HintCountRepository
 import com.eryuksa.catchthelines.ui.common.StringProvider
-import com.eryuksa.catchthelines.ui.game.uistate.AllKilled
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
-import com.eryuksa.catchthelines.ui.game.uistate.FeedbackUiState
+import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
-import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
-import com.eryuksa.catchthelines.ui.game.uistate.NoHint
-import com.eryuksa.catchthelines.ui.game.uistate.NoInput
-import com.eryuksa.catchthelines.ui.game.uistate.UserCaughtTheLine
-import com.eryuksa.catchthelines.ui.game.uistate.UserInputWrong
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+data class GameUiState1(
+    val currentPage: Int = 0,
+    val contentUiStates: List<ContentUiState> = emptyList(),
+    val usedHints: Set<Hint> = emptySet(),
+    val hintText: String = "",
+    val feedbackText: String = "",
+    val didUserCatchTheLine: Boolean = false,
+    val hintCount: Int = 10
+) {
+    val audioUris: List<List<String>>
+        get() = contentUiStates.map { it.content.lineAudioUrls }
+}
 
 class GameViewModel(
     private val contentRepository: ContentRepository,
@@ -30,170 +39,160 @@ class GameViewModel(
     private val stringProvider: StringProvider
 ) : ViewModel() {
 
-    private val _currentPagePosition = MutableLiveData(0)
-    val currentPagePosition: LiveData<Int>
-        get() = _currentPagePosition
+    private val _currentPage = MutableStateFlow<Int>(0)
+    private val _contentUiStates = MutableStateFlow<List<ContentUiState>>(emptyList())
+    private var _usedHints = MutableStateFlow<List<Set<Hint>>>(listOf(emptySet()))
+    private var _hintTexts = MutableStateFlow<List<String>>(
+        listOf(stringProvider.getString(R.string.game_listen_and_guess))
+    )
+    private var _feedbackTexts = MutableStateFlow<List<String>>(listOf(""))
+    private val _didUserCatchTheLine = MutableStateFlow<Boolean>(false)
+    private val _availableHintCount = MutableStateFlow<Int>(10)
 
-    private val _uiStates = MutableLiveData<List<GameUiState>>()
-    val uiStates: LiveData<List<GameUiState>>
-        get() = _uiStates
-    private val uiStatesForEasyAccess: List<GameUiState>
-        get() = _uiStates.value ?: emptyList()
-
-    val groupedLineAudioUrls: LiveData<List<List<String>>> = run {
-        Transformations.map(_uiStates) { uiStates ->
-            uiStates.map { it.mediaContent.lineAudioUrls }
-        }.also { audioUrls ->
-            Transformations.distinctUntilChanged(audioUrls)
-        }
-    }
-
-    private val _feedbackUiState = MediatorLiveData<FeedbackUiState>().apply {
-        addSource(_currentPagePosition) { position ->
-            val gameItems = _uiStates.value ?: return@addSource
-            value = gameItems.findFeedbackUiStateAt(position)
-        }
-        addSource(_uiStates) { items ->
-            val position = _currentPagePosition.value ?: return@addSource
-            value = items.findFeedbackUiStateAt(position)
-        }
-    }
-    val feedbackUiState: LiveData<FeedbackUiState> =
-        Transformations.distinctUntilChanged(_feedbackUiState)
-
-    private val _usedHints = MediatorLiveData<Set<Hint>>().apply {
-        addSource(_currentPagePosition) { position ->
-            val gameItems = _uiStates.value ?: return@addSource
-            value = gameItems.findUsedHintStateAt(position)
-        }
-        addSource(_uiStates) { items ->
-            val position = _currentPagePosition.value ?: return@addSource
-            value = items.findUsedHintStateAt(position)
-        }
-    }
-    val usedHints: LiveData<Set<Hint>> = Transformations.distinctUntilChanged(_usedHints)
-
-    private val _hintText = MediatorLiveData<String>().apply {
-        addSource(_currentPagePosition) { position ->
-            val gameItems = _uiStates.value ?: return@addSource
-            value = gameItems.findHintTextAt(position)
-        }
-        addSource(_uiStates) { items ->
-            val position = _currentPagePosition.value ?: return@addSource
-            value = items.findHintTextAt(position)
-        }
-    }
-    val hintText: LiveData<String> = Transformations.distinctUntilChanged(_hintText)
-
-    private val _availableHintCount = MutableLiveData<Int>()
-    val availableHintCount: LiveData<Int>
-        get() = _availableHintCount
+    val uiState1: StateFlow<GameUiState1> = combine(
+        _currentPage,
+        _contentUiStates,
+        _usedHints,
+        _hintTexts,
+        _feedbackTexts,
+        _didUserCatchTheLine,
+        _availableHintCount
+    ) { array: Array<Any> ->
+        val currentPage = array[0] as Int
+        GameUiState1(
+            currentPage = currentPage,
+            contentUiStates = array[1] as List<ContentUiState>,
+            usedHints = (array[2] as List<Set<Hint>>)[currentPage],
+            hintText = (array[3] as List<String>)[currentPage],
+            feedbackText = (array[4] as List<String>)[currentPage],
+            didUserCatchTheLine = array[5] as Boolean,
+            hintCount = array[6] as Int
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = GameUiState1()
+    )
 
     init {
         viewModelScope.launch {
-            _uiStates.value = contentRepository.getContents().map(::mapToGameItem)
+            contentRepository.getContents().also { contents ->
+                _contentUiStates.value = contents.map { eachContent ->
+                    ContentUiState(content = eachContent, blurDegree = DEFAULT_BLUR_DEGREE)
+                }
+                _usedHints.value = contents.map { emptySet() }
+                _hintTexts.value = contents.map { stringProvider.getString(R.string.game_listen_and_guess) }
+                _feedbackTexts.value = contents.map { "" }
+            }
             hintRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
     }
 
-    fun movePagePosition(position: Int) {
-        _currentPagePosition.value = position
+    fun movePageTo(position: Int) {
+        _currentPage.value = position
     }
 
     fun useHint(hint: Hint) {
-        val currentPosition = currentPagePosition.value ?: return
-        if (hint !in (usedHints.value ?: return)) {
+        val currentPage = _currentPage.value
+        val currentUsedHints = uiState1.value.usedHints
+
+        val updatedUsedHints = if (hint !in currentUsedHints) {
             viewModelScope.launch { hintRepository.decreaseHintCount() }
+            currentUsedHints.toMutableSet().also { it.add(hint) }
+        } else {
+            currentUsedHints
+        }
+        val updatedFeedbackText = when (hint) {
+            is FirstCharacterHint -> stringProvider.getString(
+                FirstCharacterHint.stringResId,
+                _contentUiStates.value[_currentPage.value].content.title.first()
+            )
+
+            is CharacterCountHint -> stringProvider.getString(
+                CharacterCountHint.stringResId,
+                _contentUiStates.value[_currentPage.value].content.title.length
+            )
+
+            else -> uiState1.value.feedbackText
+        }
+        val updatedBlurDegree = if (hint is ClearerPosterHint && hint !in currentUsedHints) {
+            CLEARER_BLUR_DEGREE
+        } else {
+            _contentUiStates.value[currentPage].blurDegree
         }
 
-        val changedGameItem = when (hint) {
-            is ClearerPosterHint -> with(uiStatesForEasyAccess[currentPosition]) {
-                copy(usedHints = this.usedHints.toMutableSet().apply { add(hint) })
-            }
-            is FirstCharacterHint -> with(uiStatesForEasyAccess[currentPosition]) {
-                copy(
-                    usedHints = this.usedHints.toMutableSet().apply { add(hint) },
-                    hintText = stringProvider.getString(
-                        FirstCharacterHint.stringResId,
-                        uiStatesForEasyAccess[currentPosition].mediaContent.title.first()
-                    )
-                )
-            }
-            is CharacterCountHint -> with(uiStatesForEasyAccess[currentPosition]) {
-                copy(
-                    usedHints = this.usedHints.toMutableSet().apply { add(hint) },
-                    hintText = stringProvider.getString(
-                        CharacterCountHint.stringResId,
-                        uiStatesForEasyAccess[currentPosition].mediaContent.title.length
-                    )
-                )
-            }
-            else -> uiStatesForEasyAccess[currentPosition]
-        }
-        _uiStates.value = uiStatesForEasyAccess.replaceOldItem(changedGameItem)
+        _usedHints.value = _usedHints.value.replaceOldItemAt(currentPage, updatedUsedHints)
+        _feedbackTexts.value = _feedbackTexts.value.replaceOldItemAt(currentPage, updatedFeedbackText)
+        _contentUiStates.value = _contentUiStates.value.replaceOldItemAt(
+            i = currentPage,
+            newItem = _contentUiStates.value[currentPage].copy(blurDegree = updatedBlurDegree)
+        )
     }
 
     fun checkUserCatchTheLine(userInput: String) {
-        val uiState = uiStatesForEasyAccess[currentPagePosition.value ?: return]
-        val changedGameItem = if (userInput.contains(uiState.mediaContent.title)) {
+        val currentContent = _contentUiStates.value[_currentPage.value].content
+        val userCatchTheLineFeedbackText = if (userInput.contains(currentContent.title)) {
             viewModelScope.launch {
-                contentRepository.saveCaughtContent(uiState.mediaContent)
+                contentRepository.saveCaughtContent(currentContent)
             }
-            uiState.copy(feedbackUiState = UserCaughtTheLine(uiState.mediaContent.title))
+            _didUserCatchTheLine.value = true
+
+            stringProvider.getString(R.string.game_feedback_catch_the_line, currentContent.title)
         } else {
-            uiState.copy(feedbackUiState = UserInputWrong(userInput))
+            stringProvider.getString(R.string.game_feedback_wrong, userInput)
         }
-        _uiStates.value = uiStatesForEasyAccess.replaceOldItem(changedGameItem)
+
+        _feedbackTexts.update { feedbackTexts ->
+            feedbackTexts.replaceOldItemAt(_currentPage.value, userCatchTheLineFeedbackText)
+        }
+        _contentUiStates.value = _contentUiStates.value.replaceOldItemAt(
+            i = _currentPage.value,
+            newItem = _contentUiStates.value[_currentPage.value].copy(blurDegree = 0)
+        )
     }
 
     fun removeCaughtContent() {
-        val currentPage = currentPagePosition.value ?: throw IllegalStateException()
-        if (currentPage == 0 && uiStatesForEasyAccess.size == 1) {
-            _uiStates.value = emptyList()
-            _feedbackUiState.value = AllKilled
-        } else if (currentPage == uiStatesForEasyAccess.lastIndex) {
-            _currentPagePosition.value = currentPage - 1
-            _uiStates.value = uiStatesForEasyAccess.subList(0, uiStatesForEasyAccess.size - 1)
+        _didUserCatchTheLine.value = false
+
+        if (_currentPage.value == 0 && _contentUiStates.value.size == 1) {
+            _contentUiStates.value = emptyList()
+            _usedHints.value = listOf(emptySet())
+            _hintTexts.value = listOf("")
+            _feedbackTexts.value = listOf(stringProvider.getString(R.string.game_feedback_all_killed))
+        } else if (_currentPage.value == _contentUiStates.value.lastIndex) {
+            _currentPage.update { it - 1 }
+            _contentUiStates.update { it.subList(0, it.lastIndex) }
+            _usedHints.update { it.subList(0, it.lastIndex) }
+            _hintTexts.update { it.subList(0, it.lastIndex) }
+            _feedbackTexts.update { it.subList(0, it.lastIndex) }
         } else {
-            _uiStates.value = uiStatesForEasyAccess.subList(0, currentPage) +
-                uiStatesForEasyAccess.subList(currentPage + 1, uiStatesForEasyAccess.size)
+            val currentPage = _currentPage.value
+            _contentUiStates.update { contentUiStates ->
+                contentUiStates.subList(0, currentPage) +
+                    contentUiStates.subList(currentPage + 1, contentUiStates.size)
+            }
+            _usedHints.update { usedHintsList ->
+                usedHintsList.subList(0, currentPage) +
+                    usedHintsList.subList(currentPage + 1, usedHintsList.size)
+            }
+            _hintTexts.update { hintText2 ->
+                hintText2.subList(0, currentPage) +
+                    hintText2.subList(currentPage + 1, hintText2.size)
+            }
+            _feedbackTexts.update { feedbackTexts ->
+                feedbackTexts.subList(0, currentPage) +
+                    feedbackTexts.subList(currentPage + 1, feedbackTexts.size)
+            }
         }
     }
 
-    private fun mapToGameItem(mediaContent: Content): GameUiState =
-        GameUiState(
-            mediaContent = mediaContent,
-            feedbackUiState = NoInput,
-            usedHints = emptySet(),
-            hintText = stringProvider.getString(NoHint.stringResId)
-        )
-}
-
-private fun List<GameUiState>.replaceOldItem(newUiState: GameUiState): List<GameUiState> =
-    this.map { uiState ->
-        if (uiState.mediaContent.id == newUiState.mediaContent.id) newUiState else uiState
+    companion object {
+        private const val CLEARER_BLUR_DEGREE = 2
+        private const val DEFAULT_BLUR_DEGREE = 6
     }
-
-private fun List<GameUiState>.findFeedbackUiStateAt(index: Int): FeedbackUiState {
-    if (this.isEmpty()) return NoInput
-    return this.asSequence()
-        .filterIndexed { i, _ -> i == index }
-        .map { it.feedbackUiState }
-        .toList()[0]
 }
 
-private fun List<GameUiState>.findUsedHintStateAt(index: Int): Set<Hint> {
-    if (this.isEmpty()) return emptySet()
-    return this.asSequence()
-        .filterIndexed { i, _ -> i == index }
-        .map { it.usedHints }
-        .toList()[0]
-}
-
-private fun List<GameUiState>.findHintTextAt(index: Int): String {
-    if (this.isEmpty()) return ""
-    return this.asSequence()
-        .filterIndexed { i, _ -> i == index }
-        .map { it.hintText }
-        .toList()[0]
-}
+private fun <T> List<T>.replaceOldItemAt(i: Int, newItem: T): List<T> =
+    this.toMutableList().also { newList ->
+        newList[i] = newItem
+    }
