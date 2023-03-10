@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -19,6 +22,9 @@ import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.launch
 
 class DetailFragment : Fragment() {
 
@@ -29,9 +35,8 @@ class DetailFragment : Fragment() {
     private val viewModel: DetailViewModel by viewModels { ContentViewModelFactory.getInstance() }
     private val args: DetailFragmentArgs by navArgs()
 
-    private val audioPlayer: ExoPlayer by lazy {
-        ExoPlayer.Builder(requireContext()).build().apply { pauseAtEndOfMediaItems = true }
-    }
+    private lateinit var audioPlayer: ExoPlayer
+    private var lastPlayedLineIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +62,31 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            bindDataToViews(uiState)
-            setUpAudio(uiState.audioUrls)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState ->
+                    bindDataToViews(uiState)
+                    setUpAudio(uiState.audioUrls)
+                }
+            }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        (binding.btnLine1 as MaterialButton).setIconResource(R.drawable.icon_play_24)
+        (binding.btnLine2 as MaterialButton).setIconResource(R.drawable.icon_play_24)
+        lastPlayedLineIndex = 0
+        audioPlayer = ExoPlayer.Builder(requireContext()).build().also { exoPlayer ->
+            exoPlayer.pauseAtEndOfMediaItems = true
+            exoPlayer.addListener(audioPlayerListener)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        audioPlayer.removeListener(audioPlayerListener)
+        audioPlayer.release()
     }
 
     private fun initWindowAppearance() {
@@ -74,18 +100,12 @@ class DetailFragment : Fragment() {
             binding.btnNavigateBack.layoutParams = this
         }
         binding.root.run {
-            setPadding(paddingLeft, paddingTop, paddingRight, requireContext().getNavigationBarHeight())
-        }
-    }
-
-    private fun initAudioButtons() {
-        binding.btnLine1.setOnClickListener {
-            audioPlayer.seekTo(0, 0)
-            audioPlayer.play()
-        }
-        binding.btnLine2.setOnClickListener {
-            audioPlayer.seekTo(1, 0)
-            audioPlayer.play()
+            setPadding(
+                paddingLeft,
+                paddingTop,
+                paddingRight,
+                requireContext().getNavigationBarHeight()
+            )
         }
     }
 
@@ -109,9 +129,47 @@ class DetailFragment : Fragment() {
     }
 
     private fun setUpAudio(urls: List<String>) {
-        audioPlayer.addMediaItems(
+        audioPlayer.setMediaItems(
             urls.map { MediaItem.fromUri(it) }
         )
         audioPlayer.prepare()
+    }
+
+    private fun initAudioButtons() {
+        arrayOf(binding.btnLine1, binding.btnLine2).forEachIndexed { i, button ->
+            button.setOnClickListener {
+                if (lastPlayedLineIndex == i) {
+                    if (audioPlayer.isPlaying) {
+                        audioPlayer.pause()
+                    } else {
+                        audioPlayer.play()
+                    }
+                } else {
+                    lastPlayedLineIndex = i
+                    audioPlayer.seekTo(i, 0)
+                    audioPlayer.play()
+                }
+            }
+        }
+    }
+
+    private val audioPlayerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            if (isPlaying) {
+                if (lastPlayedLineIndex == 0) {
+                    (binding.btnLine1 as MaterialButton).setIconResource(R.drawable.icon_pause_24)
+                    (binding.btnLine2 as MaterialButton).setIconResource(R.drawable.icon_play_24)
+                } else {
+                    (binding.btnLine1 as MaterialButton).setIconResource(R.drawable.icon_play_24)
+                    (binding.btnLine2 as MaterialButton).setIconResource(R.drawable.icon_pause_24)
+                }
+            } else {
+                if (lastPlayedLineIndex == 0) {
+                    (binding.btnLine1 as MaterialButton).setIconResource(R.drawable.icon_play_24)
+                } else {
+                    (binding.btnLine2 as MaterialButton).setIconResource(R.drawable.icon_play_24)
+                }
+            }
+        }
     }
 }

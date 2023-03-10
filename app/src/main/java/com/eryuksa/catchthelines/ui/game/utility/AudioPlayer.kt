@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.ui.common
+package com.eryuksa.catchthelines.ui.game.utility
 
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem

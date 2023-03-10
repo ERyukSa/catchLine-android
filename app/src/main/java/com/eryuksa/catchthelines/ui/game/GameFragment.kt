@@ -20,7 +20,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
-import com.eryuksa.catchthelines.ui.common.AudioPlayer
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
@@ -28,6 +27,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.AnotherLineHint
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
+import com.eryuksa.catchthelines.ui.game.utility.AudioPlayer
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonAnimationHandler
 import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
 import com.google.android.exoplayer2.ExoPlayer

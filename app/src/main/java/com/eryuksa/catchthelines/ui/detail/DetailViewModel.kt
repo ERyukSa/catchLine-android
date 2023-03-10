@@ -1,17 +1,16 @@
 package com.eryuksa.catchthelines.ui.detail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.repository.ContentRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class DetailViewModel(private val repository: ContentRepository) : ViewModel() {
 
-    private val _uiState = MutableLiveData<ContentDetailUiState>()
-    val uiState: LiveData<ContentDetailUiState>
-        get() = _uiState
+    private val _uiState = MutableStateFlow<ContentDetailUiState>(ContentDetailUiState())
+    val uiState = _uiState.asStateFlow()
 
     fun getDetailUiState(id: Int, audioUrls: Array<String>) {
         viewModelScope.launch {
