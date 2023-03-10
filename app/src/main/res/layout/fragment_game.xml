@@ -18,6 +18,9 @@
         <variable
             name="characterCountHint"
             type="com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint" />
+        <variable
+            name="anotherLineHint"
+            type="com.eryuksa.catchthelines.ui.game.uistate.AnotherLineHint" />
 
         <import type="com.eryuksa.catchthelines.ui.game.uistate.Hint" />
         <import type="java.util.Set" />
@@ -105,23 +108,25 @@
             android:id="@+id/btn_play_stop"
             android:layout_width="72dp"
             android:layout_height="72dp"
+            android:layout_marginTop="48dp"
             android:background="@drawable/game_white_filled_circle_button"
             android:contentDescription="@string/game_description_play_line"
             android:elevation="3dp"
             android:padding="16dp"
             android:scaleType="centerCrop"
-            android:layout_marginTop="48dp"
             android:src="@drawable/icon_play_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_feedback"
-
             tools:src="@drawable/icon_play_24" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_hint_another_line"
+            myHintType="@{anotherLineHint}"
+            usedHints="@{usedHints}"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:enabled="@{usedHints.contains(anotherLineHint) ? false : true}"
             android:background="@drawable/game_white_filled_circle_button"
             android:elevation="4dp"
             android:maxLines="1"
@@ -178,6 +183,7 @@
             android:id="@+id/btn_hint_clearer_poster"
             myHintType="@{clearerPosterHint}"
             usedHints="@{usedHints}"
+            android:enabled="@{usedHints.contains(clearerPosterHint) ? false : true}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_stroked_circle_button"
@@ -230,6 +236,7 @@
             android:maxLines="1"
             android:padding="0dp"
             android:text="@string/all_line1"
+            android:clickable="@{usedHints.contains(anotherLineHint) ? true : false}"
             app:layout_constraintBottom_toBottomOf="@id/btn_play_stop"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -243,12 +250,12 @@
             android:background="?attr/colorPrimary"
             android:gravity="start"
             android:hint="@string/game_input_title"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:padding="14dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:textSize="15sp"
-            android:imeOptions="actionDone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_submit_title"
             app:layout_constraintStart_toStartOf="parent" />

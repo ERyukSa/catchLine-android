@@ -7,7 +7,8 @@ data class GameUiState(
     val hintText: String = "",
     val feedbackText: String = "",
     val didUserCatchTheLine: Boolean = false,
-    val hintCount: Int = 10
+    val hintCount: Int = 10,
+    val audioIndex: Int = 0
 ) {
     val audioUris: List<List<String>>
         get() = contentUiStates.map { it.content.lineAudioUrls }

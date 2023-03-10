@@ -24,6 +24,7 @@ import com.eryuksa.catchthelines.ui.common.AudioPlayer
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
+import com.eryuksa.catchthelines.ui.game.uistate.AnotherLineHint
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
@@ -44,7 +45,7 @@ class GameFragment : Fragment() {
     private lateinit var posterDragHandler: PosterDragHandler
     private lateinit var posterAdapter: PosterViewPagerAdapter
     private val onClickPoster = { position: Int ->
-        val currentContent = viewModel.uiState1.value.contentUiStates[position].content
+        val currentContent = viewModel.uiState.value.contentUiStates[position].content
         findNavController().navigate(
             GameFragmentDirections.gameToDetail(
                 currentContent.id,
@@ -74,6 +75,7 @@ class GameFragment : Fragment() {
             clearerPosterHint = ClearerPosterHint
             firstCharacterHint = FirstCharacterHint
             characterCountHint = CharacterCountHint
+            anotherLineHint = AnotherLineHint
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
@@ -141,6 +143,12 @@ class GameFragment : Fragment() {
             true
         }
 
+        binding.btnHintAnotherLine.setOnClickListener {
+            if (viewModel.uiState.value.usedHints.contains(AnotherLineHint).not()) {
+                viewModel.useHint(AnotherLineHint)
+            }
+            hintAnimationHandler.closeHintAndDarkBackground()
+        }
         binding.btnHintClearerPoster.setOnClickListener {
             viewModel.useHint(ClearerPosterHint)
             hintAnimationHandler.closeHintAndDarkBackground()
@@ -153,21 +161,17 @@ class GameFragment : Fragment() {
             viewModel.useHint(CharacterCountHint)
             hintAnimationHandler.closeHintAndDarkBackground()
         }
+
+        binding.btnSwitchLine.setOnClickListener {
+            viewModel.switchLineOfCurrentContent()
+        }
     }
 
     private fun observeData() {
         with(viewModel) {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.currentPage }.collect { uiState ->
-                        audioPlayer.moveTo(uiState.currentPage)
-                    }
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.contentUiStates }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.contentUiStates }.collect { uiState ->
                         posterAdapter.submitList(uiState.contentUiStates)
                         binding.viewPagerPoster.setCurrentItem(uiState.currentPage, false)
                     }
@@ -176,16 +180,29 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.audioUris }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.audioUris }.collect { uiState ->
                         audioPlayer.setUpAudio(uiState.audioUris)
-                        audioPlayer.moveTo(uiState.currentPage)
+                        audioPlayer.moveTo(uiState.audioIndex)
                     }
                 }
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.feedbackText }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.audioIndex }.collect { uiState ->
+                        audioPlayer.moveTo(uiState.audioIndex)
+                        val lineOrderOfCurrentContent = uiState.audioIndex % 2 + 1
+                        binding.btnSwitchLine.text = getString(
+                            R.string.game_line_label,
+                            lineOrderOfCurrentContent
+                        )
+                    }
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    uiState.distinctUntilChangedBy { it.feedbackText }.collect { uiState ->
                         binding.tvFeedback.text = uiState.feedbackText
                     }
                 }
@@ -193,7 +210,7 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
                         binding.btnOpenHint.isClickable = uiState.didUserCatchTheLine.not()
                         binding.btnSubmitTitle.isEnabled = uiState.didUserCatchTheLine.not()
                         binding.viewPagerPoster.isUserInputEnabled = uiState.didUserCatchTheLine.not()
@@ -207,7 +224,7 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.hintText }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.hintText }.collect { uiState ->
                         binding.tvHint.text = uiState.hintText
                     }
                 }
@@ -215,7 +232,7 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.hintCount }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.hintCount }.collect { uiState ->
                         binding.tvAvailableHintCount.text =
                             getString(R.string.game_available_hint_count, uiState.hintCount)
                     }
@@ -224,7 +241,7 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState1.distinctUntilChangedBy { it.usedHints }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.usedHints }.collect { uiState ->
                         binding.usedHints = uiState.usedHints
                     }
                 }

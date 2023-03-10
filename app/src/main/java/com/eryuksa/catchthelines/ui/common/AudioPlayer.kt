@@ -11,19 +11,14 @@ class AudioPlayer(private val audioPlayer: ExoPlayer) {
     private var currentItem = 0
     private var playbackPosition = 0L
 
-    private lateinit var onPlay: () -> Unit
-    private lateinit var onPause: () -> Unit
+    private lateinit var callBackOnPlay: () -> Unit
+    private lateinit var callBackOnPause: () -> Unit
 
     private val audioPlayerListener = object : Player.Listener {
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            super.onMediaItemTransition(mediaItem, reason)
-            audioPlayer.pause()
-        }
-
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             when (isPlaying) {
-                true -> onPlay()
-                false -> onPause()
+                true -> callBackOnPlay()
+                false -> callBackOnPause()
             }
         }
     }
@@ -36,13 +31,14 @@ class AudioPlayer(private val audioPlayer: ExoPlayer) {
         playerView.player = audioPlayer.also { exoPlayer ->
             exoPlayer.playWhenReady = playWhenReady
             exoPlayer.seekTo(currentItem, playbackPosition)
+            exoPlayer.pauseAtEndOfMediaItems = true
             exoPlayer.repeatMode = ExoPlayer.REPEAT_MODE_ONE
             exoPlayer.addListener(audioPlayerListener)
             exoPlayer.prepare()
         }
 
-        this.onPlay = onPlay
-        this.onPause = onPause
+        this.callBackOnPlay = onPlay
+        this.callBackOnPause = onPause
     }
 
     fun releasePlayer() {
@@ -55,16 +51,20 @@ class AudioPlayer(private val audioPlayer: ExoPlayer) {
 
     fun setUpAudio(uris: List<List<String>>) {
         audioPlayer.setMediaItems(
-            uris.map { groupedUris ->
-                MediaItem.fromUri(groupedUris[0])
-            }
+            uris.flatten().map { uri -> MediaItem.fromUri(uri) }
         )
     }
 
     fun switchPlayingState() {
         when (audioPlayer.isPlaying) {
             true -> audioPlayer.pause()
-            false -> audioPlayer.play()
+
+            false -> {
+                if (audioPlayer.currentPosition == audioPlayer.duration) {
+                    audioPlayer.seekTo(0)
+                }
+                audioPlayer.play()
+            }
         }
     }
 

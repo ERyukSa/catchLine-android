@@ -20,7 +20,7 @@ interface ContentDAO {
     @Query(
         "SELECT content.* FROM content LEFT JOIN encountered_content " +
             "ON content.id = encountered_content.id AND encountered_content.isCaught " +
-            "WHERE encountered_content.id IS null"
+            "WHERE encountered_content.id IS null ORDER BY random()"
     )
     suspend fun getContents(): List<Content>
 

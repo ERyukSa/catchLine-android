@@ -23,6 +23,7 @@
     <string name="game_feedback_catch_the_line">%s ✅</string>
     <string name="game_feedback_wrong">%s ❌</string>
     <string name="game_feedback_all_killed">올킬하셨습니다! 💯</string>
+    <string name="game_line_label">대사%d</string>
 
     <string name="main_poster_description">메인 포스터 이미지</string>
     <string name="backdrop_poster_description">배경 포스터 이미지</string>

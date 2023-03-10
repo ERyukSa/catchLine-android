@@ -6,6 +6,7 @@ import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.data.repository.HintCountRepository
 import com.eryuksa.catchthelines.ui.common.StringProvider
+import com.eryuksa.catchthelines.ui.game.uistate.AnotherLineHint
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
@@ -36,15 +37,17 @@ class GameViewModel(
     private var _feedbackTexts = MutableStateFlow<List<String>>(listOf(""))
     private val _didUserCatchTheLine = MutableStateFlow<Boolean>(false)
     private val _availableHintCount = MutableStateFlow<Int>(10)
+    private val _audioIndex = MutableStateFlow<Int>(0)
 
-    val uiState1: StateFlow<GameUiState> = combine(
+    val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
         _contentUiStates,
         _usedHints,
         _hintTexts,
         _feedbackTexts,
         _didUserCatchTheLine,
-        _availableHintCount
+        _availableHintCount,
+        _audioIndex
     ) { array: Array<Any> ->
         val currentPage = array[0] as Int
         GameUiState(
@@ -54,7 +57,8 @@ class GameViewModel(
             hintText = (array[3] as List<String>)[currentPage],
             feedbackText = (array[4] as List<String>)[currentPage],
             didUserCatchTheLine = array[5] as Boolean,
-            hintCount = array[6] as Int
+            hintCount = array[6] as Int,
+            audioIndex = array[7] as Int
         )
     }.stateIn(
         scope = viewModelScope,
@@ -80,6 +84,7 @@ class GameViewModel(
 
     fun movePageTo(position: Int) {
         _currentPage.value = position
+        _audioIndex.value = 2 * position
         viewModelScope.launch {
             contentRepository.saveEncounteredContent(_contentUiStates.value[position].content)
         }
@@ -87,10 +92,13 @@ class GameViewModel(
 
     fun useHint(hint: Hint) {
         val currentPage = _currentPage.value
-        val currentUsedHints = uiState1.value.usedHints
+        val currentUsedHints = uiState.value.usedHints
+
+        if (hint !in currentUsedHints) {
+            viewModelScope.launch { hintRepository.decreaseHintCount() }
+        }
 
         val updatedUsedHints = if (hint !in currentUsedHints) {
-            viewModelScope.launch { hintRepository.decreaseHintCount() }
             currentUsedHints.toMutableSet().also { it.add(hint) }
         } else {
             currentUsedHints
@@ -106,7 +114,7 @@ class GameViewModel(
                 _contentUiStates.value[_currentPage.value].content.title.length
             )
 
-            else -> uiState1.value.feedbackText
+            else -> uiState.value.feedbackText
         }
         val updatedBlurDegree = if (hint is ClearerPosterHint && hint !in currentUsedHints) {
             CLEARER_BLUR_DEGREE
@@ -120,6 +128,9 @@ class GameViewModel(
             i = currentPage,
             newItem = _contentUiStates.value[currentPage].copy(blurDegree = updatedBlurDegree)
         )
+        if (hint is AnotherLineHint) {
+            _audioIndex.value += 1
+        }
     }
 
     fun checkUserCatchTheLine(userInput: String) {
@@ -184,6 +195,16 @@ class GameViewModel(
                 feedbackTexts.subList(0, currentPage) +
                     feedbackTexts.subList(currentPage + 1, feedbackTexts.size)
             }
+        }
+    }
+
+    fun switchLineOfCurrentContent() {
+        if (_audioIndex.value % 2 == 0) {
+            if (_usedHints.value[_currentPage.value].contains(AnotherLineHint)) {
+                _audioIndex.value += 1
+            }
+        } else {
+            _audioIndex.value -= 1
         }
     }
 
