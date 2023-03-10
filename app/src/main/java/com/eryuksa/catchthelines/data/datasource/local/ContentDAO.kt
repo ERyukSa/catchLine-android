@@ -19,7 +19,7 @@ interface ContentDAO {
 
     @Query(
         "SELECT content.* FROM content LEFT JOIN encountered_content " +
-            "ON content.id = encountered_content.id AND encountered_content.isCaught = true " +
+            "ON content.id = encountered_content.id AND encountered_content.isCaught " +
             "WHERE encountered_content.id IS null"
     )
     suspend fun getContents(): List<Content>
@@ -32,12 +32,12 @@ interface ContentDAO {
 
     @Query(
         "SELECT * FROM content INNER JOIN encountered_content " +
-            "on content.id = encountered_content.id AND encountered_content.isCaught = true " +
+            "on content.id = encountered_content.id AND encountered_content.isCaught " +
             "ORDER BY encountered_content.updatedTime DESC LIMIT :limit OFFSET :offset"
     )
     suspend fun getCaughtContents(limit: Int, offset: Int): List<Content>
 
-    @Query("SELECT COUNT(*) FROM encountered_content WHERE encountered_content.isCaught = TRUE")
+    @Query("SELECT COUNT(*) FROM encountered_content WHERE encountered_content.isCaught")
     suspend fun getCaughtContentsCount(): Int
 
     @Query("SELECT COUNT(*) FROM encountered_content")

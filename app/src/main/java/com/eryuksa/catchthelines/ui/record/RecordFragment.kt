@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentRecordBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
+import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
+import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import kotlinx.coroutines.launch
 
 class RecordFragment : Fragment() {
@@ -39,6 +42,12 @@ class RecordFragment : Fragment() {
     ): View {
         _binding = FragmentRecordBinding.inflate(inflater, container, false)
 
+        requireActivity().window.run {
+            statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
+            setStatusBarIconColor(isDark = true)
+            setLayoutVerticalLimit(hasLimit = true)
+        }
+
         binding.rvCaughtContents.apply {
             adapter = contentsAdapter
             addItemDecoration(caughtContentsSpaceDecorator)
@@ -46,6 +55,7 @@ class RecordFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+
         return binding.root
     }
 
@@ -73,6 +83,11 @@ class RecordFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private val caughtContentsSpaceDecorator = object : RecyclerView.ItemDecoration() {

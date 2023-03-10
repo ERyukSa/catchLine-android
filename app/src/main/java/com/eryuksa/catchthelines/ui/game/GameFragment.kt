@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,6 +22,8 @@ import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.AudioPlayer
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
+import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
+import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
@@ -59,6 +62,12 @@ class GameFragment : Fragment() {
         container: ViewGroup?,
         outState: Bundle?
     ): View {
+        requireActivity().window.run {
+            statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
+            setStatusBarIconColor(isDark = true)
+            setLayoutVerticalLimit(hasLimit = true)
+        }
+
         _binding = FragmentGameBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@GameFragment.viewModel
@@ -69,6 +78,7 @@ class GameFragment : Fragment() {
                 findNavController().navigateUp()
             }
         }
+
         initPosterViewPager()
         initViewListener()
         initHintButtonsAnimation(outState?.getBoolean(HINT_IS_OPEN_KEY) ?: false)
@@ -93,6 +103,11 @@ class GameFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         releaseAudioPlayer()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun initHintButtonsAnimation(isHintOpen: Boolean) {

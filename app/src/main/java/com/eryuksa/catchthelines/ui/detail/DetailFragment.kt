@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -12,6 +13,10 @@ import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentDetailBinding
 import com.eryuksa.catchthelines.di.ContentViewModelFactory
+import com.eryuksa.catchthelines.ui.common.getNavigationBarHeight
+import com.eryuksa.catchthelines.ui.common.getStatusBarHeight
+import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
+import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 
@@ -39,6 +44,8 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
+        initWindowAppearance()
+
         binding.ivMainPoster.clipToOutline = true
         binding.btnNavigateBack.setOnClickListener {
             findNavController().navigateUp()
@@ -53,6 +60,21 @@ class DetailFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
             bindDataToViews(uiState)
             setUpAudio(uiState.audioUrls)
+        }
+    }
+
+    private fun initWindowAppearance() {
+        requireActivity().window.run {
+            setLayoutVerticalLimit(hasLimit = false)
+            setStatusBarIconColor(isDark = false)
+        }
+
+        (binding.btnNavigateBack.layoutParams as ConstraintLayout.LayoutParams).run {
+            topMargin = requireContext().getStatusBarHeight()
+            binding.btnNavigateBack.layoutParams = this
+        }
+        binding.root.run {
+            setPadding(paddingLeft, paddingTop, paddingRight, requireContext().getNavigationBarHeight())
         }
     }
 
