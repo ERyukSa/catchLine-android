@@ -3,13 +3,11 @@ package com.eryuksa.catchthelines.ui.game.utility
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerControlView
 
-class AudioPlayer(private val audioPlayer: ExoPlayer) {
+class AudioPlayerHandler(private val audioPlayer: ExoPlayer) {
 
-    private var playWhenReady = true
-    private var currentItem = 0
-    private var playbackPosition = 0L
+    var playbackPosition = 0L
+        private set
 
     private lateinit var callBackOnPlay: () -> Unit
     private lateinit var callBackOnPause: () -> Unit
@@ -24,27 +22,25 @@ class AudioPlayer(private val audioPlayer: ExoPlayer) {
     }
 
     fun initializePlayer(
-        playerView: PlayerControlView,
+        playbackPosition: Long,
         onPlay: () -> Unit,
         onPause: () -> Unit
     ) {
-        playerView.player = audioPlayer.also { exoPlayer ->
-            exoPlayer.playWhenReady = playWhenReady
-            exoPlayer.seekTo(currentItem, playbackPosition)
+        audioPlayer.also { exoPlayer ->
             exoPlayer.pauseAtEndOfMediaItems = true
             exoPlayer.repeatMode = ExoPlayer.REPEAT_MODE_ONE
             exoPlayer.addListener(audioPlayerListener)
             exoPlayer.prepare()
         }
 
+        this.playbackPosition = playbackPosition
         this.callBackOnPlay = onPlay
         this.callBackOnPause = onPause
     }
 
     fun releasePlayer() {
-        playWhenReady = audioPlayer.playWhenReady
-        currentItem = audioPlayer.currentMediaItemIndex
         playbackPosition = audioPlayer.currentPosition
+        audioPlayer.pause()
         audioPlayer.removeListener(audioPlayerListener)
         audioPlayer.release()
     }
@@ -70,6 +66,9 @@ class AudioPlayer(private val audioPlayer: ExoPlayer) {
 
     fun moveTo(mediaItemIndex: Int) {
         audioPlayer.pause()
-        audioPlayer.seekTo(mediaItemIndex, 0)
+        audioPlayer.seekTo(mediaItemIndex, playbackPosition)
+        if (audioPlayer.mediaItemCount > 0 && playbackPosition != 0L) {
+            playbackPosition = 0
+        }
     }
 }

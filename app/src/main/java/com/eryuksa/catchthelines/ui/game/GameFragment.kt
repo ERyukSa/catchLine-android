@@ -27,7 +27,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.AnotherLineHint
 import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
-import com.eryuksa.catchthelines.ui.game.utility.AudioPlayer
+import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHandler
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonAnimationHandler
 import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
 import com.google.android.exoplayer2.ExoPlayer
@@ -54,7 +54,8 @@ class GameFragment : Fragment() {
         )
     }
 
-    private lateinit var audioPlayer: AudioPlayer
+    private lateinit var audioPlayer: AudioPlayerHandler
+    private var playbackPosition = 0L
 
     private lateinit var hintAnimationHandler: HintButtonAnimationHandler
 
@@ -81,9 +82,10 @@ class GameFragment : Fragment() {
             }
         }
 
+        restoreUiOnlyState(outState)
         initPosterViewPager()
         initViewListener()
-        initHintButtonsAnimation(outState?.getBoolean(HINT_IS_OPEN_KEY) ?: false)
+        initHintButtonsAnimation(isHintOpen = outState?.getBoolean(HINT_IS_OPEN_KEY) ?: false)
         return binding.root
     }
 
@@ -95,6 +97,7 @@ class GameFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(HINT_IS_OPEN_KEY, hintAnimationHandler.isHintOpen)
+        outState.putLong(AUDIO_PLAY_POSITION_KEY, audioPlayer.playbackPosition)
     }
 
     override fun onStart() {
@@ -110,6 +113,10 @@ class GameFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun restoreUiOnlyState(outState: Bundle?) {
+        playbackPosition = outState?.getLong(AUDIO_PLAY_POSITION_KEY) ?: 0
     }
 
     private fun initHintButtonsAnimation(isHintOpen: Boolean) {
@@ -182,7 +189,6 @@ class GameFragment : Fragment() {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState.distinctUntilChangedBy { it.audioUris }.collect { uiState ->
                         audioPlayer.setUpAudio(uiState.audioUris)
-                        audioPlayer.moveTo(uiState.audioIndex)
                     }
                 }
             }
@@ -290,11 +296,17 @@ class GameFragment : Fragment() {
     }
 
     private fun initializeAudioPlayer() {
-        audioPlayer = AudioPlayer(ExoPlayer.Builder(requireContext()).build())
+        ExoPlayer.Builder(requireContext()).build().also { exoPlayer ->
+            binding.playerView.player = exoPlayer
+            audioPlayer = AudioPlayerHandler(exoPlayer)
+        }
         audioPlayer.initializePlayer(
-            playerView = binding.playerView,
+            playbackPosition = playbackPosition,
             onPlay = { binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24) },
-            onPause = { binding.btnPlayStop.setImageResource(R.drawable.icon_play_24) }
+            onPause = {
+                binding.btnPlayStop.setImageResource(R.drawable.icon_play_24)
+                playbackPosition = audioPlayer.playbackPosition
+            }
         )
     }
 
@@ -315,5 +327,6 @@ class GameFragment : Fragment() {
 
     companion object {
         private const val HINT_IS_OPEN_KEY = "HINT_IS_OPEN_KEY"
+        private const val AUDIO_PLAY_POSITION_KEY = "AUDIO_PLAY_POSITION_KEY"
     }
 }

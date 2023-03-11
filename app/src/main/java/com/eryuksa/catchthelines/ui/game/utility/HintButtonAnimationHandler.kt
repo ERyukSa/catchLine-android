@@ -3,8 +3,6 @@ package com.eryuksa.catchthelines.ui.game.utility
 import android.animation.ObjectAnimator
 import android.view.View
 import android.widget.Button
-import androidx.core.animation.doOnPause
-import androidx.core.animation.doOnStart
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import com.eryuksa.catchthelines.R
