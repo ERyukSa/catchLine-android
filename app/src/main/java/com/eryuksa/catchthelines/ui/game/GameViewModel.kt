@@ -75,8 +75,6 @@ class GameViewModel(
                 _usedHints.value = contents.map { emptySet() }
                 _hintTexts.value = contents.map { stringProvider.getString(R.string.game_listen_and_guess) }
                 _feedbackTexts.value = contents.map { "" }
-
-                contentRepository.saveEncounteredContent(contents.first())
             }
             hintRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
@@ -86,6 +84,7 @@ class GameViewModel(
         _currentPage.value = position
         _audioIndex.value = 2 * position
         viewModelScope.launch {
+            if (_didUserCatchTheLine.value == true) return@launch
             contentRepository.saveEncounteredContent(_contentUiStates.value[position].content)
         }
     }
