@@ -92,6 +92,9 @@ class GameViewModel(
     fun useHint(hint: Hint) {
         val currentPage = _currentPage.value
         val currentUsedHints = uiState.value.usedHints
+        if (hint !in currentUsedHints && _availableHintCount.value == 0) {
+            return
+        }
 
         if (hint !in currentUsedHints) {
             viewModelScope.launch { hintRepository.decreaseHintCount() }
