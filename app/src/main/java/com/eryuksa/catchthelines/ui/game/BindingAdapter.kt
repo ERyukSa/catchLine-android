@@ -11,4 +11,5 @@ fun setBackgroundResource(button: Button, myHintType: Hint, usedHints: Set<Hint>
         true -> button.setBackgroundResource(R.drawable.game_white_filled_stroked_circle_button)
         false -> button.setBackgroundResource(R.drawable.game_white_filled_circle_button)
     }
+    button.elevation = button.resources.getDimension(R.dimen.game_hintbutton_elevation)
 }

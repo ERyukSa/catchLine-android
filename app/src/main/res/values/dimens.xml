@@ -2,7 +2,8 @@
 <resources>
     <dimen name="game_poster_margin">16dp</dimen>
     <dimen name="game_poster_elevation_over_dark_cover">8dp</dimen>
-    <dimen name="game_hint_elevation_over_dark_cover">4dp</dimen>
+    <dimen name="game_hintbutton_elevation">4dp</dimen>
+    <dimen name="game_hintbutton_margin">10dp</dimen>
 
     <dimen name="record_caught_content_item_space">12dp</dimen>
 </resources>

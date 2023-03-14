@@ -28,7 +28,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
 import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
 import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHandler
-import com.eryuksa.catchthelines.ui.game.utility.HintButtonAnimationHandler
+import com.eryuksa.catchthelines.ui.game.utility.HintButtonOpenHandler
 import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
 import com.google.android.exoplayer2.ExoPlayer
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -57,7 +57,7 @@ class GameFragment : Fragment() {
     private lateinit var audioPlayer: AudioPlayerHandler
     private var playbackPosition = 0L
 
-    private lateinit var hintAnimationHandler: HintButtonAnimationHandler
+    private lateinit var hintOpenHandler: HintButtonOpenHandler
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,7 +96,7 @@ class GameFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(HINT_IS_OPEN_KEY, hintAnimationHandler.isHintOpen)
+        outState.putBoolean(HINT_IS_OPEN_KEY, hintOpenHandler.isHintOpen)
         outState.putLong(AUDIO_PLAY_POSITION_KEY, audioPlayer.playbackPosition)
     }
 
@@ -120,7 +120,7 @@ class GameFragment : Fragment() {
     }
 
     private fun initHintButtonsAnimation(isHintOpen: Boolean) {
-        hintAnimationHandler = HintButtonAnimationHandler(
+        hintOpenHandler = HintButtonOpenHandler(
             hintEntranceButton = binding.btnOpenHint,
             hintButtons = listOf(
                 binding.btnHintClearerPoster,
@@ -154,19 +154,19 @@ class GameFragment : Fragment() {
             if (viewModel.uiState.value.usedHints.contains(AnotherLineHint).not()) {
                 viewModel.useHint(AnotherLineHint)
             }
-            hintAnimationHandler.closeHintAndDarkBackground()
+            hintOpenHandler.closeHintAndDarkBackground()
         }
         binding.btnHintClearerPoster.setOnClickListener {
             viewModel.useHint(ClearerPosterHint)
-            hintAnimationHandler.closeHintAndDarkBackground()
+            hintOpenHandler.closeHintAndDarkBackground()
         }
         binding.btnHintFirstCharacter.setOnClickListener {
             viewModel.useHint(FirstCharacterHint)
-            hintAnimationHandler.closeHintAndDarkBackground()
+            hintOpenHandler.closeHintAndDarkBackground()
         }
         binding.btnHintCharactersCount.setOnClickListener {
             viewModel.useHint(CharacterCountHint)
-            hintAnimationHandler.closeHintAndDarkBackground()
+            hintOpenHandler.closeHintAndDarkBackground()
         }
 
         binding.btnSwitchLine.setOnClickListener {

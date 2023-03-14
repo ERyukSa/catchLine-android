@@ -8,15 +8,15 @@ import androidx.core.view.isVisible
 import com.eryuksa.catchthelines.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class HintButtonAnimationHandler(
+class HintButtonOpenHandler(
     hintEntranceButton: FloatingActionButton,
     hintButtons: List<Button>,
     wasHintOpened: Boolean,
     private val darkBackgroundView: View
 ) {
 
-    private val innerButtons = mutableListOf<InnerButton>()
-    private var ceil = hintEntranceButton.height.toFloat()
+    private val innerButtons = mutableListOf<HintButton>()
+    private var animationDistance = 0f
     var isHintOpen = wasHintOpened
         private set
 
@@ -29,21 +29,19 @@ class HintButtonAnimationHandler(
         }
 
         hintEntranceButton.doOnLayout {
-            ceil = it.height.toFloat()
+            animationDistance = it.height.toFloat() + hintEntranceButton.getHintButtonMargin()
             hintButtons.forEach(this::addInnerButton)
-            rollbackToOpenState()
+            rollbackToPrevState()
         }
     }
 
     private fun addInnerButton(button: Button) {
         button.doOnLayout {
-            val openAnimator = ObjectAnimator.ofFloat(button, "TranslationY", -(ceil + MARGIN))
+            val openAnimator = ObjectAnimator
+                .ofFloat(button, "TranslationY", -animationDistance)
                 .setDuration(ANIMATION_DURATION)
-            val closeAnimator = ObjectAnimator.ofFloat(button, "TranslationY", 0f)
-                .setDuration(ANIMATION_DURATION)
-            innerButtons += InnerButton(button, openAnimator, closeAnimator)
-            ceil += (button.height + MARGIN)
-            button.isVisible = false
+            innerButtons += HintButton(button, openAnimator)
+            animationDistance += (button.height + button.getHintButtonMargin())
         }
     }
 
@@ -61,9 +59,6 @@ class HintButtonAnimationHandler(
 
     private fun openHint() {
         innerButtons.forEach {
-            it.button.isVisible = true
-            it.button.elevation =
-                it.button.resources.getDimension(R.dimen.game_hint_elevation_over_dark_cover)
             it.open()
         }
     }
@@ -71,32 +66,39 @@ class HintButtonAnimationHandler(
     private fun closeHint() {
         innerButtons.forEach {
             it.close()
-            it.button.isVisible = false
         }
     }
 
-    private fun rollbackToOpenState() {
+    private fun rollbackToPrevState() {
         if (isHintOpen) {
             openHintAndDarkBackground()
         }
     }
 
-    private class InnerButton(
-        val button: Button,
-        private val openAnimator: ObjectAnimator,
-        private val closeAnimator: ObjectAnimator
+    private class HintButton(
+        private val button: Button,
+        private val openAnimator: ObjectAnimator
     ) {
+
+        init {
+            button.elevation = button.resources.getDimension(R.dimen.game_hintbutton_elevation)
+            button.isVisible = false
+        }
+
         fun open() {
             openAnimator.start()
+            button.isVisible = true
         }
 
         fun close() {
-            closeAnimator.start()
+            button.translationY = 0f
+            button.isVisible = false
         }
     }
 
     companion object {
-        private const val MARGIN = 20
         private const val ANIMATION_DURATION = 400L
     }
 }
+
+private fun <T : View> T.getHintButtonMargin() = resources.getDimension(R.dimen.game_hintbutton_margin)
