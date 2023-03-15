@@ -119,6 +119,22 @@ class GameFragment : Fragment() {
         playbackPosition = outState?.getLong(AUDIO_PLAY_POSITION_KEY) ?: 0
     }
 
+    private fun initPosterViewPager() {
+        binding.viewPagerPoster.run {
+            offscreenPageLimit = 2
+            posterDragHandler = PosterDragHandlerImpl(
+                binding,
+                removeCaughtContent = viewModel::removeCaughtContent
+            )
+            adapter = PosterViewPagerAdapter(posterDragHandler, onClickPoster).also {
+                this@GameFragment.posterAdapter = it
+            }
+            this.removeOverScroll()
+            setPageTransformer(buildPageTransformer())
+            registerOnPageChangeCallback(onPageChange)
+        }
+    }
+
     private fun initHintButtonsAnimation(isHintOpen: Boolean) {
         hintOpenHandler = HintButtonOpenHandler(
             hintEntranceButton = binding.btnOpenHint,
@@ -130,6 +146,21 @@ class GameFragment : Fragment() {
             ),
             wasHintOpened = isHintOpen,
             darkBackgroundView = binding.darkBackgroundCoverForHint
+        )
+    }
+
+    private fun initializeAudioPlayer() {
+        ExoPlayer.Builder(requireContext()).build().also { exoPlayer ->
+            binding.playerView.player = exoPlayer
+            audioPlayer = AudioPlayerHandler(exoPlayer)
+        }
+        audioPlayer.initializePlayer(
+            playbackPosition = playbackPosition,
+            onPlay = { binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24) },
+            onPause = {
+                binding.btnPlayStop.setImageResource(R.drawable.icon_play_24)
+                playbackPosition = audioPlayer.playbackPosition
+            }
         )
     }
 
@@ -255,59 +286,20 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun ViewPager2.setHorizontalPadding(padding: Int) {
-        this.setPadding(padding, 0, padding, 0)
-    }
-
-    private val switchAudioLineOnPageChange = object : ViewPager2.OnPageChangeCallback() {
+    private val onPageChange = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             viewModel.movePageTo(position)
         }
     }
 
-    private fun buildPageTransformer(): CompositePageTransformer {
-        return CompositePageTransformer().also {
-            it.addTransformer(
-                MarginPageTransformer(resources.getDimensionPixelOffset(R.dimen.game_poster_margin))
-            )
-            it.addTransformer { eachPageView: View, positionFromCenter: Float ->
-                val scale = 1 - abs(positionFromCenter)
-                eachPageView.scaleY = 0.85f + 0.15f * scale
-            }
-        }
-    }
-
-    private fun initPosterViewPager() {
-        binding.viewPagerPoster.run {
-            offscreenPageLimit = 3
-            posterDragHandler = PosterDragHandlerImpl(
-                binding,
-                removeCaughtContent = viewModel::removeCaughtContent
-            )
-            adapter = PosterViewPagerAdapter(posterDragHandler, onClickPoster).also {
-                this@GameFragment.posterAdapter = it
-            }
-            this.removeOverScroll()
-            this.setHorizontalPadding((resources.displayMetrics.widthPixels * 0.15).toInt())
-            setPageTransformer(buildPageTransformer())
-            registerOnPageChangeCallback(switchAudioLineOnPageChange)
-            scheduleLayoutAnimation()
-        }
-    }
-
-    private fun initializeAudioPlayer() {
-        ExoPlayer.Builder(requireContext()).build().also { exoPlayer ->
-            binding.playerView.player = exoPlayer
-            audioPlayer = AudioPlayerHandler(exoPlayer)
-        }
-        audioPlayer.initializePlayer(
-            playbackPosition = playbackPosition,
-            onPlay = { binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24) },
-            onPause = {
-                binding.btnPlayStop.setImageResource(R.drawable.icon_play_24)
-                playbackPosition = audioPlayer.playbackPosition
-            }
+    private fun buildPageTransformer() = CompositePageTransformer().also {
+        it.addTransformer(
+            MarginPageTransformer(resources.getDimensionPixelOffset(R.dimen.game_poster_margin))
         )
+        it.addTransformer { eachPageView: View, positionFromCenter: Float ->
+            val scale = 1 - abs(positionFromCenter)
+            eachPageView.scaleY = 0.85f + 0.15f * scale
+        }
     }
 
     private fun releaseAudioPlayer() {
