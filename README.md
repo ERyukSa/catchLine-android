@@ -11,15 +11,14 @@
 2023-02-11 ~ 2023-03-11 (1st readme update)
 
 ## Feature Overview
-- 애니메이션을 활용한 엔터테인먼트적 요소 추가
-- MVVM: UI layer와 Data layer의 관심사 분리
-  - 이벤트 전달과 의존성 방향: View -> ViewModel -> Repository -> DataSource
-  - 데이터의 발생과 전달 방향: 이벤트와 반대로
-  - 객체에서 파생된 데이터는 최대한 객체 스스로 처리하도록 캡슐화
-  - 클라이언트 객체 기준의 메서드 작성
+- 애니메이션을 활용한 엔터테인먼트 요소 제공
+  - [**ObjectAnimator를 이용한 버튼 애니메이션**](https://best-human-developer.tistory.com/129)
+  - [**ViewPager2를 활용한 페이지 크기 조절 및 미리보기**](https://best-human-developer.tistory.com/130)
+  - 터치 리스너와 ObjectAnimator를 활용한 drag & swipe
+- MVVM 아키텍처
 - StateFlow를 활용한 UI State 보존과 데이터 바인딩
-- 생명주기에 따른 리소스 처리 
-- Kotlin Coroutine을 활용한 Thread-safe 작업
+- 생명주기에 따른 리소스 처리
+  - onStart: 오디오 초기화, onStop: 오디오 해제
 
 ## UI Features
 |                          **게임 시작**                          |                    컨텐츠 제목 맞히기 (캐치) + 상세 정보                    |
