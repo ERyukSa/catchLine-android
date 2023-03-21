@@ -281,7 +281,7 @@
             android:visibility="invisible" />
 
         <ImageView
-            android:id="@+id/iv_remove_content"
+            android:id="@+id/iv_content_removable_area"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"

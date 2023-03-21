@@ -5,14 +5,19 @@ import com.eryuksa.catchthelines.data.datasource.remote.ContentRemoteDataSource
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.data.dto.ContentDetail
 import com.eryuksa.catchthelines.data.dto.EncounteredContent
+import com.eryuksa.catchthelines.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ContentRepository(
+@Singleton
+class ContentRepository @Inject constructor(
     private val remoteDataSource: ContentRemoteDataSource,
-    private val localDataSource: ContentLocalDataSource
+    private val localDataSource: ContentLocalDataSource,
+    @ApplicationScope private val externalScope: CoroutineScope
 ) {
 
     suspend fun getContents(): List<Content> {
@@ -23,7 +28,7 @@ class ContentRepository(
             }
 
             val contentsFromRemote = remoteDataSource.getContents()
-            GlobalScope.launch {
+            externalScope.launch {
                 localDataSource.saveContents(contentsFromRemote)
             }
             return@withContext contentsFromRemote
@@ -48,7 +53,7 @@ class ContentRepository(
     }
 
     private suspend fun saveEncounteredContent(content: Content, isCaught: Boolean) {
-        GlobalScope.launch(Dispatchers.IO) {
+        externalScope.launch(Dispatchers.IO) {
             localDataSource.saveEncounteredContent(
                 EncounteredContent(
                     id = content.id,

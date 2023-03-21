@@ -2,14 +2,17 @@ package com.eryuksa.catchthelines.data.datasource.remote
 
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.data.dto.ContentDetail
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ContentRemoteDataSource(
-    private val gameApi: ContentRetrofitApi,
+@Singleton
+class ContentRemoteDataSource @Inject constructor(
+    private val contentsApi: ContentsRetrofitApi,
     private val contentDetailApi: ContentDetailRetrofitApi
 ) {
 
     suspend fun getContents(): List<Content> {
-        val response = gameApi.getMediaContents()
+        val response = contentsApi.getMediaContents()
         return if (response.isSuccessful) {
             response.body()?.values?.toList() ?: emptyList()
         } else {

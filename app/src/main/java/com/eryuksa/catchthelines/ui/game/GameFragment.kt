@@ -19,7 +19,6 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
-import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
@@ -31,16 +30,18 @@ import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHandler
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonOpenHandler
 import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
 import com.google.android.exoplayer2.ExoPlayer
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+@AndroidEntryPoint
 class GameFragment : Fragment() {
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding!!
-    private val viewModel: GameViewModel by viewModels { ContentViewModelFactory.getInstance() }
+    private val viewModel: GameViewModel by viewModels()
 
     private lateinit var posterDragHandler: PosterDragHandler
     private lateinit var posterAdapter: PosterViewPagerAdapter

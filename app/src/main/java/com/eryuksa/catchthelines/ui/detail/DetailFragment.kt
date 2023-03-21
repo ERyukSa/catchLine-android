@@ -15,7 +15,6 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentDetailBinding
-import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.getNavigationBarHeight
 import com.eryuksa.catchthelines.ui.common.getStatusBarHeight
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
@@ -24,15 +23,17 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.material.button.MaterialButton
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class DetailFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding: FragmentDetailBinding
         get() = _binding!!
 
-    private val viewModel: DetailViewModel by viewModels { ContentViewModelFactory.getInstance() }
+    private val viewModel: DetailViewModel by viewModels()
     private val args: DetailFragmentArgs by navArgs()
 
     private lateinit var audioPlayer: ExoPlayer

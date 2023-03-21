@@ -1,31 +1,17 @@
 package com.eryuksa.catchthelines.ui.common
 
-import android.app.Application
+import android.content.Context
 import androidx.annotation.StringRes
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class StringProvider private constructor() {
+@Singleton
+class StringProvider @Inject constructor(@ApplicationContext private val context: Context) {
 
     fun getString(@StringRes resId: Int): String =
-        application.getString(resId)
+        context.getString(resId)
 
     fun getString(@StringRes resId: Int, vararg formatArgs: Any): String =
-        application.getString(resId, *formatArgs)
-
-    companion object {
-
-        private lateinit var application: Application
-        private var instance: StringProvider? = null
-
-        fun initialize(_application: Application) {
-            instance ?: synchronized(this) {
-                instance ?: StringProvider().also {
-                    instance = it
-                    application = _application
-                }
-            }
-        }
-
-        fun getInstance(): StringProvider =
-            instance ?: throw UninitializedPropertyAccessException()
-    }
+        context.getString(resId, *formatArgs)
 }

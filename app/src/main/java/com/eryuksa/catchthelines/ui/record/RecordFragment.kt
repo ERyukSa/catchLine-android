@@ -15,17 +15,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentRecordBinding
-import com.eryuksa.catchthelines.di.ContentViewModelFactory
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class RecordFragment : Fragment() {
 
     private var _binding: FragmentRecordBinding? = null
     private val binding: FragmentRecordBinding
         get() = _binding!!
-    private val viewModel: RecordViewModel by viewModels { ContentViewModelFactory.getInstance() }
+    private val viewModel: RecordViewModel by viewModels()
 
     private val contentsAdapter: CaughtContentsAdapter by lazy {
         CaughtContentsAdapter { content ->

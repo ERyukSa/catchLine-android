@@ -13,6 +13,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
 import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
 import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,10 +22,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GameViewModel(
+@HiltViewModel
+class GameViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
-    private val hintRepository: HintCountRepository,
+    private val hintCountHandler: HintCountRepository,
     private val stringProvider: StringProvider
 ) : ViewModel() {
 
@@ -76,7 +79,7 @@ class GameViewModel(
                 _hintTexts.value = contents.map { stringProvider.getString(R.string.game_listen_and_guess) }
                 _feedbackTexts.value = contents.map { "" }
             }
-            hintRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
+            hintCountHandler.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
     }
 
@@ -97,7 +100,7 @@ class GameViewModel(
         }
 
         if (hint !in currentUsedHints) {
-            viewModelScope.launch { hintRepository.decreaseHintCount() }
+            viewModelScope.launch { hintCountHandler.decreaseHintCount() }
         }
 
         val updatedUsedHints = if (hint !in currentUsedHints) {

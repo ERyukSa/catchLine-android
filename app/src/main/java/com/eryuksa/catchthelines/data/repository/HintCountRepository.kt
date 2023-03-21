@@ -4,19 +4,26 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import kotlinx.coroutines.GlobalScope
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import com.eryuksa.catchthelines.di.ApplicationScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class HintCountRepository(
+@Singleton
+class HintCountRepository @Inject constructor(
     private val hintCountStore: DataStore<Preferences>,
-    private val hintCountKey: Preferences.Key<Int>,
-    private val lastUpdatedTimeKey: Preferences.Key<Long>
+    @ApplicationScope externalScope: CoroutineScope
 ) {
+    private val hintCountKey = intPreferencesKey("hint_count")
+    private val lastUpdatedTimeKey = longPreferencesKey("last_updated_time_key")
 
     private val mutex = Mutex()
     private var isIncreasingHintCount = false
@@ -28,7 +35,7 @@ class HintCountRepository(
     }
 
     init {
-        GlobalScope.launch {
+        externalScope.launch {
             setUpHintCount()
             increaseHintCountPeriodically()
         }

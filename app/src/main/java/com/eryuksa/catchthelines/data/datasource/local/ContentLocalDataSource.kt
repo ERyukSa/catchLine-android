@@ -2,8 +2,11 @@ package com.eryuksa.catchthelines.data.datasource.local
 
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.data.dto.EncounteredContent
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ContentLocalDataSource(
+@Singleton
+class ContentLocalDataSource @Inject constructor(
     private val dao: ContentDAO
 ) {
 

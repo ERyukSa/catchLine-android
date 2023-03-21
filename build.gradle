@@ -3,9 +3,11 @@ buildscript {
     repositories {
         google()
     }
+    ext.navVersion = '2.5.3'
+    ext.hiltVersion ='2.40'
     dependencies {
-        def nav_version = "2.5.3"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
     }
 }
 
@@ -17,7 +19,6 @@ plugins {
 
 ext {
     glideVersion = '4.14.2'
-    navVersion = '2.5.3'
     retrofitVersion = '2.9.0'
     exoVersion = '2.18.3'
     roomVersion = "2.5.0"
