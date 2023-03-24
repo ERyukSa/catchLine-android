@@ -16,4 +16,5 @@
     <color name="green">#00C73C</color>
     <color name="orange">#E78111</color>
     <color name="transparentBlack">#77000000</color>
+    <color name="transparentBlack2">#10000000</color>
 </resources>

@@ -9,12 +9,13 @@
     <string name="all_line2">대사2</string>
 
     <string name="game_listen_and_guess">대사를 듣고 제목을 맞혀보세요!</string>
-    <string name="game_hint_text_first_character">첫 글자: %c</string>
-    <string name="game_hint_text_characters_count">글자 수: %d</string>
-    <string name="game_input_title">제목을 입력하세요</string>
     <string name="game_description_select_hint">힌트 선택</string>
     <string name="game_description_change_line">대사 변경</string>
     <string name="game_description_play_line">대사 재생하기</string>
+    <string name="game_description_pause_line">대사 일시정지</string>
+    <string name="game_description_first_character_hint">글자 수 힌트 요청</string>
+    <string name="game_description_characters_count_Hint">첫 글자 힌트 요청</string>
+    <string name="game_description_clearer_poster_Hint">선명한 사진 힌트 요청</string>
     <string name="game_characters_count">글자수</string>
     <string name="game_first_character">첫글자</string>
     <string name="game_clearer_poster">선명함</string>
@@ -24,6 +25,7 @@
     <string name="game_feedback_wrong">%s ❌</string>
     <string name="game_feedback_all_killed">올킬하셨습니다! 💯</string>
     <string name="game_line_label">대사%d</string>
+    <string name="game_result_for_submit">결과</string>
 
     <string name="main_poster_description">메인 포스터 이미지</string>
     <string name="backdrop_poster_description">배경 포스터 이미지</string>
