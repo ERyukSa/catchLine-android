@@ -6,11 +6,7 @@ import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.data.repository.HintCountRepository
 import com.eryuksa.catchthelines.ui.common.StringProvider
-import com.eryuksa.catchthelines.ui.game.uistate.AnotherLineHint
-import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
-import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
 import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
-import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
 import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,35 +29,39 @@ class GameViewModel @Inject constructor(
 
     private val _currentPage = MutableStateFlow<Int>(0)
     private val _contentUiStates = MutableStateFlow<List<ContentUiState>>(emptyList())
-    private var _usedHints = MutableStateFlow<List<Set<Hint>>>(listOf(emptySet()))
-    private var _hintTexts = MutableStateFlow<List<String>>(
+    private val _groupedUsedHints = MutableStateFlow<List<Set<Hint>>>(listOf(emptySet()))
+    private val _hintTexts = MutableStateFlow<List<String>>(
         listOf(stringProvider.getString(R.string.game_listen_and_guess))
     )
-    private var _feedbackTexts = MutableStateFlow<List<String>>(listOf(""))
+    private val _feedbackTexts = MutableStateFlow<List<String>>(listOf(""))
     private val _didUserCatchTheLine = MutableStateFlow<Boolean>(false)
     private val _availableHintCount = MutableStateFlow<Int>(10)
-    private val _audioIndex = MutableStateFlow<Int>(0)
+    private val _lineNumbers = MutableStateFlow<List<Int>>(emptyList())
+    private val _groupedAudioUrls = MutableStateFlow<List<List<String>>>(emptyList())
+
+    private val _isHintOpen = MutableStateFlow<Boolean>(false)
+    val isHintOpen: StateFlow<Boolean> get() = _isHintOpen
 
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
         _contentUiStates,
-        _usedHints,
         _hintTexts,
         _feedbackTexts,
         _didUserCatchTheLine,
         _availableHintCount,
-        _audioIndex
+        _lineNumbers,
+        _groupedAudioUrls
     ) { array: Array<Any> ->
         val currentPage = array[0] as Int
         GameUiState(
             currentPage = currentPage,
             contentUiStates = array[1] as List<ContentUiState>,
-            usedHints = (array[2] as List<Set<Hint>>)[currentPage],
-            hintText = (array[3] as List<String>)[currentPage],
-            feedbackText = (array[4] as List<String>)[currentPage],
-            didUserCatchTheLine = array[5] as Boolean,
-            hintCount = array[6] as Int,
-            audioIndex = array[7] as Int
+            hintText = (array[2] as List<String>)[currentPage],
+            feedbackText = (array[3] as List<String>)[currentPage],
+            didUserCatchTheLine = array[4] as Boolean,
+            hintCount = array[5] as Int,
+            audioIndex = 0, // 2 * currentPage + (array[7] as List<Int>)[currentPage],
+            groupedAudioUrls = array[7] as List<List<String>>
         )
     }.stateIn(
         scope = viewModelScope,
@@ -72,10 +72,17 @@ class GameViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             contentRepository.getContents().also { contents ->
-                _contentUiStates.value = contents.map { eachContent ->
-                    ContentUiState(content = eachContent, blurDegree = DEFAULT_BLUR_DEGREE)
+                _contentUiStates.value = contents.map {
+                    ContentUiState(
+                        id = it.id,
+                        title = it.title,
+                        posterUrl = it.posterUrl,
+                        blurDegree = DEFAULT_BLUR_DEGREE
+                    )
                 }
-                _usedHints.value = contents.map { emptySet() }
+                _lineNumbers.value = List(contents.size) { 0 }
+                _groupedUsedHints.value = contents.map { emptySet() }
+                _groupedAudioUrls.value = contents.map { it.lineAudioUrls }
                 _hintTexts.value = contents.map { stringProvider.getString(R.string.game_listen_and_guess) }
                 _feedbackTexts.value = contents.map { "" }
             }
@@ -83,73 +90,91 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    fun changeHintOpenState() {
+        _isHintOpen.update { !it }
+    }
+
     fun movePageTo(position: Int) {
         _currentPage.value = position
-        _audioIndex.value = 2 * position
         viewModelScope.launch {
             if (_didUserCatchTheLine.value == true) return@launch
-            contentRepository.saveEncounteredContent(_contentUiStates.value[position].content)
+            contentRepository.saveEncounteredContent(_contentUiStates.value[position].id)
         }
     }
 
     fun useHint(hint: Hint) {
         val currentPage = _currentPage.value
-        val currentUsedHints = uiState.value.usedHints
+        val currentUsedHints = _groupedUsedHints.value[currentPage]
         if (hint !in currentUsedHints && _availableHintCount.value == 0) {
             return
         }
 
+        when (hint) {
+            is Hint.ClearerPoster -> useClearerPosterHint()
+            is Hint.FirstCharacter -> useFirstCharacterHint()
+            is Hint.CharacterCount -> useCharacterCountHint()
+        }
+
         if (hint !in currentUsedHints) {
             viewModelScope.launch { hintCountHandler.decreaseHintCount() }
+            _groupedUsedHints.update { groupedUsedHints ->
+                val updatedUsedHints = currentUsedHints.toMutableSet().apply { add(hint) }
+                groupedUsedHints.replaceOldItemAt(currentPage, updatedUsedHints)
+            }
         }
+    }
 
-        val updatedUsedHints = if (hint !in currentUsedHints) {
-            currentUsedHints.toMutableSet().also { it.add(hint) }
-        } else {
-            currentUsedHints
-        }
-        val updatedFeedbackText = when (hint) {
-            is FirstCharacterHint -> stringProvider.getString(
-                FirstCharacterHint.stringResId,
-                _contentUiStates.value[_currentPage.value].content.title.first()
+    private fun useClearerPosterHint() {
+        _contentUiStates.update { contentUiStates ->
+            contentUiStates.replaceOldItemAt(
+                i = _currentPage.value,
+                newItem = contentUiStates[_currentPage.value].copy(blurDegree = CLEARER_BLUR_DEGREE)
             )
-
-            is CharacterCountHint -> stringProvider.getString(
-                CharacterCountHint.stringResId,
-                _contentUiStates.value[_currentPage.value].content.title.length
-            )
-
-            else -> uiState.value.feedbackText
         }
-        val updatedBlurDegree = if (hint is ClearerPosterHint && hint !in currentUsedHints) {
-            CLEARER_BLUR_DEGREE
-        } else {
-            _contentUiStates.value[currentPage].blurDegree
-        }
+    }
 
-        _usedHints.value = _usedHints.value.replaceOldItemAt(currentPage, updatedUsedHints)
-        _feedbackTexts.value = _feedbackTexts.value.replaceOldItemAt(currentPage, updatedFeedbackText)
-        _contentUiStates.value = _contentUiStates.value.replaceOldItemAt(
-            i = currentPage,
-            newItem = _contentUiStates.value[currentPage].copy(blurDegree = updatedBlurDegree)
+    private fun useFirstCharacterHint() {
+/*        val hintText = stringProvider.getString(
+            FirstCharacterHint.stringResId,
+            _contentUiStates.value[_currentPage.value].title.first()
         )
-        if (hint is AnotherLineHint) {
-            _audioIndex.value += 1
+        _feedbackTexts.update { feedbackTexts ->
+            feedbackTexts.replaceOldItemAt(_currentPage.value, hintText)
+        }*/
+    }
+
+    private fun useCharacterCountHint() {
+        /*val hintText = stringProvider.getString(
+            CharacterCountHint.stringResId,
+            _contentUiStates.value[_currentPage.value].title.length
+        )
+        _feedbackTexts.update { feedbackTexts ->
+            feedbackTexts.replaceOldItemAt(_currentPage.value, hintText)
+        }*/
+    }
+
+    fun switchLineOfCurrentContent() {
+        val currentPage = _currentPage.value
+        _lineNumbers.update { lineNumbers ->
+            val lineNumberOfCurrentContent = lineNumbers[currentPage]
+            lineNumbers.replaceOldItemAt(i = currentPage, newItem = 1 - lineNumberOfCurrentContent)
         }
     }
 
     fun checkUserCatchTheLine(userInput: String) {
-        val currentContent = _contentUiStates.value[_currentPage.value].content
-        if (doesUserCatch(userInput, currentContent.title)) {
+        val currentContentUiState = _contentUiStates.value[_currentPage.value]
+        if (doesUserCatch(userInput, currentContentUiState.title)) {
             viewModelScope.launch {
-                contentRepository.saveCaughtContent(currentContent)
+                contentRepository.saveCaughtContent(currentContentUiState.id)
             }
             _didUserCatchTheLine.update { true }
             _feedbackTexts.update { feedbackTexts ->
                 feedbackTexts.replaceOldItemAt(
                     i = _currentPage.value,
-                    newItem =
-                    stringProvider.getString(R.string.game_feedback_catch_the_line, currentContent.title)
+                    newItem = stringProvider.getString(
+                        R.string.game_feedback_catch_the_line,
+                        currentContentUiState.title
+                    )
                 )
             }
             _contentUiStates.update { contentUiStates ->
@@ -173,13 +198,13 @@ class GameViewModel @Inject constructor(
 
         if (_currentPage.value == 0 && _contentUiStates.value.size == 1) {
             _contentUiStates.value = emptyList()
-            _usedHints.value = listOf(emptySet())
+            _groupedUsedHints.value = listOf(emptySet())
             _hintTexts.value = listOf("")
             _feedbackTexts.value = listOf(stringProvider.getString(R.string.game_feedback_all_killed))
         } else if (_currentPage.value == _contentUiStates.value.lastIndex) {
             _currentPage.update { it - 1 }
             _contentUiStates.update { it.subList(0, it.lastIndex) }
-            _usedHints.update { it.subList(0, it.lastIndex) }
+            _groupedUsedHints.update { it.subList(0, it.lastIndex) }
             _hintTexts.update { it.subList(0, it.lastIndex) }
             _feedbackTexts.update { it.subList(0, it.lastIndex) }
         } else {
@@ -188,7 +213,7 @@ class GameViewModel @Inject constructor(
                 contentUiStates.subList(0, currentPage) +
                     contentUiStates.subList(currentPage + 1, contentUiStates.size)
             }
-            _usedHints.update { usedHintsList ->
+            _groupedUsedHints.update { usedHintsList ->
                 usedHintsList.subList(0, currentPage) +
                     usedHintsList.subList(currentPage + 1, usedHintsList.size)
             }
@@ -200,16 +225,6 @@ class GameViewModel @Inject constructor(
                 feedbackTexts.subList(0, currentPage) +
                     feedbackTexts.subList(currentPage + 1, feedbackTexts.size)
             }
-        }
-    }
-
-    fun switchLineOfCurrentContent() {
-        if (_audioIndex.value % 2 == 0) {
-            if (_usedHints.value[_currentPage.value].contains(AnotherLineHint)) {
-                _audioIndex.value += 1
-            }
-        } else {
-            _audioIndex.value -= 1
         }
     }
 

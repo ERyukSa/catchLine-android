@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,14 +23,10 @@ import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
-import com.eryuksa.catchthelines.ui.game.uistate.AnotherLineHint
-import com.eryuksa.catchthelines.ui.game.uistate.CharacterCountHint
-import com.eryuksa.catchthelines.ui.game.uistate.ClearerPosterHint
-import com.eryuksa.catchthelines.ui.game.uistate.FirstCharacterHint
+import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHandler
-import com.eryuksa.catchthelines.ui.game.utility.HintButtonOpenHandler
+import com.eryuksa.catchthelines.ui.game.utility.HintButtonOpenHelper
 import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
-import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
@@ -46,19 +43,15 @@ class GameFragment : Fragment() {
     private lateinit var posterDragHandler: PosterDragHandler
     private lateinit var posterAdapter: PosterViewPagerAdapter
     private val onClickPoster = { position: Int ->
-        val currentContent = viewModel.uiState.value.contentUiStates[position].content
         findNavController().navigate(
             GameFragmentDirections.gameToDetail(
-                currentContent.id,
-                currentContent.lineAudioUrls.toTypedArray()
+                viewModel.uiState.value.contentUiStates[position].id,
+                viewModel.uiState.value.groupedAudioUrls[position].toTypedArray()
             )
         )
     }
 
-    private lateinit var audioPlayer: AudioPlayerHandler
-    private var playbackPosition = 0L
-
-    private lateinit var hintOpenHandler: HintButtonOpenHandler
+    private lateinit var audioPlayerHandler: AudioPlayerHandler
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,19 +67,18 @@ class GameFragment : Fragment() {
         _binding = FragmentGameBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@GameFragment.viewModel
-            clearerPosterHint = ClearerPosterHint
-            firstCharacterHint = FirstCharacterHint
-            characterCountHint = CharacterCountHint
-            anotherLineHint = AnotherLineHint
+            clearerPosterHint = Hint.ClearerPoster
+            firstCharacterHint = Hint.FirstCharacter
+            characterCountHint = Hint.CharacterCount
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
         }
 
-        restoreUiOnlyState(outState)
         initPosterViewPager()
         initViewListener()
-        initHintButtonsAnimation(isHintOpen = outState?.getBoolean(HINT_IS_OPEN_KEY) ?: false)
+        setUpHintButtonsAnimator()
+        initializeAudioPlayerHandler()
         return binding.root
     }
 
@@ -95,29 +87,9 @@ class GameFragment : Fragment() {
         observeData()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(HINT_IS_OPEN_KEY, hintOpenHandler.isHintOpen)
-        outState.putLong(AUDIO_PLAY_POSITION_KEY, audioPlayer.playbackPosition)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        initializeAudioPlayer()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        releaseAudioPlayer()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun restoreUiOnlyState(outState: Bundle?) {
-        playbackPosition = outState?.getLong(AUDIO_PLAY_POSITION_KEY) ?: 0
     }
 
     private fun initPosterViewPager() {
@@ -136,43 +108,34 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun initHintButtonsAnimation(isHintOpen: Boolean) {
-        hintOpenHandler = HintButtonOpenHandler(
-            hintEntranceButton = binding.btnOpenHint,
-            hintButtons = listOf(
-                binding.btnHintClearerPoster,
-                binding.btnHintFirstCharacter,
-                binding.btnHintCharactersCount,
-                binding.btnHintAnotherLine
-            ),
-            wasHintOpened = isHintOpen,
-            darkBackgroundView = binding.darkBackgroundCoverForHint
-        )
+    private fun setUpHintButtonsAnimator() {
+        val hintButtonElevation = resources.getDimension(R.dimen.game_hintbutton_elevation)
+
+        binding.btnOpenHint.doOnLayout {
+            binding.hintOpenAnimatorList = HintButtonOpenHelper.createOpenAnimators(
+                binding.btnOpenHint,
+                binding.btnClearerPosterHint.apply { elevation = hintButtonElevation },
+                binding.btnFirstCharacterHint.apply { elevation = hintButtonElevation },
+                binding.btnCharactersCountHint.apply { elevation = hintButtonElevation }
+            )
+        }
+
+        binding.btnOpenHint.setOnClickListener {
+            viewModel.changeHintOpenState()
+        }
     }
 
-    private fun initializeAudioPlayer() {
-        ExoPlayer.Builder(requireContext()).build().also { exoPlayer ->
-            binding.playerView.player = exoPlayer
-            audioPlayer = AudioPlayerHandler(exoPlayer)
+    private fun initializeAudioPlayerHandler() {
+        AudioPlayerHandler(requireContext()).run {
+            audioPlayerHandler = this
+            binding.playerView.player = this.audioPlayer
         }
-        audioPlayer.initializePlayer(
-            playbackPosition = playbackPosition,
-            onPlay = { binding.btnPlayStop.setImageResource(R.drawable.icon_pause_24) },
-            onPause = {
-                binding.btnPlayStop.setImageResource(R.drawable.icon_play_24)
-                playbackPosition = audioPlayer.playbackPosition
-            }
-        )
     }
 
     private fun initViewListener() {
         binding.btnSubmitTitle.setOnClickListener {
             submitUserInputAndClearText()
             hideInputMethod()
-        }
-
-        binding.btnPlayStop.setOnClickListener {
-            audioPlayer.switchPlayingState()
         }
 
         binding.edittextInputTitle.setOnEditorActionListener { _, actionId, _ ->
@@ -182,27 +145,17 @@ class GameFragment : Fragment() {
             true
         }
 
-        binding.btnHintAnotherLine.setOnClickListener {
-            if (viewModel.uiState.value.usedHints.contains(AnotherLineHint).not()) {
-                viewModel.useHint(AnotherLineHint)
-            }
-            hintOpenHandler.closeHintAndDarkBackground()
+        binding.btnClearerPosterHint.setOnClickListener {
+            viewModel.useHint(Hint.ClearerPoster)
+            viewModel.changeHintOpenState()
         }
-        binding.btnHintClearerPoster.setOnClickListener {
-            viewModel.useHint(ClearerPosterHint)
-            hintOpenHandler.closeHintAndDarkBackground()
+        binding.btnFirstCharacterHint.setOnClickListener {
+            viewModel.useHint(Hint.FirstCharacter)
+            viewModel.changeHintOpenState()
         }
-        binding.btnHintFirstCharacter.setOnClickListener {
-            viewModel.useHint(FirstCharacterHint)
-            hintOpenHandler.closeHintAndDarkBackground()
-        }
-        binding.btnHintCharactersCount.setOnClickListener {
-            viewModel.useHint(CharacterCountHint)
-            hintOpenHandler.closeHintAndDarkBackground()
-        }
-
-        binding.btnSwitchLine.setOnClickListener {
-            viewModel.switchLineOfCurrentContent()
+        binding.btnCharactersCountHint.setOnClickListener {
+            viewModel.useHint(Hint.CharacterCount)
+            viewModel.changeHintOpenState()
         }
     }
 
@@ -219,8 +172,8 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.audioUris }.collect { uiState ->
-                        audioPlayer.setUpAudio(uiState.audioUris)
+                    uiState.distinctUntilChangedBy { it.groupedAudioUrls }.collect { uiState ->
+                        audioPlayerHandler.setAudioItems(uiState.groupedAudioUrls)
                     }
                 }
             }
@@ -228,12 +181,8 @@ class GameFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState.distinctUntilChangedBy { it.audioIndex }.collect { uiState ->
-                        audioPlayer.moveTo(uiState.audioIndex)
-                        val lineOrderOfCurrentContent = uiState.audioIndex % 2 + 1
-                        binding.btnSwitchLine.text = getString(
-                            R.string.game_line_label,
-                            lineOrderOfCurrentContent
-                        )
+                        audioPlayerHandler.moveTo(uiState.audioIndex)
+                        val lineNumber = uiState.audioIndex % 2 + 1
                     }
                 }
             }
@@ -241,7 +190,7 @@ class GameFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState.distinctUntilChangedBy { it.feedbackText }.collect { uiState ->
-                        binding.tvFeedback.text = uiState.feedbackText
+                        // binding.tvFeedback.text = uiState.feedbackText
                     }
                 }
             }
@@ -251,7 +200,8 @@ class GameFragment : Fragment() {
                     uiState.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
                         binding.btnOpenHint.isClickable = uiState.didUserCatchTheLine.not()
                         binding.btnSubmitTitle.isEnabled = uiState.didUserCatchTheLine.not()
-                        binding.viewPagerPoster.isUserInputEnabled = uiState.didUserCatchTheLine.not()
+                        binding.viewPagerPoster.isUserInputEnabled =
+                            uiState.didUserCatchTheLine.not()
                         binding.viewPagerPoster.elevation = when (uiState.didUserCatchTheLine) {
                             true -> resources.getDimension(R.dimen.game_poster_elevation_over_dark_cover)
                             false -> 0f
@@ -263,7 +213,7 @@ class GameFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState.distinctUntilChangedBy { it.hintText }.collect { uiState ->
-                        binding.tvHint.text = uiState.hintText
+                        // binding.tvHint.text = uiState.hintText
                     }
                 }
             }
@@ -273,14 +223,6 @@ class GameFragment : Fragment() {
                     uiState.distinctUntilChangedBy { it.hintCount }.collect { uiState ->
                         binding.tvAvailableHintCount.text =
                             getString(R.string.game_available_hint_count, uiState.hintCount)
-                    }
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.usedHints }.collect { uiState ->
-                        binding.usedHints = uiState.usedHints
                     }
                 }
             }
@@ -303,10 +245,6 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun releaseAudioPlayer() {
-        audioPlayer.releasePlayer()
-    }
-
     private fun submitUserInputAndClearText() {
         viewModel.checkUserCatchTheLine(binding.edittextInputTitle.text.toString())
         binding.edittextInputTitle.text?.clear()
@@ -316,10 +254,5 @@ class GameFragment : Fragment() {
         val inputManager =
             getSystemService(requireContext(), InputMethodManager::class.java) as InputMethodManager
         inputManager.hideSoftInputFromWindow(binding.root.windowToken, 0)
-    }
-
-    companion object {
-        private const val HINT_IS_OPEN_KEY = "HINT_IS_OPEN_KEY"
-        private const val AUDIO_PLAY_POSITION_KEY = "AUDIO_PLAY_POSITION_KEY"
     }
 }

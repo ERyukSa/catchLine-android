@@ -9,6 +9,8 @@
             name="viewModel"
             type="com.eryuksa.catchthelines.ui.game.GameViewModel" />
 
+        <import type="com.eryuksa.catchthelines.ui.game.uistate.Hint" />
+
         <variable
             name="clearerPosterHint"
             type="com.eryuksa.catchthelines.ui.game.uistate.Hint.ClearerPoster" />
@@ -21,13 +23,11 @@
             name="characterCountHint"
             type="com.eryuksa.catchthelines.ui.game.uistate.Hint.CharacterCount" />
 
-        <import type="com.eryuksa.catchthelines.ui.game.uistate.Hint" />
-
-        <import type="java.util.Set" />
-
+        <import type="java.util.List" />
+        <import type="android.animation.ObjectAnimator" />
         <variable
-            name="usedHints"
-            type="Set&lt;Hint&gt;" />
+            name="hintOpenAnimatorList"
+            type="List&lt;ObjectAnimator&gt;" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,17 +61,17 @@
             android:layout_marginTop="8dp"
             android:clipChildren="false"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintHeight_percent="0.40"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintWidth_percent="0.725" />
+            app:layout_constraintWidth_percent="0.685" />
 
         <com.google.android.exoplayer2.ui.PlayerControlView
             android:id="@+id/player_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            app:controller_layout_id="@layout/audio_time_bar_game"
+            app:controller_layout_id="@layout/view_audio_controller"
             app:layout_constraintBottom_toBottomOf="@id/view_pager_poster"
             app:layout_constraintEnd_toEndOf="@id/view_pager_poster"
             app:layout_constraintStart_toStartOf="@id/view_pager_poster"
@@ -116,10 +116,11 @@
             layout="@layout/view_game_board"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
             app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
-            app:layout_constraintEnd_toEndOf="@id/view_pager_poster"
-            app:layout_constraintStart_toStartOf="@id/view_pager_poster"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/chip_group_lines"
             app:layout_constraintVertical_bias="0" />
 
@@ -152,13 +153,13 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_characters_count_hint"
-            myHintType="@{characterCountHint}"
-            usedHints="@{usedHints}"
+            hintOpenAnimatorList="@{hintOpenAnimatorList}"
+            index="@{2}"
+            isHintOpen="@{viewModel.isHintOpen}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_circle_button"
             android:contentDescription="@string/game_description_characters_count_Hint"
-            android:elevation="4dp"
             android:maxLines="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
@@ -172,13 +173,13 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_first_character_hint"
-            myHintType="@{firstCharacterHint}"
-            usedHints="@{usedHints}"
+            hintOpenAnimatorList="@{hintOpenAnimatorList}"
+            index="@{1}"
+            isHintOpen="@{viewModel.isHintOpen}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_circle_button"
             android:contentDescription="@string/game_description_first_character_hint"
-            android:elevation="4dp"
             android:maxLines="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
@@ -192,14 +193,13 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_clearer_poster_hint"
-            myHintType="@{clearerPosterHint}"
-            usedHints="@{usedHints}"
+            hintOpenAnimatorList="@{hintOpenAnimatorList}"
+            index="@{0}"
+            isHintOpen="@{viewModel.isHintOpen}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_stroked_circle_button"
             android:contentDescription="@string/game_description_clearer_poster_Hint"
-            android:elevation="4dp"
-            android:enabled="@{usedHints.contains(clearerPosterHint) ? false : true}"
             android:maxLines="1"
             android:minWidth="0dp"
             android:minHeight="0dp"
@@ -241,12 +241,13 @@
             app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
 
         <View
-            android:id="@+id/dark_background_cover_for_poster"
+            android:id="@+id/dark_background_cover"
+            visible="@{viewModel.isHintOpen}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/transparentBlack"
-            android:elevation="6dp"
-            android:visibility="invisible" />
+            android:elevation="3dp"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/iv_content_removable_area"
@@ -256,9 +257,9 @@
             android:background="@drawable/game_outlined_circle_button"
             android:elevation="8dp"
             android:padding="4dp"
+            android:visibility="gone"
             android:scaleType="centerCrop"
             android:src="@drawable/icon_check_24"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
