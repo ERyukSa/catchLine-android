@@ -230,6 +230,13 @@ class GameFragment : Fragment() {
     }
 
     private val onPageChange = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageScrollStateChanged(state: Int) {
+            binding.playerView.visibility = when (state) {
+                ViewPager2.SCROLL_STATE_IDLE -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
         override fun onPageSelected(position: Int) {
             viewModel.movePageTo(position)
         }
