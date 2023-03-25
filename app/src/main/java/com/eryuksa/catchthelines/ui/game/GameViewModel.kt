@@ -2,11 +2,10 @@ package com.eryuksa.catchthelines.ui.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.data.repository.HintCountRepository
-import com.eryuksa.catchthelines.ui.common.StringProvider
-import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
+import com.eryuksa.catchthelines.ui.game.uistate.ContentInfo
+import com.eryuksa.catchthelines.ui.game.uistate.GameMode
 import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,45 +22,45 @@ import javax.inject.Inject
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
-    private val hintCountHandler: HintCountRepository,
-    private val stringProvider: StringProvider
+    private val hintCountRepository: HintCountRepository
 ) : ViewModel() {
 
     private val _currentPage = MutableStateFlow<Int>(0)
-    private val _contentUiStates = MutableStateFlow<List<ContentUiState>>(emptyList())
-    private val _groupedUsedHints = MutableStateFlow<List<Set<Hint>>>(listOf(emptySet()))
-    private val _hintTexts = MutableStateFlow<List<String>>(
-        listOf(stringProvider.getString(R.string.game_listen_and_guess))
-    )
-    private val _feedbackTexts = MutableStateFlow<List<String>>(listOf(""))
-    private val _didUserCatchTheLine = MutableStateFlow<Boolean>(false)
+    private val _contentInfo = MutableStateFlow<List<ContentInfo>>(emptyList())
+    private val _selectedLine = MutableStateFlow<Int>(0)
+    private val _usedHints = MutableStateFlow<Set<Hint>>(emptySet())
+    private val _firstCharacterHintText = MutableStateFlow<String>("")
+    private val _characterCountHint = MutableStateFlow<Int>(0)
+    private val _resultText = MutableStateFlow<String>("")
+    private val _gameMode = MutableStateFlow<GameMode>(GameMode.WATCHING)
     private val _availableHintCount = MutableStateFlow<Int>(10)
-    private val _lineNumbers = MutableStateFlow<List<Int>>(emptyList())
-    private val _groupedAudioUrls = MutableStateFlow<List<List<String>>>(emptyList())
 
     private val _isHintOpen = MutableStateFlow<Boolean>(false)
     val isHintOpen: StateFlow<Boolean> get() = _isHintOpen
 
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
-        _contentUiStates,
-        _hintTexts,
-        _feedbackTexts,
-        _didUserCatchTheLine,
+        _contentInfo,
+        _selectedLine,
+        _usedHints,
+        _firstCharacterHintText,
+        _characterCountHint,
+        _resultText,
         _availableHintCount,
-        _lineNumbers,
-        _groupedAudioUrls
+        _gameMode
     ) { array: Array<Any> ->
         val currentPage = array[0] as Int
+        val selectedLine = array[2] as Int
         GameUiState(
             currentPage = currentPage,
-            contentUiStates = array[1] as List<ContentUiState>,
-            hintText = (array[2] as List<String>)[currentPage],
-            feedbackText = (array[3] as List<String>)[currentPage],
-            didUserCatchTheLine = array[4] as Boolean,
-            hintCount = array[5] as Int,
-            audioIndex = 0, // 2 * currentPage + (array[7] as List<Int>)[currentPage],
-            groupedAudioUrls = array[7] as List<List<String>>
+            contentItems = array[1] as List<ContentInfo>,
+            audioIndex = 2 * currentPage + selectedLine,
+            usedHints = array[3] as Set<Hint>,
+            firstCharacterHint = array[4] as String,
+            characterCountHint = if (array[5] == 0) null else array[5] as Int,
+            resultText = array[6] as String,
+            hintCount = array[7] as Int,
+            gameMode = array[8] as GameMode
         )
     }.stateIn(
         scope = viewModelScope,
@@ -72,21 +71,17 @@ class GameViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             contentRepository.getContents().also { contents ->
-                _contentUiStates.value = contents.map {
-                    ContentUiState(
+                _contentInfo.value = contents.map {
+                    ContentInfo(
                         id = it.id,
                         title = it.title,
+                        audioUrls = it.lineAudioUrls,
                         posterUrl = it.posterUrl,
                         blurDegree = DEFAULT_BLUR_DEGREE
                     )
                 }
-                _lineNumbers.value = List(contents.size) { 0 }
-                _groupedUsedHints.value = contents.map { emptySet() }
-                _groupedAudioUrls.value = contents.map { it.lineAudioUrls }
-                _hintTexts.value = contents.map { stringProvider.getString(R.string.game_listen_and_guess) }
-                _feedbackTexts.value = contents.map { "" }
             }
-            hintCountHandler.availableHintCount.collectLatest { _availableHintCount.value = it }
+            hintCountRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
     }
 
@@ -94,122 +89,97 @@ class GameViewModel @Inject constructor(
         _isHintOpen.update { !it }
     }
 
+    fun changeSelectedLine(selectedLine: Int) {
+        _selectedLine.value = selectedLine
+    }
+
     fun movePageTo(position: Int) {
         _currentPage.value = position
-        viewModelScope.launch {
-            if (_didUserCatchTheLine.value == true) return@launch
-            contentRepository.saveEncounteredContent(_contentUiStates.value[position].id)
-        }
     }
 
     fun useHint(hint: Hint) {
-        val currentPage = _currentPage.value
-        val currentUsedHints = _groupedUsedHints.value[currentPage]
-        if (hint !in currentUsedHints && _availableHintCount.value == 0) {
+        if (_availableHintCount.value == 0) {
             return
+        }
+        viewModelScope.launch { hintCountRepository.decreaseHintCount() }
+
+        if (_gameMode.value == GameMode.WATCHING) {
+            setInGameMode()
         }
 
         when (hint) {
-            is Hint.ClearerPoster -> useClearerPosterHint()
-            is Hint.FirstCharacter -> useFirstCharacterHint()
-            is Hint.CharacterCount -> useCharacterCountHint()
+            Hint.CLEARER_POSTER -> useClearerPosterHint()
+            Hint.FIRST_CHARACTER -> useFirstCharacterHint()
+            Hint.CHARACTER_COUNT -> useCharacterCountHint()
         }
-
-        if (hint !in currentUsedHints) {
-            viewModelScope.launch { hintCountHandler.decreaseHintCount() }
-            _groupedUsedHints.update { groupedUsedHints ->
-                val updatedUsedHints = currentUsedHints.toMutableSet().apply { add(hint) }
-                groupedUsedHints.replaceOldItemAt(currentPage, updatedUsedHints)
-            }
+        _usedHints.update { usedHints ->
+            usedHints.toMutableSet().apply { add(hint) }
         }
     }
 
     private fun useClearerPosterHint() {
-        _contentUiStates.update { contentUiStates ->
+        /*_contentInfo.update { contentUiStates ->
             contentUiStates.replaceOldItemAt(
                 i = _currentPage.value,
                 newItem = contentUiStates[_currentPage.value].copy(blurDegree = CLEARER_BLUR_DEGREE)
             )
-        }
+        }*/
     }
 
     private fun useFirstCharacterHint() {
-/*        val hintText = stringProvider.getString(
-            FirstCharacterHint.stringResId,
-            _contentUiStates.value[_currentPage.value].title.first()
-        )
-        _feedbackTexts.update { feedbackTexts ->
-            feedbackTexts.replaceOldItemAt(_currentPage.value, hintText)
-        }*/
+        _firstCharacterHintText.update {
+            _contentInfo.value[_currentPage.value].title.first().toString()
+        }
     }
 
     private fun useCharacterCountHint() {
-        /*val hintText = stringProvider.getString(
-            CharacterCountHint.stringResId,
-            _contentUiStates.value[_currentPage.value].title.length
-        )
-        _feedbackTexts.update { feedbackTexts ->
-            feedbackTexts.replaceOldItemAt(_currentPage.value, hintText)
-        }*/
-    }
-
-    fun switchLineOfCurrentContent() {
-        val currentPage = _currentPage.value
-        _lineNumbers.update { lineNumbers ->
-            val lineNumberOfCurrentContent = lineNumbers[currentPage]
-            lineNumbers.replaceOldItemAt(i = currentPage, newItem = 1 - lineNumberOfCurrentContent)
+        _characterCountHint.update {
+            _contentInfo.value[_currentPage.value].title.length
         }
     }
 
     fun checkUserCatchTheLine(userInput: String) {
-        val currentContentUiState = _contentUiStates.value[_currentPage.value]
-        if (doesUserCatch(userInput, currentContentUiState.title)) {
+        if (_gameMode.value == GameMode.WATCHING) {
+            setInGameMode()
+        }
+
+        val contentInfo = _contentInfo.value[_currentPage.value]
+        if (doesUserCatch(userInput, contentInfo.title)) {
             viewModelScope.launch {
-                contentRepository.saveCaughtContent(currentContentUiState.id)
+                contentRepository.saveCaughtContent(contentInfo.id)
             }
-            _didUserCatchTheLine.update { true }
-            _feedbackTexts.update { feedbackTexts ->
-                feedbackTexts.replaceOldItemAt(
-                    i = _currentPage.value,
-                    newItem = stringProvider.getString(
-                        R.string.game_feedback_catch_the_line,
-                        currentContentUiState.title
-                    )
-                )
-            }
-            _contentUiStates.update { contentUiStates ->
-                contentUiStates.replaceOldItemAt(
-                    i = _currentPage.value,
-                    newItem = _contentUiStates.value[_currentPage.value].copy(blurDegree = 0)
-                )
-            }
+
+            _gameMode.update { GameMode.CATCH }
+            _resultText.update { contentInfo.title }
         } else {
-            _feedbackTexts.update { feedbackTexts ->
-                feedbackTexts.replaceOldItemAt(
-                    i = _currentPage.value,
-                    newItem = stringProvider.getString(R.string.game_feedback_wrong, userInput)
-                )
-            }
+            _resultText.update { userInput }
+        }
+    }
+
+    private fun setInGameMode() {
+        viewModelScope.launch {
+            _gameMode.update { GameMode.IN_GAME }
+            contentRepository.saveTriedContent(_contentInfo.value[_currentPage.value].id)
         }
     }
 
     fun removeCaughtContent() {
-        _didUserCatchTheLine.value = false
+        /*_didUserCatchTheLine.value = false
 
-        if (_currentPage.value == 0 && _contentUiStates.value.size == 1) {
-            _contentUiStates.value = emptyList()
+        if (_currentPage.value == 0 && _contentInfo.value.size == 1) {
+            _contentInfo.value = emptyList()
             _groupedUsedHints.value = listOf(emptySet())
             _hintTexts.value = listOf("")
-            _feedbackTexts.value = listOf(stringProvider.getString(R.string.game_feedback_all_killed))
-        } else if (_currentPage.value == _contentUiStates.value.lastIndex) {
+            _resultText.value = listOf(stringProvider.getString(R.string.game_feedback_all_killed))
+        } else if (_currentPage.value == _contentInfo.value.lastIndex) {
             _currentPage.update { it - 1 }
-            _contentUiStates.update { it.subList(0, it.lastIndex) }
+            _contentInfo.update { it.subList(0, it.lastIndex) }
             _groupedUsedHints.update { it.subList(0, it.lastIndex) }
             _hintTexts.update { it.subList(0, it.lastIndex) }
-            _feedbackTexts.update { it.subList(0, it.lastIndex) }
+            _resultText.update { it.subList(0, it.lastIndex) }
         } else {
             val currentPage = _currentPage.value
-            _contentUiStates.update { contentUiStates ->
+            _contentInfo.update { contentUiStates ->
                 contentUiStates.subList(0, currentPage) +
                     contentUiStates.subList(currentPage + 1, contentUiStates.size)
             }
@@ -221,11 +191,11 @@ class GameViewModel @Inject constructor(
                 hintText2.subList(0, currentPage) +
                     hintText2.subList(currentPage + 1, hintText2.size)
             }
-            _feedbackTexts.update { feedbackTexts ->
+            _resultText.update { feedbackTexts ->
                 feedbackTexts.subList(0, currentPage) +
                     feedbackTexts.subList(currentPage + 1, feedbackTexts.size)
             }
-        }
+        }*/
     }
 
     private fun doesUserCatch(userInput: String, contentTitle: String): Boolean =

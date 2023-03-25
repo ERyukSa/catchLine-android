@@ -23,7 +23,7 @@ class RecordViewModel @Inject constructor(
             _uiState.value = RecordUiState(
                 caughtContents = repository.getCaughtContents(size = CAUGHT_CONTENTS_CHUNK, offset = 0),
                 caughtContentsCount = repository.getCaughtContentsCount(),
-                encounteredContentsCount = repository.getEncounteredContentsCount()
+                triedContentsCount = repository.getTriedContentsCount()
             )
         }
     }

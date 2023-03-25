@@ -4,7 +4,7 @@ import com.eryuksa.catchthelines.data.datasource.local.ContentLocalDataSource
 import com.eryuksa.catchthelines.data.datasource.remote.ContentRemoteDataSource
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.data.dto.ContentDetail
-import com.eryuksa.catchthelines.data.dto.EncounteredContent
+import com.eryuksa.catchthelines.data.dto.TriedContent
 import com.eryuksa.catchthelines.di.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,19 +44,19 @@ class ContentRepository @Inject constructor(
         }
     }
 
-    suspend fun saveCaughtContent(content: Content) {
-        saveEncounteredContent(content, isCaught = true)
+    suspend fun saveCaughtContent(contentId: Int) {
+        saveTriedContent(contentId, isCaught = true)
     }
 
-    suspend fun saveEncounteredContent(content: Content) {
-        saveEncounteredContent(content, isCaught = false)
+    suspend fun saveTriedContent(contentId: Int) {
+        saveTriedContent(contentId, isCaught = false)
     }
 
-    private suspend fun saveEncounteredContent(content: Content, isCaught: Boolean) {
+    private suspend fun saveTriedContent(contentId: Int, isCaught: Boolean) {
         externalScope.launch(Dispatchers.IO) {
-            localDataSource.saveEncounteredContent(
-                EncounteredContent(
-                    id = content.id,
+            localDataSource.saveTriedContent(
+                TriedContent(
+                    id = contentId,
                     updatedTime = System.currentTimeMillis(),
                     isCaught = isCaught
                 )
@@ -64,8 +64,8 @@ class ContentRepository @Inject constructor(
         }
     }
 
-    suspend fun getEncounteredContentsCount(): Int =
-        localDataSource.getEncounteredContentsCount()
+    suspend fun getTriedContentsCount(): Int =
+        localDataSource.getTriedContentsCount()
 
     suspend fun getCaughtContentsCount(): Int =
         localDataSource.getCaughtContentsCount()

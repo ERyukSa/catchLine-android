@@ -25,7 +25,7 @@ import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHandler
-import com.eryuksa.catchthelines.ui.game.utility.HintButtonOpenHelper
+import com.eryuksa.catchthelines.ui.game.utility.HintButtonHelper
 import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -45,8 +45,8 @@ class GameFragment : Fragment() {
     private val onClickPoster = { position: Int ->
         findNavController().navigate(
             GameFragmentDirections.gameToDetail(
-                viewModel.uiState.value.contentUiStates[position].id,
-                viewModel.uiState.value.groupedAudioUrls[position].toTypedArray()
+                viewModel.uiState.value.contentItems[position].id,
+                viewModel.uiState.value.contentItems[position].audioUrls.toTypedArray()
             )
         )
     }
@@ -67,16 +67,13 @@ class GameFragment : Fragment() {
         _binding = FragmentGameBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@GameFragment.viewModel
-            clearerPosterHint = Hint.ClearerPoster
-            firstCharacterHint = Hint.FirstCharacter
-            characterCountHint = Hint.CharacterCount
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
         }
 
         initPosterViewPager()
-        initViewListener()
+        setUpListeners()
         setUpHintButtonsAnimator()
         initializeAudioPlayerHandler()
         return binding.root
@@ -112,7 +109,7 @@ class GameFragment : Fragment() {
         val hintButtonElevation = resources.getDimension(R.dimen.game_hintbutton_elevation)
 
         binding.btnOpenHint.doOnLayout {
-            binding.hintOpenAnimatorList = HintButtonOpenHelper.createOpenAnimators(
+            binding.hintOpenAnimatorList = HintButtonHelper.createOpenAnimators(
                 binding.btnOpenHint,
                 binding.btnClearerPosterHint.apply { elevation = hintButtonElevation },
                 binding.btnFirstCharacterHint.apply { elevation = hintButtonElevation },
@@ -132,7 +129,7 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun initViewListener() {
+    private fun setUpListeners() {
         binding.btnSubmitTitle.setOnClickListener {
             submitUserInputAndClearText()
             hideInputMethod()
@@ -146,16 +143,26 @@ class GameFragment : Fragment() {
         }
 
         binding.btnClearerPosterHint.setOnClickListener {
-            viewModel.useHint(Hint.ClearerPoster)
+            viewModel.useHint(Hint.CLEARER_POSTER)
             viewModel.changeHintOpenState()
         }
         binding.btnFirstCharacterHint.setOnClickListener {
-            viewModel.useHint(Hint.FirstCharacter)
+            viewModel.useHint(Hint.FIRST_CHARACTER)
             viewModel.changeHintOpenState()
         }
         binding.btnCharactersCountHint.setOnClickListener {
-            viewModel.useHint(Hint.CharacterCount)
+            viewModel.useHint(Hint.CHARACTER_COUNT)
             viewModel.changeHintOpenState()
+        }
+        binding.chipLine1.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewModel.changeSelectedLine(0)
+            }
+        }
+        binding.chipLine2.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewModel.changeSelectedLine(1)
+            }
         }
     }
 
@@ -163,8 +170,8 @@ class GameFragment : Fragment() {
         with(viewModel) {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.contentUiStates }.collect { uiState ->
-                        posterAdapter.submitList(uiState.contentUiStates)
+                    uiState.distinctUntilChangedBy { it.contentItems }.collect { uiState ->
+                        posterAdapter.submitList(uiState.contentItems)
                         binding.viewPagerPoster.setCurrentItem(uiState.currentPage, false)
                     }
                 }
@@ -172,8 +179,8 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.groupedAudioUrls }.collect { uiState ->
-                        audioPlayerHandler.setAudioItems(uiState.groupedAudioUrls)
+                    uiState.distinctUntilChangedBy { it.contentItems }.collect { uiState ->
+                        audioPlayerHandler.setAudioItems(uiState.contentItems.map { it.audioUrls })
                     }
                 }
             }
@@ -182,14 +189,13 @@ class GameFragment : Fragment() {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState.distinctUntilChangedBy { it.audioIndex }.collect { uiState ->
                         audioPlayerHandler.moveTo(uiState.audioIndex)
-                        val lineNumber = uiState.audioIndex % 2 + 1
                     }
                 }
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.feedbackText }.collect { uiState ->
+                    uiState.distinctUntilChangedBy { it.resultText }.collect { uiState ->
                         // binding.tvFeedback.text = uiState.feedbackText
                     }
                 }
@@ -197,7 +203,7 @@ class GameFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
+                    /*uiState.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
                         binding.btnOpenHint.isClickable = uiState.didUserCatchTheLine.not()
                         binding.btnSubmitTitle.isEnabled = uiState.didUserCatchTheLine.not()
                         binding.viewPagerPoster.isUserInputEnabled =
@@ -206,15 +212,7 @@ class GameFragment : Fragment() {
                             true -> resources.getDimension(R.dimen.game_poster_elevation_over_dark_cover)
                             false -> 0f
                         }
-                    }
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.hintText }.collect { uiState ->
-                        // binding.tvHint.text = uiState.hintText
-                    }
+                    }*/
                 }
             }
 

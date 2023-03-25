@@ -6,12 +6,10 @@
     <data>
 
         <variable
-            name="headerText"
-            type="String" />
+            name="viewModel"
+            type="com.eryuksa.catchthelines.ui.game.GameViewModel" />
 
-        <variable
-            name="bodyText"
-            type="String" />
+        <import type="com.eryuksa.catchthelines.ui.game.uistate.GameMode" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,7 +24,7 @@
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="게임 보드"
+            android:text="@string/game_board_title"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@{headerText}"
+            android:text="@string/game_board_result_for_submit"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +59,8 @@
             android:gravity="center"
             android:maxLines="2"
             android:minHeight="48sp"
-            android:text="@{bodyText}"
+            gameMode="@{viewModel.uiState.gameMode}"
+            resultText="@{viewModel.uiState.resultText}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_header_result"
@@ -96,7 +95,7 @@
             android:gravity="center"
             android:maxLines="1"
             android:minHeight="24sp"
-            android:text="@{bodyText}"
+            android:text="@{viewModel.uiState.firstCharacterHint}"
             app:layout_constraintEnd_toStartOf="@id/divider_between_hint"
             app:layout_constraintStart_toStartOf="@id/tv_header_first_character"
             app:layout_constraintTop_toBottomOf="@id/tv_header_first_character"
@@ -131,7 +130,7 @@
             android:gravity="center"
             android:maxLines="1"
             android:minHeight="24sp"
-            android:text="@{bodyText}"
+            android:text="@{viewModel.uiState.characterCountHint.toString()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_header_character_count"
             app:layout_constraintTop_toBottomOf="@id/tv_header_character_count"

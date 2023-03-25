@@ -72,12 +72,12 @@ class RecordFragment : Fragment() {
                         )
                         binding.tvTryCount.text = getString(
                             R.string.record_encounter_count,
-                            encounteredContentsCount
+                            triedContentsCount
                         )
                         binding.tvStatistics.text = getString(
                             R.string.record_statistics,
                             caughtContentsCount,
-                            encounteredContentsCount
+                            triedContentsCount
                         )
                         contentsAdapter.contents = caughtContents
                     }

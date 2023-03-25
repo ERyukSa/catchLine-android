@@ -2,14 +2,12 @@ package com.eryuksa.catchthelines.ui.game.uistate
 
 data class GameUiState(
     val currentPage: Int = 0,
-    val contentUiStates: List<ContentUiState> = emptyList(),
+    val contentItems: List<ContentInfo> = emptyList(),
+    val audioIndex: Int = 0,
     val usedHints: Set<Hint> = emptySet(),
-    val hintText: String = "",
-    val feedbackText: String = "",
-    val didUserCatchTheLine: Boolean = false,
+    val firstCharacterHint: String = "",
+    val characterCountHint: Int? = null,
+    val resultText: String = "",
     val hintCount: Int = 10,
-    val audioIndex: Int = 0
-) {
-    val audioUris: List<List<String>>
-        get() = contentUiStates.map { it.content.lineAudioUrls }
-}
+    val gameMode: GameMode = GameMode.WATCHING
+)

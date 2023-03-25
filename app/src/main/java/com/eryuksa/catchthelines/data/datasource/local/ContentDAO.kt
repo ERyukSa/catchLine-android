@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.data.dto.ContentDetail
-import com.eryuksa.catchthelines.data.dto.EncounteredContent
+import com.eryuksa.catchthelines.data.dto.TriedContent
 
 @Dao
 interface ContentDAO {
@@ -18,9 +18,9 @@ interface ContentDAO {
     suspend fun insert(contents: List<Content>)
 
     @Query(
-        "SELECT content.* FROM content LEFT JOIN encountered_content " +
-            "ON content.id = encountered_content.id AND encountered_content.isCaught " +
-            "WHERE encountered_content.id IS null ORDER BY random()"
+        "SELECT content.* FROM content LEFT JOIN tried_content " +
+            "ON content.id = tried_content.id AND tried_content.isCaught " +
+            "WHERE tried_content.id IS null ORDER BY random()"
     )
     suspend fun getContents(): List<Content>
 
@@ -28,19 +28,19 @@ interface ContentDAO {
     suspend fun getContent(id: Int): Content
 
     @Insert(onConflict = REPLACE)
-    suspend fun insert(encounteredContent: EncounteredContent)
+    suspend fun insert(triedContent: TriedContent)
 
     @Query(
-        "SELECT * FROM content INNER JOIN encountered_content " +
-            "on content.id = encountered_content.id AND encountered_content.isCaught " +
-            "ORDER BY encountered_content.updatedTime DESC LIMIT :limit OFFSET :offset"
+        "SELECT * FROM content INNER JOIN tried_content " +
+            "on content.id = tried_content.id AND tried_content.isCaught " +
+            "ORDER BY tried_content.updatedTime DESC LIMIT :limit OFFSET :offset"
     )
     suspend fun getCaughtContents(limit: Int, offset: Int): List<Content>
 
-    @Query("SELECT COUNT(*) FROM encountered_content WHERE encountered_content.isCaught")
+    @Query("SELECT COUNT(*) FROM tried_content WHERE tried_content.isCaught")
     suspend fun getCaughtContentsCount(): Int
 
-    @Query("SELECT COUNT(*) FROM encountered_content")
+    @Query("SELECT COUNT(*) FROM tried_content")
     suspend fun getEncounteredContentsCount(): Int
 
     @Insert(onConflict = REPLACE)

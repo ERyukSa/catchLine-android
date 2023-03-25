@@ -5,9 +5,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.data.dto.ContentDetail
-import com.eryuksa.catchthelines.data.dto.EncounteredContent
+import com.eryuksa.catchthelines.data.dto.TriedContent
 
-@Database(entities = [Content::class, ContentDetail::class, EncounteredContent::class], version = 6)
+@Database(entities = [Content::class, ContentDetail::class, TriedContent::class], version = 7)
 @TypeConverters(ContentTypeConverter::class)
 abstract class ContentDatabase : RoomDatabase() {
 

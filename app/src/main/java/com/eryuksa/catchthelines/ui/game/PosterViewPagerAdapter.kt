@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
-import com.eryuksa.catchthelines.ui.game.uistate.ContentUiState
+import com.eryuksa.catchthelines.ui.game.uistate.PosterInfo
 import jp.wasabeef.glide.transformations.BlurTransformation
 
 interface PosterDragHandler {
@@ -28,7 +28,7 @@ class PosterViewPagerAdapter(
     val dragListener: PosterDragHandler,
     val onClick: (position: Int) -> Unit
 ) :
-    ListAdapter<ContentUiState, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
+    ListAdapter<PosterInfo, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
         val binding = ItemPosterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -113,23 +113,23 @@ class PosterViewPagerAdapter(
         }
 
         @SuppressLint("CheckResult")
-        fun bind(uiState: ContentUiState) {
+        fun bind(posterInfo: PosterInfo) {
             initialX = binding.root.x
             initialY = binding.root.y
 
-            uiState.canDrag.also { canDrag ->
+            posterInfo.canDrag.also { canDrag ->
                 this.isDraggable = canDrag
                 binding.root.isClickable = canDrag
                 binding.btnNavigateToDetail.isVisible = canDrag
             }
 
             Glide.with(itemView.context)
-                .load(uiState.content.posterUrl)
+                .load(posterInfo.posterUrl)
                 .apply {
-                    if (uiState.blurDegree > 0) {
+                    if (posterInfo.blurDegree > 0) {
                         this.apply(
                             RequestOptions.bitmapTransform(
-                                BlurTransformation(25, uiState.blurDegree)
+                                BlurTransformation(25, posterInfo.blurDegree)
                             )
                         )
                     }
@@ -139,12 +139,12 @@ class PosterViewPagerAdapter(
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<ContentUiState>() {
-            override fun areContentsTheSame(oldState: ContentUiState, newState: ContentUiState) =
-                oldState.blurDegree == newState.blurDegree
+        val diffUtil = object : DiffUtil.ItemCallback<PosterInfo>() {
+            override fun areContentsTheSame(oldItem: PosterInfo, newItem: PosterInfo) =
+                oldItem.blurDegree == newItem.blurDegree
 
-            override fun areItemsTheSame(oldState: ContentUiState, newState: ContentUiState) =
-                oldState.content.id == newState.content.id
+            override fun areItemsTheSame(oldItem: PosterInfo, newItem: PosterInfo) =
+                oldItem.id == newItem.id
         }
     }
 }
