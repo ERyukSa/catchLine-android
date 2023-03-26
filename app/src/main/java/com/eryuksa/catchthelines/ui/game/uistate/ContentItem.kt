@@ -13,6 +13,9 @@ data class ContentItem(
     fun toClearerPosterContent(): ContentItem =
         this.copy(blurDegree = CLEARER_BLUE_DEGREE)
 
+    fun toNoBlurPosterContent(): ContentItem =
+        this.copy(blurDegree = 0)
+
     companion object {
 
         private const val DEFAULT_BLUE_DEGREE = 6

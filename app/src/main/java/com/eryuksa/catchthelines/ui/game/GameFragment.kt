@@ -187,21 +187,6 @@ class GameFragment : Fragment() {
                     }
                 }
             }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    /*uiState.distinctUntilChangedBy { it.didUserCatchTheLine }.collect { uiState ->
-                        binding.btnOpenHint.isClickable = uiState.didUserCatchTheLine.not()
-                        binding.btnSubmitTitle.isEnabled = uiState.didUserCatchTheLine.not()
-                        binding.viewPagerPoster.isUserInputEnabled =
-                            uiState.didUserCatchTheLine.not()
-                        binding.viewPagerPoster.elevation = when (uiState.didUserCatchTheLine) {
-                            true -> resources.getDimension(R.dimen.game_poster_elevation_over_dark_cover)
-                            false -> 0f
-                        }
-                    }*/
-                }
-            }
         }
     }
 

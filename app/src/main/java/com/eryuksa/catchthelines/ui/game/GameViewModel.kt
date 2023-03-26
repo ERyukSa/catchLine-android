@@ -108,13 +108,6 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    private fun useClearerPosterHint() {
-        _contentItems.update { contentItems ->
-            val clearerPosterContent = contentItems[_currentPage.value].toClearerPosterContent()
-            contentItems.replaceOldItemAt(i = _currentPage.value, newItem = clearerPosterContent)
-        }
-    }
-
     fun checkUserCatchTheLine(userInput: String) {
         if (_gameMode.value == GameMode.WATCHING) {
             setInGameMode()
@@ -125,10 +118,21 @@ class GameViewModel @Inject constructor(
             viewModelScope.launch {
                 contentRepository.saveCaughtContent(contentItem.id)
             }
-            _gameMode.update { GameMode.CATCH }
-            _resultText.update { contentItem.title }
+            setCatchMode(contentItem)
         } else {
             _resultText.update { userInput }
+        }
+    }
+
+    fun removeCaughtContent() {
+        setWatchingMode()
+        removeCurrentContent()
+    }
+
+    private fun useClearerPosterHint() {
+        _contentItems.update { contentItems ->
+            val clearerPosterContent = contentItems[_currentPage.value].toClearerPosterContent()
+            contentItems.replaceOldItemAt(i = _currentPage.value, newItem = clearerPosterContent)
         }
     }
 
@@ -139,46 +143,40 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun removeCaughtContent() {
-        /*_didUserCatchTheLine.value = false
+    private fun setCatchMode(currentContentItem: ContentItem) {
+        _gameMode.update { GameMode.CATCH }
+        _resultText.update { currentContentItem.title }
+        _contentItems.update { contentItems ->
+            val noBlurPosterContent = currentContentItem.toNoBlurPosterContent()
+            contentItems.replaceOldItemAt(i = _currentPage.value, newItem = noBlurPosterContent)
+        }
+    }
 
-        if (_currentPage.value == 0 && _contentInfo.value.size == 1) {
-            _contentInfo.value = emptyList()
-            _groupedUsedHints.value = listOf(emptySet())
-            _hintTexts.value = listOf("")
-            _resultText.value = listOf(stringProvider.getString(R.string.game_feedback_all_killed))
-        } else if (_currentPage.value == _contentInfo.value.lastIndex) {
+    private fun setWatchingMode() {
+        _gameMode.update { GameMode.WATCHING }
+        _resultText.update { "" }
+        _usedHints.update { emptySet() }
+    }
+
+    private fun removeCurrentContent() {
+        val currentPage = _currentPage.value
+        if (currentPage == 0 && _contentItems.value.size == 1) {
+            _contentItems.update { emptyList() }
+        } else if (currentPage == _contentItems.value.lastIndex) {
             _currentPage.update { it - 1 }
-            _contentInfo.update { it.subList(0, it.lastIndex) }
-            _groupedUsedHints.update { it.subList(0, it.lastIndex) }
-            _hintTexts.update { it.subList(0, it.lastIndex) }
-            _resultText.update { it.subList(0, it.lastIndex) }
+            _contentItems.update { it.subList(0, it.lastIndex) }
         } else {
-            val currentPage = _currentPage.value
-            _contentInfo.update { contentUiStates ->
-                contentUiStates.subList(0, currentPage) +
-                    contentUiStates.subList(currentPage + 1, contentUiStates.size)
+            _contentItems.update {
+                it.subList(0, currentPage) + it.subList(currentPage + 1, it.size)
             }
-            _groupedUsedHints.update { usedHintsList ->
-                usedHintsList.subList(0, currentPage) +
-                    usedHintsList.subList(currentPage + 1, usedHintsList.size)
-            }
-            _hintTexts.update { hintText2 ->
-                hintText2.subList(0, currentPage) +
-                    hintText2.subList(currentPage + 1, hintText2.size)
-            }
-            _resultText.update { feedbackTexts ->
-                feedbackTexts.subList(0, currentPage) +
-                    feedbackTexts.subList(currentPage + 1, feedbackTexts.size)
-            }
-        }*/
+        }
     }
 
     private fun doesUserCatch(userInput: String, contentTitle: String): Boolean =
         userInput.contains(contentTitle)
-}
 
-private fun <T> List<T>.replaceOldItemAt(i: Int, newItem: T): List<T> =
-    this.toMutableList().also { newList ->
-        newList[i] = newItem
-    }
+    private fun <T> List<T>.replaceOldItemAt(i: Int, newItem: T): List<T> =
+        this.toMutableList().also { newList ->
+            newList[i] = newItem
+        }
+}
