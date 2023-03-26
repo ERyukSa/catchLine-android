@@ -7,6 +7,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.GameMode
 
 @BindingAdapter("resultText", "gameMode")
 fun TextView.setResultText(resultText: String, gameMode: GameMode) {
+    if (resultText.isBlank()) return
     text = when (gameMode) {
         GameMode.WATCHING -> null
         GameMode.IN_GAME -> resources.getString(R.string.game_result_wrong, resultText)

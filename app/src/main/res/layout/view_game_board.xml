@@ -10,6 +10,7 @@
             type="com.eryuksa.catchthelines.ui.game.GameViewModel" />
 
         <import type="com.eryuksa.catchthelines.ui.game.uistate.GameMode" />
+        <import type="com.eryuksa.catchthelines.ui.game.uistate.Hint" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -95,6 +96,7 @@
             android:gravity="center"
             android:maxLines="1"
             android:minHeight="24sp"
+            visible="@{viewModel.uiState.usedHints.contains(Hint.FIRST_CHARACTER)}"
             android:text="@{viewModel.uiState.firstCharacterHint}"
             app:layout_constraintEnd_toStartOf="@id/divider_between_hint"
             app:layout_constraintStart_toStartOf="@id/tv_header_first_character"
@@ -130,6 +132,7 @@
             android:gravity="center"
             android:maxLines="1"
             android:minHeight="24sp"
+            visible="@{viewModel.uiState.usedHints.contains(Hint.CHARACTER_COUNT)}"
             android:text="@{viewModel.uiState.characterCountHint.toString()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_header_character_count"

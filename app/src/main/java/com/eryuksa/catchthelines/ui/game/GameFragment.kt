@@ -131,6 +131,7 @@ class GameFragment : Fragment() {
 
     private fun setUpListeners() {
         binding.btnSubmitTitle.setOnClickListener {
+            if (binding.edittextInputTitle.text.isBlank()) return@setOnClickListener
             submitUserInputAndClearText()
             hideInputMethod()
         }
@@ -173,13 +174,7 @@ class GameFragment : Fragment() {
                     uiState.distinctUntilChangedBy { it.contentItems }.collect { uiState ->
                         posterAdapter.submitList(uiState.contentItems)
                         binding.viewPagerPoster.setCurrentItem(uiState.currentPage, false)
-                    }
-                }
-            }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.contentItems }.collect { uiState ->
                         audioPlayerHandler.setAudioItems(uiState.contentItems.map { it.audioUrls })
                     }
                 }
@@ -189,14 +184,6 @@ class GameFragment : Fragment() {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState.distinctUntilChangedBy { it.audioIndex }.collect { uiState ->
                         audioPlayerHandler.moveTo(uiState.audioIndex)
-                    }
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.resultText }.collect { uiState ->
-                        // binding.tvFeedback.text = uiState.feedbackText
                     }
                 }
             }
@@ -213,15 +200,6 @@ class GameFragment : Fragment() {
                             false -> 0f
                         }
                     }*/
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    uiState.distinctUntilChangedBy { it.hintCount }.collect { uiState ->
-                        binding.tvAvailableHintCount.text =
-                            getString(R.string.game_available_hint_count, uiState.hintCount)
-                    }
                 }
             }
         }

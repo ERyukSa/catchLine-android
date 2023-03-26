@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -13,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
-import com.eryuksa.catchthelines.ui.game.uistate.PosterInfo
+import com.eryuksa.catchthelines.ui.game.uistate.PosterItem
 import jp.wasabeef.glide.transformations.BlurTransformation
 
 interface PosterDragHandler {
@@ -27,8 +28,7 @@ interface PosterDragHandler {
 class PosterViewPagerAdapter(
     val dragListener: PosterDragHandler,
     val onClick: (position: Int) -> Unit
-) :
-    ListAdapter<PosterInfo, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
+) : ListAdapter<PosterItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
         val binding = ItemPosterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -112,38 +112,42 @@ class PosterViewPagerAdapter(
             binding.root.y = initialY
         }
 
-        @SuppressLint("CheckResult")
-        fun bind(posterInfo: PosterInfo) {
+        fun bind(posterItem: PosterItem) {
             initialX = binding.root.x
             initialY = binding.root.y
 
-            posterInfo.canDrag.also { canDrag ->
+            (posterItem.blurDegree == 0).also { canDrag ->
                 this.isDraggable = canDrag
                 binding.root.isClickable = canDrag
                 binding.btnNavigateToDetail.isVisible = canDrag
             }
 
-            Glide.with(itemView.context)
-                .load(posterInfo.posterUrl)
+            binding.ivPoster.setPosterImage(posterItem)
+        }
+
+        @SuppressLint("CheckResult")
+        private fun ImageView.setPosterImage(posterItem: PosterItem) {
+            Glide.with(context)
+                .load(posterItem.posterUrl)
                 .apply {
-                    if (posterInfo.blurDegree > 0) {
+                    if (posterItem.blurDegree > 0) {
                         this.apply(
                             RequestOptions.bitmapTransform(
-                                BlurTransformation(25, posterInfo.blurDegree)
+                                BlurTransformation(25, posterItem.blurDegree)
                             )
                         )
                     }
                 }
-                .into(binding.ivPoster)
+                .into(this)
         }
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<PosterInfo>() {
-            override fun areContentsTheSame(oldItem: PosterInfo, newItem: PosterInfo) =
+        val diffUtil = object : DiffUtil.ItemCallback<PosterItem>() {
+            override fun areContentsTheSame(oldItem: PosterItem, newItem: PosterItem) =
                 oldItem.blurDegree == newItem.blurDegree
 
-            override fun areItemsTheSame(oldItem: PosterInfo, newItem: PosterInfo) =
+            override fun areItemsTheSame(oldItem: PosterItem, newItem: PosterItem) =
                 oldItem.id == newItem.id
         }
     }

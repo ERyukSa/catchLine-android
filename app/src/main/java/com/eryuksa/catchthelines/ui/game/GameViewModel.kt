@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.repository.ContentRepository
 import com.eryuksa.catchthelines.data.repository.HintCountRepository
-import com.eryuksa.catchthelines.ui.game.uistate.ContentInfo
+import com.eryuksa.catchthelines.ui.game.uistate.ContentItem
 import com.eryuksa.catchthelines.ui.game.uistate.GameMode
 import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
@@ -26,11 +26,9 @@ class GameViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _currentPage = MutableStateFlow<Int>(0)
-    private val _contentInfo = MutableStateFlow<List<ContentInfo>>(emptyList())
+    private val _contentItems = MutableStateFlow<List<ContentItem>>(emptyList())
     private val _selectedLine = MutableStateFlow<Int>(0)
     private val _usedHints = MutableStateFlow<Set<Hint>>(emptySet())
-    private val _firstCharacterHintText = MutableStateFlow<String>("")
-    private val _characterCountHint = MutableStateFlow<Int>(0)
     private val _resultText = MutableStateFlow<String>("")
     private val _gameMode = MutableStateFlow<GameMode>(GameMode.WATCHING)
     private val _availableHintCount = MutableStateFlow<Int>(10)
@@ -40,27 +38,28 @@ class GameViewModel @Inject constructor(
 
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
-        _contentInfo,
+        _contentItems,
         _selectedLine,
         _usedHints,
-        _firstCharacterHintText,
-        _characterCountHint,
         _resultText,
         _availableHintCount,
         _gameMode
     ) { array: Array<Any> ->
         val currentPage = array[0] as Int
+        val contentItems = array[1] as List<ContentItem>
         val selectedLine = array[2] as Int
+        val currentContentItem: ContentItem? = contentItems.getOrNull(currentPage)
+
         GameUiState(
             currentPage = currentPage,
-            contentItems = array[1] as List<ContentInfo>,
+            contentItems = contentItems,
             audioIndex = 2 * currentPage + selectedLine,
             usedHints = array[3] as Set<Hint>,
-            firstCharacterHint = array[4] as String,
-            characterCountHint = if (array[5] == 0) null else array[5] as Int,
-            resultText = array[6] as String,
-            hintCount = array[7] as Int,
-            gameMode = array[8] as GameMode
+            firstCharacterHint = currentContentItem?.title?.first().toString(),
+            characterCountHint = currentContentItem?.title?.length,
+            resultText = array[4] as String,
+            hintCount = array[5] as Int,
+            gameMode = array[6] as GameMode
         )
     }.stateIn(
         scope = viewModelScope,
@@ -71,15 +70,7 @@ class GameViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             contentRepository.getContents().also { contents ->
-                _contentInfo.value = contents.map {
-                    ContentInfo(
-                        id = it.id,
-                        title = it.title,
-                        audioUrls = it.lineAudioUrls,
-                        posterUrl = it.posterUrl,
-                        blurDegree = DEFAULT_BLUR_DEGREE
-                    )
-                }
+                _contentItems.value = contents.map { ContentItem.from(it) }
             }
             hintCountRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
         }
@@ -109,8 +100,8 @@ class GameViewModel @Inject constructor(
 
         when (hint) {
             Hint.CLEARER_POSTER -> useClearerPosterHint()
-            Hint.FIRST_CHARACTER -> useFirstCharacterHint()
-            Hint.CHARACTER_COUNT -> useCharacterCountHint()
+            Hint.FIRST_CHARACTER -> Unit
+            Hint.CHARACTER_COUNT -> Unit
         }
         _usedHints.update { usedHints ->
             usedHints.toMutableSet().apply { add(hint) }
@@ -118,23 +109,9 @@ class GameViewModel @Inject constructor(
     }
 
     private fun useClearerPosterHint() {
-        /*_contentInfo.update { contentUiStates ->
-            contentUiStates.replaceOldItemAt(
-                i = _currentPage.value,
-                newItem = contentUiStates[_currentPage.value].copy(blurDegree = CLEARER_BLUR_DEGREE)
-            )
-        }*/
-    }
-
-    private fun useFirstCharacterHint() {
-        _firstCharacterHintText.update {
-            _contentInfo.value[_currentPage.value].title.first().toString()
-        }
-    }
-
-    private fun useCharacterCountHint() {
-        _characterCountHint.update {
-            _contentInfo.value[_currentPage.value].title.length
+        _contentItems.update { contentItems ->
+            val clearerPosterContent = contentItems[_currentPage.value].toClearerPosterContent()
+            contentItems.replaceOldItemAt(i = _currentPage.value, newItem = clearerPosterContent)
         }
     }
 
@@ -143,14 +120,13 @@ class GameViewModel @Inject constructor(
             setInGameMode()
         }
 
-        val contentInfo = _contentInfo.value[_currentPage.value]
-        if (doesUserCatch(userInput, contentInfo.title)) {
+        val contentItem = _contentItems.value[_currentPage.value]
+        if (doesUserCatch(userInput, contentItem.title)) {
             viewModelScope.launch {
-                contentRepository.saveCaughtContent(contentInfo.id)
+                contentRepository.saveCaughtContent(contentItem.id)
             }
-
             _gameMode.update { GameMode.CATCH }
-            _resultText.update { contentInfo.title }
+            _resultText.update { contentItem.title }
         } else {
             _resultText.update { userInput }
         }
@@ -159,7 +135,7 @@ class GameViewModel @Inject constructor(
     private fun setInGameMode() {
         viewModelScope.launch {
             _gameMode.update { GameMode.IN_GAME }
-            contentRepository.saveTriedContent(_contentInfo.value[_currentPage.value].id)
+            contentRepository.saveTriedContent(_contentItems.value[_currentPage.value].id)
         }
     }
 
@@ -200,11 +176,6 @@ class GameViewModel @Inject constructor(
 
     private fun doesUserCatch(userInput: String, contentTitle: String): Boolean =
         userInput.contains(contentTitle)
-
-    companion object {
-        private const val CLEARER_BLUR_DEGREE = 3
-        private const val DEFAULT_BLUR_DEGREE = 6
-    }
 }
 
 private fun <T> List<T>.replaceOldItemAt(i: Int, newItem: T): List<T> =
