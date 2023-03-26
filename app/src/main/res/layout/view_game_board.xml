@@ -10,6 +10,7 @@
             type="com.eryuksa.catchthelines.ui.game.GameViewModel" />
 
         <import type="com.eryuksa.catchthelines.ui.game.uistate.GameMode" />
+
         <import type="com.eryuksa.catchthelines.ui.game.uistate.Hint" />
     </data>
 
@@ -55,13 +56,13 @@
 
         <TextView
             android:id="@+id/tv_body_result"
+            gameMode="@{viewModel.uiState.gameMode}"
+            resultText="@{viewModel.uiState.resultText}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:maxLines="2"
             android:minHeight="48sp"
-            gameMode="@{viewModel.uiState.gameMode}"
-            resultText="@{viewModel.uiState.resultText}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_header_result"
@@ -90,13 +91,13 @@
 
         <TextView
             android:id="@+id/tv_body_first_character"
+            visible="@{viewModel.uiState.usedHints.contains(Hint.FIRST_CHARACTER)}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:gravity="center"
             android:maxLines="1"
             android:minHeight="24sp"
-            visible="@{viewModel.uiState.usedHints.contains(Hint.FIRST_CHARACTER)}"
             android:text="@{viewModel.uiState.firstCharacterHint}"
             app:layout_constraintEnd_toStartOf="@id/divider_between_hint"
             app:layout_constraintStart_toStartOf="@id/tv_header_first_character"
@@ -108,7 +109,7 @@
             android:layout_width="1dp"
             android:layout_height="0dp"
             android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toBottomOf="@id/tv_body_first_character"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_header_first_character" />
@@ -127,12 +128,12 @@
 
         <TextView
             android:id="@+id/tv_body_character_count"
+            visible="@{viewModel.uiState.usedHints.contains(Hint.CHARACTER_COUNT)}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:maxLines="1"
             android:minHeight="24sp"
-            visible="@{viewModel.uiState.usedHints.contains(Hint.CHARACTER_COUNT)}"
             android:text="@{viewModel.uiState.characterCountHint.toString()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_header_character_count"

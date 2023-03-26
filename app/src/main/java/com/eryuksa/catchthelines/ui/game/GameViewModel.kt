@@ -9,7 +9,9 @@ import com.eryuksa.catchthelines.ui.game.uistate.GameMode
 import com.eryuksa.catchthelines.ui.game.uistate.GameUiState
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -35,6 +37,9 @@ class GameViewModel @Inject constructor(
 
     private val _isHintOpen = MutableStateFlow<Boolean>(false)
     val isHintOpen: StateFlow<Boolean> get() = _isHintOpen
+
+    private val _hideKeyboard = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val hideKeyboard: SharedFlow<Unit> get() = _hideKeyboard
 
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
@@ -112,6 +117,7 @@ class GameViewModel @Inject constructor(
         if (_gameMode.value == GameMode.WATCHING) {
             setInGameMode()
         }
+        _hideKeyboard.tryEmit(Unit)
 
         val contentItem = _contentItems.value[_currentPage.value]
         if (doesUserCatch(userInput, contentItem.title)) {

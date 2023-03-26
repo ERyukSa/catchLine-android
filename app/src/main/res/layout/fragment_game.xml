@@ -10,10 +10,13 @@
             type="com.eryuksa.catchthelines.ui.game.GameViewModel" />
 
         <import type="com.eryuksa.catchthelines.ui.game.uistate.Hint" />
+
         <import type="com.eryuksa.catchthelines.ui.game.uistate.GameMode" />
 
         <import type="java.util.List" />
+
         <import type="android.animation.ObjectAnimator" />
+
         <variable
             name="hintOpenAnimatorList"
             type="List&lt;ObjectAnimator&gt;" />
@@ -50,12 +53,12 @@
             android:layout_marginTop="8dp"
             android:clipChildren="false"
             android:elevation="3dp"
-            app:userInputEnabled="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.40"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintWidth_percent="0.685" />
+            app:layout_constraintWidth_percent="0.685"
+            app:userInputEnabled="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}" />
 
         <com.google.android.exoplayer2.ui.PlayerControlView
             android:id="@+id/player_view"
@@ -102,20 +105,20 @@
 
         <include
             android:id="@+id/view_game_board"
-            viewModel="@{viewModel}"
             layout="@layout/view_game_board"
+            viewModel="@{viewModel}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
+            app:layout_constraintBottom_toTopOf="@id/edittext_input_title_guess"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/chip_group_lines"
             app:layout_constraintVertical_bias="0" />
 
         <EditText
-            android:id="@+id/edittext_input_title"
+            android:id="@+id/edittext_input_title_guess"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
@@ -128,21 +131,21 @@
             android:textColorHint="@color/white"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_submit_title"
+            app:layout_constraintEnd_toStartOf="@+id/btn_submit_user_guess"
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageButton
-            android:id="@+id/btn_submit_title"
+            android:id="@+id/btn_submit_user_guess"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:backgroundTint="@android:color/transparent"
+            android:clickable="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}"
             android:contentDescription="@string/game_description_submit"
             android:elevation="0dp"
             android:src="@drawable/icon_submit_24"
-            android:clickable="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}"
-            app:layout_constraintBottom_toBottomOf="@id/edittext_input_title"
+            app:layout_constraintBottom_toBottomOf="@id/edittext_input_title_guess"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
+            app:layout_constraintTop_toTopOf="@id/edittext_input_title_guess" />
 
         <View
             android:id="@+id/dark_background_cover"
@@ -152,8 +155,8 @@
             android:background="@color/transparentBlack"
             android:clickable="true"
             android:elevation="3dp"
-            android:visibility="gone"
-            android:focusable="true" />
+            android:focusable="true"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/iv_content_removable_area"
@@ -176,9 +179,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:backgroundTint="?attr/colorSurface"
+            android:clickable="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}"
             android:contentDescription="@string/game_description_select_hint"
             android:src="@drawable/icon_hint_24"
-            android:clickable="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}"
             app:borderWidth="0dp"
             app:elevation="4dp"
             app:layout_constraintBottom_toTopOf="@id/tv_available_hint_count"
@@ -195,7 +198,7 @@
             android:text="@{@string/game_available_hint_count(viewModel.uiState.hintCount)}"
             android:textColor="@color/black"
             android:textSize="11sp"
-            app:layout_constraintBottom_toTopOf="@id/edittext_input_title"
+            app:layout_constraintBottom_toTopOf="@id/edittext_input_title_guess"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="남은 힌트: 10개" />
 
@@ -204,10 +207,10 @@
             hintOpenAnimatorList="@{hintOpenAnimatorList}"
             index="@{2}"
             isHintOpen="@{viewModel.isHintOpen}"
-            android:clickable="@{!viewModel.uiState.usedHints.contains(Hint.CHARACTER_COUNT)}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_stroked_circle_button"
+            android:clickable="@{!viewModel.uiState.usedHints.contains(Hint.CHARACTER_COUNT)}"
             android:contentDescription="@string/game_description_characters_count_Hint"
             android:maxLines="1"
             android:minWidth="0dp"
@@ -225,10 +228,10 @@
             hintOpenAnimatorList="@{hintOpenAnimatorList}"
             index="@{1}"
             isHintOpen="@{viewModel.isHintOpen}"
-            android:clickable="@{!viewModel.uiState.usedHints.contains(Hint.FIRST_CHARACTER)}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_stroked_circle_button"
+            android:clickable="@{!viewModel.uiState.usedHints.contains(Hint.FIRST_CHARACTER)}"
             android:contentDescription="@string/game_description_first_character_hint"
             android:maxLines="1"
             android:minWidth="0dp"
@@ -246,10 +249,10 @@
             hintOpenAnimatorList="@{hintOpenAnimatorList}"
             index="@{0}"
             isHintOpen="@{viewModel.isHintOpen}"
-            android:clickable="@{!viewModel.uiState.usedHints.contains(Hint.CLEARER_POSTER)}"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:background="@drawable/game_white_filled_stroked_circle_button"
+            android:clickable="@{!viewModel.uiState.usedHints.contains(Hint.CLEARER_POSTER)}"
             android:contentDescription="@string/game_description_clearer_poster_Hint"
             android:maxLines="1"
             android:minWidth="0dp"

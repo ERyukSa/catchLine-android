@@ -131,13 +131,12 @@ class GameFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        binding.btnSubmitTitle.setOnClickListener {
-            if (binding.edittextInputTitle.text.isBlank()) return@setOnClickListener
+        binding.btnSubmitUserGuess.setOnClickListener {
+            if (binding.edittextInputTitleGuess.text.isBlank()) return@setOnClickListener
             submitUserInputAndClearText()
-            hideInputMethod()
         }
 
-        binding.edittextInputTitle.setOnEditorActionListener { _, actionId, _ ->
+        binding.edittextInputTitleGuess.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 submitUserInputAndClearText()
             }
@@ -192,6 +191,14 @@ class GameFragment : Fragment() {
                     }
                 }
             }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    hideKeyboard.collect {
+                        hideInputMethod()
+                    }
+                }
+            }
         }
     }
 
@@ -219,8 +226,8 @@ class GameFragment : Fragment() {
     }
 
     private fun submitUserInputAndClearText() {
-        viewModel.checkUserCatchTheLine(binding.edittextInputTitle.text.toString())
-        binding.edittextInputTitle.text?.clear()
+        viewModel.checkUserCatchTheLine(binding.edittextInputTitleGuess.text.toString())
+        binding.edittextInputTitleGuess.text?.clear()
     }
 
     private fun hideInputMethod() {
