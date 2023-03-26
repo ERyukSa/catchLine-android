@@ -93,6 +93,7 @@ class GameViewModel @Inject constructor(
 
     fun movePageTo(position: Int) {
         _currentPage.value = position
+        setWatchingMode()
     }
 
     fun useHint(hint: Hint) {
