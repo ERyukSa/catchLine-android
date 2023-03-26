@@ -114,6 +114,62 @@
             app:layout_constraintTop_toBottomOf="@id/chip_group_lines"
             app:layout_constraintVertical_bias="0" />
 
+        <EditText
+            android:id="@+id/edittext_input_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:gravity="start"
+            android:hint="@string/game_listen_and_guess"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:padding="14dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_submit_title"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btn_submit_title"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/game_description_submit"
+            android:elevation="0dp"
+            android:src="@drawable/icon_submit_24"
+            android:clickable="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}"
+            app:layout_constraintBottom_toBottomOf="@id/edittext_input_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
+
+        <View
+            android:id="@+id/dark_background_cover"
+            visible="@{viewModel.isHintOpen}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparentBlack"
+            android:clickable="true"
+            android:elevation="3dp"
+            android:visibility="gone"
+            android:focusable="true" />
+
+        <ImageView
+            android:id="@+id/iv_content_removable_area"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/game_outlined_circle_button"
+            android:elevation="8dp"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icon_check_24"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_open_hint"
             android:layout_width="wrap_content"
@@ -205,59 +261,5 @@
             app:layout_constraintEnd_toEndOf="@id/btn_open_hint"
             app:layout_constraintStart_toStartOf="@id/btn_open_hint"
             app:layout_constraintTop_toTopOf="@id/btn_open_hint" />
-
-        <EditText
-            android:id="@+id/edittext_input_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:gravity="start"
-            android:hint="@string/game_listen_and_guess"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:padding="14dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_submit_title"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ImageButton
-            android:id="@+id/btn_submit_title"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:backgroundTint="@android:color/transparent"
-            android:contentDescription="@string/game_description_submit"
-            android:elevation="0dp"
-            android:src="@drawable/icon_submit_24"
-            android:clickable="@{!(viewModel.uiState.gameMode == GameMode.CATCH)}"
-            app:layout_constraintBottom_toBottomOf="@id/edittext_input_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/edittext_input_title" />
-
-        <View
-            android:id="@+id/dark_background_cover"
-            visible="@{viewModel.isHintOpen}"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/transparentBlack"
-            android:elevation="3dp"
-            android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/iv_content_removable_area"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/game_outlined_circle_button"
-            android:elevation="8dp"
-            android:padding="4dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/icon_check_24"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

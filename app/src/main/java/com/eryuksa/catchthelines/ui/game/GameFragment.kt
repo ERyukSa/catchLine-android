@@ -67,9 +67,6 @@ class GameFragment : Fragment() {
         _binding = FragmentGameBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@GameFragment.viewModel
-            toolbar.setNavigationOnClickListener {
-                findNavController().navigateUp()
-            }
         }
 
         initPosterViewPager()
@@ -130,6 +127,10 @@ class GameFragment : Fragment() {
     }
 
     private fun setUpListeners() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
         binding.btnSubmitTitle.setOnClickListener {
             if (binding.edittextInputTitle.text.isBlank()) return@setOnClickListener
             submitUserInputAndClearText()
@@ -164,6 +165,10 @@ class GameFragment : Fragment() {
             if (isChecked) {
                 viewModel.changeSelectedLine(1)
             }
+        }
+
+        binding.darkBackgroundCover.setOnClickListener {
+            viewModel.changeHintOpenState()
         }
     }
 
