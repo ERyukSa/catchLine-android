@@ -132,28 +132,24 @@ class GameFragment : Fragment() {
         }
 
         binding.btnSubmitUserGuess.setOnClickListener {
-            if (binding.edittextInputTitleGuess.text.isBlank()) return@setOnClickListener
-            submitUserInputAndClearText()
+            viewModel.checkUserCatchTheLine()
         }
 
         binding.edittextInputTitleGuess.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                submitUserInputAndClearText()
+                viewModel.checkUserCatchTheLine()
             }
             true
         }
 
         binding.btnClearerPosterHint.setOnClickListener {
             viewModel.useHint(Hint.CLEARER_POSTER)
-            viewModel.changeHintOpenState()
         }
         binding.btnFirstCharacterHint.setOnClickListener {
             viewModel.useHint(Hint.FIRST_CHARACTER)
-            viewModel.changeHintOpenState()
         }
         binding.btnCharactersCountHint.setOnClickListener {
             viewModel.useHint(Hint.CHARACTER_COUNT)
-            viewModel.changeHintOpenState()
         }
         binding.chipLine1.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -223,11 +219,6 @@ class GameFragment : Fragment() {
             val scale = 1 - abs(positionFromCenter)
             eachPageView.scaleY = 0.85f + 0.15f * scale
         }
-    }
-
-    private fun submitUserInputAndClearText() {
-        viewModel.checkUserCatchTheLine(binding.edittextInputTitleGuess.text.toString())
-        binding.edittextInputTitleGuess.text?.clear()
     }
 
     private fun hideInputMethod() {

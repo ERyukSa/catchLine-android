@@ -41,6 +41,8 @@ class GameViewModel @Inject constructor(
     private val _hideKeyboard = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val hideKeyboard: SharedFlow<Unit> get() = _hideKeyboard
 
+    val userInputTitle = MutableStateFlow<String>("")
+
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
         _contentItems,
@@ -98,6 +100,7 @@ class GameViewModel @Inject constructor(
             return
         }
         viewModelScope.launch { hintCountRepository.decreaseHintCount() }
+        changeHintOpenState()
 
         if (_gameMode.value == GameMode.WATCHING) {
             setInGameMode()
@@ -113,21 +116,24 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun checkUserCatchTheLine(userInput: String) {
+    fun checkUserCatchTheLine() {
+        if (userInputTitle.value.isBlank()) return
         if (_gameMode.value == GameMode.WATCHING) {
             setInGameMode()
         }
-        _hideKeyboard.tryEmit(Unit)
 
         val contentItem = _contentItems.value[_currentPage.value]
-        if (doesUserCatch(userInput, contentItem.title)) {
+        if (doesUserCatch(contentItem.title)) {
             viewModelScope.launch {
                 contentRepository.saveCaughtContent(contentItem.id)
             }
             setCatchMode(contentItem)
         } else {
-            _resultText.update { userInput }
+            _resultText.update { userInputTitle.value }
         }
+
+        _hideKeyboard.tryEmit(Unit)
+        userInputTitle.update { "" }
     }
 
     fun removeCaughtContent() {
@@ -178,8 +184,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    private fun doesUserCatch(userInput: String, contentTitle: String): Boolean =
-        userInput.contains(contentTitle)
+    private fun doesUserCatch(contentTitle: String): Boolean =
+        userInputTitle.value.contains(contentTitle)
 
     private fun <T> List<T>.replaceOldItemAt(i: Int, newItem: T): List<T> =
         this.toMutableList().also { newList ->
