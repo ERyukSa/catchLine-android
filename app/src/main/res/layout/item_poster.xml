@@ -1,27 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:elevation="0dp"
-    app:cardCornerRadius="12dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/iv_poster"
+    <data>
+
+        <variable
+            name="posterItem"
+            type="com.eryuksa.catchthelines.ui.game.uistate.PosterItem" />
+    </data>
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:contentDescription="@string/main_poster_description" />
+        android:elevation="0dp"
+        app:cardCornerRadius="12dp">
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btn_navigate_to_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:backgroundTint="@android:color/transparent"
-        android:src="@drawable/icon_info_24"
-        android:layout_gravity="end|top" />
-</androidx.cardview.widget.CardView>
+        <ImageView
+            android:id="@+id/iv_poster"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            posterItem="@{posterItem}"
+            android:contentDescription="@string/main_poster_description" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_navigate_to_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="8dp"
+            visible="@{posterItem.blurDegree == 0}"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/icon_info_24"
+            android:layout_gravity="end|top" />
+    </androidx.cardview.widget.CardView>
+</layout>

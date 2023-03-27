@@ -5,28 +5,24 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.animation.doOnEnd
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
 import com.eryuksa.catchthelines.ui.game.uistate.PosterItem
-import jp.wasabeef.glide.transformations.BlurTransformation
 
-interface PosterDragHandler {
+interface PosterDragListener {
 
     fun onStartDrag()
     fun onDraggingPoster(y: Float)
     fun isPosterRemovable(y: Float): Boolean
-    fun onFinishDrag(lastY: Float)
+    fun onFinishDrag()
+    fun onRemovePoster()
 }
 
 class PosterViewPagerAdapter(
-    val dragListener: PosterDragHandler,
+    val dragListener: PosterDragListener,
     val onClick: (position: Int) -> Unit
 ) : ListAdapter<PosterItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
@@ -44,18 +40,17 @@ class PosterViewPagerAdapter(
     inner class PosterViewHolder(private val binding: ItemPosterBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private var isDraggable = false
+        private var canDrag = false
         private var initialX = 0f
         private var initialY = 0f
         private var lastTouchedRawX = 0f
         private var lastTouchedRawY = 0f
-        private var lastY = 0f
 
         private val removeAnimator: ObjectAnimator by lazy {
             ObjectAnimator.ofFloat(binding.root, "translationY", -3000f)
                 .setDuration(500).also {
                     it.doOnEnd {
-                        dragListener.onFinishDrag(lastY)
+                        dragListener.onRemovePoster()
                         rollBackToInitialPosition()
                     }
                 }
@@ -66,7 +61,7 @@ class PosterViewPagerAdapter(
                 onClick(layoutPosition)
             }
             binding.root.setOnTouchListener { _, event ->
-                if (isDraggable) {
+                if (canDrag) {
                     dragOnTouch(event)
                 }
                 true
@@ -80,17 +75,15 @@ class PosterViewPagerAdapter(
                     saveLastTouchedRawPoint(event.rawX, event.rawY)
                 }
                 MotionEvent.ACTION_MOVE -> {
+                    dragListener.onDraggingPoster(binding.root.y)
                     dragPoster(event.rawX - lastTouchedRawX, event.rawY - lastTouchedRawY)
                     saveLastTouchedRawPoint(event.rawX, event.rawY)
-                    dragListener.onDraggingPoster(binding.root.y)
                 }
                 MotionEvent.ACTION_UP -> {
-                    lastY = binding.root.y
-                    if (dragListener.isPosterRemovable(lastY)) {
+                    dragListener.onFinishDrag()
+                    if (dragListener.isPosterRemovable(binding.root.y)) {
                         removeAnimator.start()
-                        // removeAnimator.doOnEnd{}에서 else문 진행
                     } else {
-                        dragListener.onFinishDrag(lastY)
                         rollBackToInitialPosition()
                     }
                 }
@@ -116,29 +109,8 @@ class PosterViewPagerAdapter(
             initialX = binding.root.x
             initialY = binding.root.y
 
-            (posterItem.blurDegree == 0).also { canDrag ->
-                this.isDraggable = canDrag
-                binding.root.isClickable = canDrag
-                binding.btnNavigateToDetail.isVisible = canDrag
-            }
-
-            binding.ivPoster.setPosterImage(posterItem)
-        }
-
-        @SuppressLint("CheckResult")
-        private fun ImageView.setPosterImage(posterItem: PosterItem) {
-            Glide.with(context)
-                .load(posterItem.posterUrl)
-                .apply {
-                    if (posterItem.blurDegree > 0) {
-                        this.apply(
-                            RequestOptions.bitmapTransform(
-                                BlurTransformation(25, posterItem.blurDegree)
-                            )
-                        )
-                    }
-                }
-                .into(this)
+            binding.posterItem = posterItem
+            canDrag = posterItem.blurDegree == 0
         }
     }
 

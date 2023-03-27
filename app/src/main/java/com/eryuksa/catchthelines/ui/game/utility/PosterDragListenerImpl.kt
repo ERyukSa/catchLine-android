@@ -1,23 +1,22 @@
 package com.eryuksa.catchthelines.ui.game.utility
 
 import android.view.View
-import androidx.core.view.isVisible
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
-import com.eryuksa.catchthelines.ui.game.PosterDragHandler
+import com.eryuksa.catchthelines.ui.game.PosterDragListener
 
-class PosterDragHandlerImpl(
+class PosterDragListenerImpl(
     private val binding: FragmentGameBinding,
     private val removeCaughtContent: () -> Unit
-) : PosterDragHandler {
+) : PosterDragListener {
 
     override fun onStartDrag() {
-        binding.darkBackgroundCoverForPoster.visibility = View.VISIBLE
-        binding.ivContentRemovableArea.isVisible = true
+        binding.darkBackgroundCover.visibility = View.VISIBLE
+        binding.ivContentRemovableArea.visibility = View.VISIBLE
     }
 
     override fun onDraggingPoster(y: Float) {
-        when (isContentInRemoveRange(y)) {
+        when (isPosterInRemoveRange(y)) {
             true -> binding.ivContentRemovableArea.setBackgroundResource(
                 R.drawable.game_white_filled_circle_button
             )
@@ -28,17 +27,18 @@ class PosterDragHandlerImpl(
     }
 
     override fun isPosterRemovable(y: Float): Boolean =
-        isContentInRemoveRange(y)
+        isPosterInRemoveRange(y)
 
-    override fun onFinishDrag(lastY: Float) {
-        binding.darkBackgroundCoverForPoster.visibility = View.INVISIBLE
-        binding.ivContentRemovableArea.isVisible = false
-        if (isContentInRemoveRange(lastY)) {
-            removeCaughtContent()
-        }
+    override fun onFinishDrag() {
+        binding.darkBackgroundCover.visibility = View.GONE
+        binding.ivContentRemovableArea.visibility = View.GONE
     }
 
-    private fun isContentInRemoveRange(y: Float): Boolean =
+    override fun onRemovePoster() {
+        removeCaughtContent()
+    }
+
+    private fun isPosterInRemoveRange(y: Float): Boolean =
         binding.ivContentRemovableArea.y + binding.ivContentRemovableArea.height * 0.65 >=
             binding.viewPagerPoster.y + y
 }
