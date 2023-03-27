@@ -1,5 +1,5 @@
 package com.eryuksa.catchthelines.ui.game.uistate
 
 enum class GameMode {
-    IN_GAME, CATCH, WATCHING
+    IN_GAME, CATCH, WATCHING, ALL_CATCH
 }

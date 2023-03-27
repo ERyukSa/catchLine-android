@@ -186,6 +186,7 @@ class GameViewModel @Inject constructor(
         val currentPage = _currentPage.value
         if (currentPage == 0 && _contentItems.value.size == 1) {
             _contentItems.update { emptyList() }
+            _gameMode.update { GameMode.ALL_CATCH }
         } else if (currentPage == _contentItems.value.lastIndex) {
             _currentPage.update { it - 1 }
             _contentItems.update { it.subList(0, it.lastIndex) }
