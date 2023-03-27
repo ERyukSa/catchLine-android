@@ -3,7 +3,6 @@ package com.eryuksa.catchthelines.ui.record
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.databinding.ItemCaughtContentBinding
 
@@ -39,9 +38,8 @@ class CaughtContentsAdapter(private val onClick: (content: Content) -> Unit) :
         }
 
         fun bind(content: Content) {
-            Glide.with(itemView.context)
-                .load(content.posterUrl)
-                .into(binding.ivPoster)
+            binding.content = content
+            binding.executePendingBindings()
         }
     }
 }

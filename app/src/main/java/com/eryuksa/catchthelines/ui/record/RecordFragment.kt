@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.eryuksa.catchthelines.R
@@ -18,7 +15,6 @@ import com.eryuksa.catchthelines.databinding.FragmentRecordBinding
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RecordFragment : Fragment() {
@@ -41,7 +37,10 @@ class RecordFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentRecordBinding.inflate(inflater, container, false)
+        _binding = FragmentRecordBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
+            vm = viewModel
+        }
 
         requireActivity().window.run {
             statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
@@ -58,32 +57,6 @@ class RecordFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { uiState ->
-                    with(uiState) {
-                        binding.tvCaughtCount.text = getString(
-                            R.string.record_catch_count,
-                            caughtContentsCount
-                        )
-                        binding.tvTryCount.text = getString(
-                            R.string.record_encounter_count,
-                            triedContentsCount
-                        )
-                        binding.tvStatistics.text = getString(
-                            R.string.record_statistics,
-                            caughtContentsCount,
-                            triedContentsCount
-                        )
-                        contentsAdapter.contents = caughtContents
-                    }
-                }
-            }
-        }
     }
 
     override fun onDestroyView() {

@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/iv_poster"
-    android:layout_width="84dp"
-    android:layout_height="120dp"
-    android:background="@drawable/background_radius_10dp"
-    android:contentDescription="@string/main_poster_description"
-    android:scaleType="fitXY" />
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <data>
+
+        <variable
+            name="content"
+            type="com.eryuksa.catchthelines.data.dto.Content" />
+    </data>
+
+    <ImageView
+        android:id="@+id/iv_poster"
+        android:layout_width="84dp"
+        android:layout_height="120dp"
+        posterUrl="@{content.posterUrl}"
+        android:background="@drawable/background_radius_10dp"
+        android:contentDescription="@string/main_poster_description"
+        android:scaleType="fitXY" />
+</layout>
 

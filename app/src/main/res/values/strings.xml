@@ -41,7 +41,7 @@
     <string name="record_caught_contents">캐치한 컨텐츠</string>
     <string name="record_description_btn_navigate_to_caught_contents">캐치한 컨텐츠 보기 버튼</string>
     <string name="record_catch_count">캐치: %d개</string>
-    <string name="record_encounter_count">등장: %d개</string>
+    <string name="record_try_count">도전: %d개</string>
     <string name="record_statistics">%d / %d</string>
 
     <string name="detail_release_date">%s 개봉</string>
