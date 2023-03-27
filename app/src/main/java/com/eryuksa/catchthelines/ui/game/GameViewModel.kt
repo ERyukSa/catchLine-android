@@ -41,6 +41,9 @@ class GameViewModel @Inject constructor(
     private val _hideKeyboard = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val hideKeyboard: SharedFlow<Unit> get() = _hideKeyboard
 
+    private val _showGameStateResetMessage = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val showGameStateResetMessage: SharedFlow<Unit> get() = _showGameStateResetMessage
+
     val userInputTitle = MutableStateFlow<String>("")
 
     val uiState: StateFlow<GameUiState> = combine(
@@ -91,9 +94,17 @@ class GameViewModel @Inject constructor(
         _selectedLine.value = selectedLine
     }
 
-    fun movePageTo(position: Int) {
-        _currentPage.value = position
+    fun tryToMovePageTo(position: Int) {
+        if (_gameMode.value == GameMode.IN_GAME) {
+            _showGameStateResetMessage.tryEmit(Unit)
+        } else {
+            _currentPage.value = position
+        }
+    }
+
+    fun forceToMovePageTo(position: Int) {
         setWatchingMode()
+        _currentPage.update { position }
     }
 
     fun useHint(hint: Hint) {

@@ -1,5 +1,6 @@
 package com.eryuksa.catchthelines.ui.game
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,7 @@ import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHandler
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonHelper
 import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
@@ -52,6 +54,22 @@ class GameFragment : Fragment() {
     }
 
     private lateinit var audioPlayerHandler: AudioPlayerHandler
+
+    private val gameStateResetDialog: Dialog by lazy {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.game_reset_game_state_message_title)
+            .setMessage(R.string.game_reset_game_state_message_body)
+            .setPositiveButton(R.string.game_reset_game_state_message_positive) { _, _ ->
+                viewModel.forceToMovePageTo(binding.viewPagerPoster.currentItem)
+                gameStateResetDialog.dismiss()
+            }
+            .setNegativeButton(R.string.game_reset_game_state_message_negative) { _, _ ->
+                binding.viewPagerPoster.currentItem = viewModel.uiState.value.currentPage
+                gameStateResetDialog.dismiss()
+            }
+            .setCancelable(false)
+            .create()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -195,6 +213,14 @@ class GameFragment : Fragment() {
                     }
                 }
             }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    showGameStateResetMessage.collect {
+                        gameStateResetDialog.show()
+                    }
+                }
+            }
         }
     }
 
@@ -207,7 +233,7 @@ class GameFragment : Fragment() {
         }
 
         override fun onPageSelected(position: Int) {
-            viewModel.movePageTo(position)
+            viewModel.tryToMovePageTo(position)
         }
     }
 

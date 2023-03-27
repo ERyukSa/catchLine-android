@@ -25,6 +25,12 @@
     <string name="game_result_wrong">%s ❌</string>
     <string name="game_feedback_all_killed">올킬하셨습니다! 💯</string>
     <string name="game_line_label">대사%d</string>
+    <string name="game_reset_game_state_message_title">게임 상태 초기화</string>
+    <string name="game_reset_game_state_message_body">직전 컨텐츠의 게임 상태가 초기화 됩니다.
+        다음 컨텐츠로 이동하시겠어요?</string>
+    <string name="game_reset_game_state_message_positive">네, 이동할게요</string>
+    <string name="game_reset_game_state_message_negative">아니요</string>
+
     <string name="game_board_title">게임 보드</string>
     <string name="game_board_result_for_submit">결과</string>
 
