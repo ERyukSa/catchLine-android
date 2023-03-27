@@ -25,9 +25,9 @@ import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
-import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHandler
+import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHelper
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonHelper
-import com.eryuksa.catchthelines.ui.game.utility.PosterDragHandlerImpl
+import com.eryuksa.catchthelines.ui.game.utility.PosterDragListenerImpl
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -42,7 +42,7 @@ class GameFragment : Fragment() {
         get() = _binding!!
     private val viewModel: GameViewModel by viewModels()
 
-    private lateinit var posterDragHandler: PosterDragHandler
+    private lateinit var posterDragListener: PosterDragListener
     private lateinit var posterAdapter: PosterViewPagerAdapter
     private val onClickPoster = { position: Int ->
         findNavController().navigate(
@@ -53,7 +53,9 @@ class GameFragment : Fragment() {
         )
     }
 
-    private lateinit var audioPlayerHandler: AudioPlayerHandler
+    private val audioPlayerHelper: AudioPlayerHelper by lazy {
+        AudioPlayerHelper(requireContext())
+    }
 
     private val gameStateResetDialog: Dialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
@@ -90,13 +92,24 @@ class GameFragment : Fragment() {
         initPosterViewPager()
         setUpListeners()
         setUpHintButtonsAnimator()
-        initializeAudioPlayerHandler()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeData()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        audioPlayerHelper.initialize()
+        binding.playerView.player = audioPlayerHelper.audioPlayer
+    }
+
+    override fun onStop() {
+        super.onStop()
+        audioPlayerHelper.release()
+        binding.playerView.player = null
     }
 
     override fun onDestroyView() {
@@ -107,11 +120,11 @@ class GameFragment : Fragment() {
     private fun initPosterViewPager() {
         binding.viewPagerPoster.run {
             offscreenPageLimit = 2
-            posterDragHandler = PosterDragHandlerImpl(
+            posterDragListener = PosterDragListenerImpl(
                 binding,
                 removeCaughtContent = viewModel::removeCaughtContent
             )
-            adapter = PosterViewPagerAdapter(posterDragHandler, onClickPoster).also {
+            adapter = PosterViewPagerAdapter(posterDragListener, onClickPoster).also {
                 this@GameFragment.posterAdapter = it
             }
             this.removeOverScroll()
@@ -121,26 +134,17 @@ class GameFragment : Fragment() {
     }
 
     private fun setUpHintButtonsAnimator() {
-        val hintButtonElevation = resources.getDimension(R.dimen.game_hintbutton_elevation)
-
         binding.btnOpenHint.doOnLayout {
             binding.hintOpenAnimatorList = HintButtonHelper.createOpenAnimators(
                 binding.btnOpenHint,
-                binding.btnClearerPosterHint.apply { elevation = hintButtonElevation },
-                binding.btnFirstCharacterHint.apply { elevation = hintButtonElevation },
-                binding.btnCharactersCountHint.apply { elevation = hintButtonElevation }
+                binding.btnClearerPosterHint,
+                binding.btnFirstCharacterHint,
+                binding.btnCharactersCountHint
             )
         }
 
         binding.btnOpenHint.setOnClickListener {
             viewModel.changeHintOpenState()
-        }
-    }
-
-    private fun initializeAudioPlayerHandler() {
-        AudioPlayerHandler(requireContext()).run {
-            audioPlayerHandler = this
-            binding.playerView.player = this.audioPlayer
         }
     }
 
@@ -193,7 +197,7 @@ class GameFragment : Fragment() {
                         posterAdapter.submitList(uiState.contentItems)
                         binding.viewPagerPoster.setCurrentItem(uiState.currentPage, false)
 
-                        audioPlayerHandler.setAudioItems(uiState.contentItems.map { it.audioUrls })
+                        audioPlayerHelper.setAudioItems(uiState.contentItems.map { it.audioUrls })
                     }
                 }
             }
@@ -201,7 +205,7 @@ class GameFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     uiState.distinctUntilChangedBy { it.audioIndex }.collect { uiState ->
-                        audioPlayerHandler.moveTo(uiState.audioIndex)
+                        audioPlayerHelper.moveTo(uiState.audioIndex)
                     }
                 }
             }
