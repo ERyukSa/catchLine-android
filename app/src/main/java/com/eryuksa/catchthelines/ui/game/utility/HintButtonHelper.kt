@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Button
 import androidx.databinding.BindingAdapter
 import com.eryuksa.catchthelines.R
-import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 object HintButtonHelper {
@@ -38,12 +37,5 @@ object HintButtonHelper {
             this.translationY = 0f
             this.visibility = View.GONE
         }
-    }
-
-    @JvmStatic
-    @BindingAdapter("index", "usedHints")
-    fun Button.setClickable(index: Int, usedHints: Set<Hint>) {
-        val myHintType = Hint.values()[index]
-        isClickable = usedHints.contains(myHintType).not()
     }
 }
