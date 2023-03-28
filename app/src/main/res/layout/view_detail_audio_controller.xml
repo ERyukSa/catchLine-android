@@ -12,9 +12,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/game_description_play_line"
-        android:padding="8dp"
+        android:padding="4dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/colorPrimary" />
 
     <ImageButton
         android:id="@+id/exo_pause"
@@ -22,9 +23,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/game_description_pause_line"
-        android:padding="8dp"
+        android:padding="4dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/colorPrimary" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier"
@@ -37,9 +39,10 @@
         android:id="@id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:scrubber_color="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/barrier"
         app:layout_constraintTop_toTopOf="parent"
-        app:played_color="@color/white" />
+        app:played_color="?attr/colorPrimary" />
 </androidx.constraintlayout.widget.ConstraintLayout>

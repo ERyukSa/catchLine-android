@@ -46,4 +46,5 @@
 
     <string name="detail_release_date">%s 개봉</string>
     <string name="detail_running_time">%d 분</string>>
+    <string name="detail_short_summary">\"%s\"</string>>
 </resources>

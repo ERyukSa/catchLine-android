@@ -12,4 +12,6 @@ data class ContentDetailUiState(
     val releaseDate: String = "",
     val runningTime: Int = 0,
     val audioUrls: List<String> = emptyList()
-)
+) {
+    val genresAsString get() = genres.joinToString(", ") { it.name }
+}

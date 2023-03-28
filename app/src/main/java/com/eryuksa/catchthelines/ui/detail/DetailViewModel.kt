@@ -17,6 +17,12 @@ class DetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ContentDetailUiState>(ContentDetailUiState())
     val uiState = _uiState.asStateFlow()
 
+    var currentAudioIndex = MutableStateFlow(0)
+    var playWhenReady = false
+        private set
+    var audioPosition = 0L
+        private set
+
     fun getDetailUiState(id: Int, audioUrls: Array<String>) {
         viewModelScope.launch {
             _uiState.value = repository.getContentDetail(id)?.run {
@@ -33,5 +39,11 @@ class DetailViewModel @Inject constructor(
                 )
             } ?: return@launch
         }
+    }
+
+    fun saveAudioPlayState(playWhenReady: Boolean, audioIndex: Int, position: Long) {
+        this.playWhenReady = playWhenReady
+        this.currentAudioIndex.value = audioIndex
+        audioPosition = position
     }
 }
