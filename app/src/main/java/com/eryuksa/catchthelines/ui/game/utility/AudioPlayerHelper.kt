@@ -26,9 +26,13 @@ class AudioPlayerHelper(private val context: Context) {
     }
 
     fun setAudioItems(uris: List<List<String>>) {
-        audioPlayer.setMediaItems(
-            uris.flatten().map { uri -> MediaItem.fromUri(uri) }
-        )
+        if (audioPlayer.mediaItemCount != uris.size * 2) {
+            val currentIndex = audioPlayer.currentMediaItemIndex
+            audioPlayer.setMediaItems(
+                uris.flatten().map { uri -> MediaItem.fromUri(uri) }
+            )
+            moveTo(currentIndex)
+        }
     }
 
     fun moveTo(mediaItemIndex: Int) {
