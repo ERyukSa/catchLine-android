@@ -7,6 +7,7 @@ import android.view.Window
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 
 fun ViewPager2.removeOverScroll() {
     if (this.childCount == 0) return
@@ -55,4 +56,10 @@ fun Context.getNavigationBarHeight(): Int {
     } else {
         0
     }
+}
+
+fun Glide.preloadImage(url: String) {
+    Glide.with(context)
+        .load(url)
+        .preload()
 }

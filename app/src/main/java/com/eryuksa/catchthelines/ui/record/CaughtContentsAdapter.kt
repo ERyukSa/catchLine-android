@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.databinding.ItemCaughtContentBinding
+import com.eryuksa.catchthelines.ui.common.preloadImage
 
 class CaughtContentsAdapter(private val onClick: (content: Content, sharedElements: Pair<ImageView, String>) -> Unit) :
     RecyclerView.Adapter<CaughtContentsAdapter.ViewHolder>() {
@@ -24,6 +26,8 @@ class CaughtContentsAdapter(private val onClick: (content: Content, sharedElemen
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(contents[position])
+        val futurePosition = (position + 5).coerceAtMost(contents.lastIndex)
+        Glide.get(holder.itemView.context).preloadImage(contents[futurePosition].posterUrl)
     }
 
     override fun getItemCount(): Int = contents.size

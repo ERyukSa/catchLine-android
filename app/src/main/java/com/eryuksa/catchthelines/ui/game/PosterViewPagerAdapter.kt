@@ -10,7 +10,9 @@ import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
+import com.eryuksa.catchthelines.ui.common.preloadImage
 import com.eryuksa.catchthelines.ui.game.uistate.PosterItem
 
 interface PosterDragListener {
@@ -35,6 +37,8 @@ class PosterViewPagerAdapter(
 
     override fun onBindViewHolder(holder: PosterViewHolder, position: Int) {
         holder.bind(getItem(position))
+        val futurePosition = (position + 3).coerceAtMost(currentList.lastIndex)
+        Glide.get(holder.itemView.context).preloadImage(getItem(futurePosition).posterUrl)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -67,6 +71,14 @@ class PosterViewPagerAdapter(
                 }
                 true
             }
+        }
+
+        fun bind(posterItem: PosterItem) {
+            initialX = binding.root.x
+            initialY = binding.root.y
+
+            binding.posterItem = posterItem
+            canDrag = posterItem.blurDegree == 0
         }
 
         private fun dragOnTouch(event: MotionEvent) {
@@ -104,14 +116,6 @@ class PosterViewPagerAdapter(
         private fun rollBackToInitialPosition() {
             binding.root.x = initialX
             binding.root.y = initialY
-        }
-
-        fun bind(posterItem: PosterItem) {
-            initialX = binding.root.x
-            initialY = binding.root.y
-
-            binding.posterItem = posterItem
-            canDrag = posterItem.blurDegree == 0
         }
     }
 
