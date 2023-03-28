@@ -2,11 +2,12 @@ package com.eryuksa.catchthelines.ui.record
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.databinding.ItemCaughtContentBinding
 
-class CaughtContentsAdapter(private val onClick: (content: Content) -> Unit) :
+class CaughtContentsAdapter(private val onClick: (content: Content, sharedElements: Pair<ImageView, String>) -> Unit) :
     RecyclerView.Adapter<CaughtContentsAdapter.ViewHolder>() {
 
     var contents: List<Content> = emptyList()
@@ -32,9 +33,9 @@ class CaughtContentsAdapter(private val onClick: (content: Content) -> Unit) :
 
         init {
             itemView.setOnClickListener {
-                onClick(contents[layoutPosition])
+                val content = contents[layoutPosition]
+                onClick(content, Pair(binding.ivPoster, binding.ivPoster.transitionName))
             }
-            binding.ivPoster.clipToOutline = true
         }
 
         fun bind(content: Content) {

@@ -17,22 +17,23 @@
 
         <ImageView
             android:id="@+id/iv_poster"
+            posterItem="@{posterItem}"
+            android:transitionName="@{String.valueOf(posterItem.id)}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            posterItem="@{posterItem}"
-            android:contentDescription="@string/main_poster_description" />
+            android:contentDescription="@string/main_poster_description"
+            android:scaleType="fitXY" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btn_navigate_to_detail"
+            visible="@{posterItem.blurDegree == 0}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:padding="8dp"
-            visible="@{posterItem.blurDegree == 0}"
+            android:layout_gravity="end|top"
             android:backgroundTint="@android:color/transparent"
-            android:src="@drawable/icon_info_24"
-            android:layout_gravity="end|top" />
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="8dp"
+            android:src="@drawable/icon_info_24" />
     </androidx.cardview.widget.CardView>
 </layout>

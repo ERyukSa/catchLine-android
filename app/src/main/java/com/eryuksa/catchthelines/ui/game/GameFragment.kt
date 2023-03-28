@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.doOnLayout
@@ -15,6 +16,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -44,12 +46,13 @@ class GameFragment : Fragment() {
 
     private lateinit var posterDragListener: PosterDragListener
     private lateinit var posterAdapter: PosterViewPagerAdapter
-    private val onClickPoster = { position: Int ->
+    private val onClickPoster = { position: Int, sharedElements: Pair<ImageView, String> ->
         findNavController().navigate(
-            GameFragmentDirections.gameToDetail(
+            directions = GameFragmentDirections.gameToDetail(
                 viewModel.uiState.value.contentItems[position].id,
                 viewModel.uiState.value.contentItems[position].audioUrls.toTypedArray()
-            )
+            ),
+            navigatorExtras = FragmentNavigatorExtras(sharedElements)
         )
     }
 

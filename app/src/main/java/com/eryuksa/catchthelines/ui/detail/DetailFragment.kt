@@ -1,10 +1,12 @@
 package com.eryuksa.catchthelines.ui.detail
 
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -36,7 +38,7 @@ class DetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.getDetailUiState(args.contentId, args.audioUrls)
+        viewModel.requestDetailUiState(args.contentId, args.audioUrls)
     }
 
     override fun onCreateView(
@@ -48,9 +50,8 @@ class DetailFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             vm = viewModel
         }
-        initWindowAppearance()
+        setUpWindowAppearance()
 
-        binding.ivMainPoster.clipToOutline = true
         binding.btnNavigateBack.setOnClickListener {
             findNavController().navigateUp()
         }
@@ -59,6 +60,7 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpSharedElementEnterTransition()
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -70,7 +72,15 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun initWindowAppearance() {
+    override fun onStop() {
+        super.onStop()
+        audioPlayer.run {
+            viewModel.saveAudioPlayState(playWhenReady, currentMediaItemIndex, currentPosition)
+            release()
+        }
+    }
+
+    private fun setUpWindowAppearance() {
         requireActivity().window.run {
             setLayoutVerticalLimit(hasLimit = false)
             setStatusBarIconColor(isDark = false)
@@ -90,6 +100,17 @@ class DetailFragment : Fragment() {
         }
     }
 
+    private fun setUpSharedElementEnterTransition() {
+        binding.ivMainPoster.transitionName = args.contentId.toString()
+        sharedElementEnterTransition = TransitionInflater.from(requireContext())
+            .inflateTransition(android.R.transition.move)
+            .apply { duration = 700 }
+        postponeEnterTransition()
+        binding.root.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
+    }
+
     private fun setUpAudioPlayer(urls: List<String>) {
         audioPlayer = ExoPlayer.Builder(requireContext()).build().apply {
             setMediaItems(urls.map { MediaItem.fromUri(it) })
@@ -98,14 +119,6 @@ class DetailFragment : Fragment() {
             pauseAtEndOfMediaItems = true
             repeatMode = ExoPlayer.REPEAT_MODE_ONE
             prepare()
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        audioPlayer.run {
-            viewModel.saveAudioPlayState(playWhenReady, currentMediaItemIndex, currentPosition)
-            release()
         }
     }
 }

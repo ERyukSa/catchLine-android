@@ -10,11 +10,13 @@
 
     <ImageView
         android:id="@+id/iv_poster"
+        clipToOutline="@{true}"
+        posterUrl="@{content.posterUrl}"
         android:layout_width="84dp"
         android:layout_height="120dp"
-        posterUrl="@{content.posterUrl}"
         android:background="@drawable/background_radius_10dp"
         android:contentDescription="@string/main_poster_description"
-        android:scaleType="fitXY" />
+        android:scaleType="fitXY"
+        android:transitionName="@{String.valueOf(content.id)}" />
 </layout>
 

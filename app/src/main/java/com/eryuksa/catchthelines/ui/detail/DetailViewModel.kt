@@ -23,7 +23,7 @@ class DetailViewModel @Inject constructor(
     var audioPosition = 0L
         private set
 
-    fun getDetailUiState(id: Int, audioUrls: Array<String>) {
+    fun requestDetailUiState(id: Int, audioUrls: Array<String>) {
         viewModelScope.launch {
             _uiState.value = repository.getContentDetail(id)?.run {
                 ContentDetailUiState(

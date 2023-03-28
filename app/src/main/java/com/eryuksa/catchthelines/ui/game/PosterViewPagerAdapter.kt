@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -23,7 +24,7 @@ interface PosterDragListener {
 
 class PosterViewPagerAdapter(
     val dragListener: PosterDragListener,
-    val onClick: (position: Int) -> Unit
+    val onClick: (position: Int, sharedElements: Pair<ImageView, String>) -> Unit
 ) : ListAdapter<PosterItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
@@ -58,7 +59,7 @@ class PosterViewPagerAdapter(
 
         init {
             binding.btnNavigateToDetail.setOnClickListener {
-                onClick(layoutPosition)
+                onClick(layoutPosition, Pair(binding.ivPoster, binding.ivPoster.transitionName))
             }
             binding.root.setOnTouchListener { _, event ->
                 if (canDrag) {

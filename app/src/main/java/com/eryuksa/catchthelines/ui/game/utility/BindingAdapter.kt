@@ -1,10 +1,10 @@
 package com.eryuksa.catchthelines.ui.game.utility
 
 import android.annotation.SuppressLint
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.eryuksa.catchthelines.R
@@ -27,7 +27,7 @@ fun TextView.setResultText(resultText: String, gameMode: GameMode) {
 }
 
 @BindingAdapter("gameMode")
-fun ViewPager2.setElevationBy(gameMode: GameMode) {
+fun View.setElevationBy(gameMode: GameMode) {
     elevation = if (gameMode == GameMode.CATCH) {
         resources.getDimension(R.dimen.game_poster_elevation_over_dark_cover)
     } else {
