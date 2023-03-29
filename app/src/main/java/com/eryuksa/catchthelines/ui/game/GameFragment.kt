@@ -58,7 +58,7 @@ class GameFragment : Fragment() {
     }
 
     private val audioPlayerHelper: AudioPlayerHelper by lazy {
-        AudioPlayerHelper(requireContext())
+        AudioPlayerHelper(requireContext(), viewModel)
     }
 
     private val gameStateResetDialog: Dialog by lazy {

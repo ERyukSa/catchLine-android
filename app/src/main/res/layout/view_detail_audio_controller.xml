@@ -15,7 +15,7 @@
         android:padding="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/colorPrimary" />
+        app:tint="?attr/colorPrimaryVariant" />
 
     <ImageButton
         android:id="@+id/exo_pause"
@@ -26,7 +26,7 @@
         android:padding="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/colorPrimary" />
+        app:tint="?attr/colorPrimaryVariant" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier"
@@ -39,10 +39,10 @@
         android:id="@id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:scrubber_color="?attr/colorPrimary"
+        app:scrubber_color="?attr/colorPrimaryVariant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/barrier"
         app:layout_constraintTop_toTopOf="parent"
-        app:played_color="?attr/colorPrimary" />
+        app:played_color="?attr/colorPrimaryVariant" />
 </androidx.constraintlayout.widget.ConstraintLayout>

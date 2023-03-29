@@ -46,6 +46,8 @@ class GameViewModel @Inject constructor(
 
     val userInputTitle = MutableStateFlow<String>("")
 
+    var audioPlaybackPosition = 0L
+
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
         _contentItems,
