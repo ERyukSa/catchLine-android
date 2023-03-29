@@ -2,60 +2,69 @@
 ## 소개
 ![KakaoTalk_20230311_180722855](https://user-images.githubusercontent.com/48471292/224475689-a21edf64-985b-49c3-a1d5-b271f5807e96.jpg)
 
-대사를 듣고 힌트를 곁들여 영화, 드라마의 제목을 맞히는 게임입니다.  
-*"명작은 그 전개와 결말을 알고도 다시 찾게 만든다."* 많은 사랑을 받았던 미디어 컨텐츠들을 다시 만나보며 소소한 즐거움을 느껴봐요!
+대사를 듣고 힌트를 곁들여 영화ㆍ드라마의 제목을 맞히는 게임입니다.  
 
-실습용 리포지토리로 계속 업데이트 될 예정입니다.
+*"명작은 그 전개와 결말을 알고도 다시 찾게 만든다."*  
+ 
+ 많은 사랑을 받았던 컨텐츠와 명대사를 다시 즐겨보아요!
 
-### 기간
-2023-02-11 ~ 2023-03-11 (1st readme update)
+---
+
+## 업데이트
+1차:  2023-02-11 ~ 2023-03-11
+<details>
+<summary>2차: 2023-03-29</summary>
+
+- UI 변경
+   - 게임 화면에 게임 보드판 추가: 정답 제출시 정답 여부와 힌트를 확인할 수 있음
+   - 대사는 힌트 사용 없이 2개 모두 들을 수 있음
+   - 기본은 관전 모드, 힌트나 정답 제출 시 자동으로 게임 모드로 전환, 정답을 맞추고 스와이프 하거나 다음 문제로 넘어가면 자동으로 관전 모드로 전환, 관전 모드에서 대사를 듣거나 문제 넘기는 건 모드 전환X 
+   - 게임 모드에서 다음 문제로 넘어가려고 할 때 해당 컨텐츠의 게임 상태 초기화를 알리는 다이얼로그 출력, 취소 누르면 이전 문제로 되돌아감
+   - SharedElement Transition 애니메이션 추가
+ - 기술적 변경
+   - Binding Adapter: Presentation 내 관심사 분리 => 상태 출력은 XML + Binding Adapter 담당, 사용자 입력은 Fragment 담당
+   - 의존성 주입: Hilt 사용
+   - 젼체적으로 클래스와 메서드 분리, 코드 라인 감소 
+</details>
+
+---
 
 ## Feature Overview
-- 애니메이션을 활용한 엔터테인먼트 요소 제공
-  - [**ObjectAnimator를 이용한 버튼 애니메이션**](https://best-human-developer.tistory.com/129)
-  - [**ViewPager2를 활용한 페이지 크기 조절 및 미리보기**](https://best-human-developer.tistory.com/130)
-  - 터치 리스너와 ObjectAnimator를 활용한 drag & swipe
-- MVVM 아키텍처
-- StateFlow를 활용한 UI State 보존과 데이터 바인딩
-- 생명주기에 따른 리소스 처리
-  - onStart: 오디오 초기화, onStop: 오디오 해제
+- 다양한 애니메이션
+- 생명주기 콜백 메서드와 AAC ViewModel을 활용한 상태 관리
+- Google Android App Architecture (MVVM)
+- 의존성 주입 (Hilt)
+- DataBinding & Binding Adapter & StateFlow/SharedFlow
 
 ## UI Features
-|                          **게임 시작**                          |                    컨텐츠 제목 맞히기 (캐치) + 상세 정보                    |
+|                          **컨텐츠 둘러보기(feat. 슬라이드 애니메이션)**                          |        컨텐츠 상세 화면 이동 (feat. SharedElement Transition)                    |
 | :----------------------------------------------------------: | :----------------------------------------------------------: |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img height=600 src="https://user-images.githubusercontent.com/48471292/224484447-11597bc4-c052-48bf-b359-f8b3ef3a4fb4.gif"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img height=600 src="https://user-images.githubusercontent.com/48471292/224484989-5a6fbbe1-8fb1-4fa3-a3d1-106ae4dce5e9.gif"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-|       **맞힌 문제 스와이프**         |                      **힌트 요청<br/>(힌트 개수 하나씩 자동 증가됨 - 앱 밖에서도 유효)**                      |
-| <img height=600 src="https://user-images.githubusercontent.com/48471292/224485217-b236b513-7870-4c78-b2ad-265a49c72a31.gif"/> | <img height=600 src="https://user-images.githubusercontent.com/48471292/224485662-f6df3e05-c0d9-433c-a51c-c37c5214cdb2.gif"/> |
-|       **다이나믹한 상태 저장**         |                      기록 화면                      |
-| <img height=600 src="https://user-images.githubusercontent.com/48471292/224497059-598c3829-c23f-4384-ba6f-69990132d563.gif"/> | <img height=600 src="https://user-images.githubusercontent.com/48471292/224491783-08863cbb-2833-4b97-ae24-39e26d9e505e.gif"/> |
-
-(++ 생명주기에 따라 오디오 플레이어 할당/해제)
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img height=600 src="https://user-images.githubusercontent.com/48471292/228535328-9783cf4c-d32a-4c22-b14f-b0591a2d605d.gif"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img height=600 src="https://user-images.githubusercontent.com/48471292/228536810-61c956c9-9192-47ab-a364-6ad95a71d045.gif"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+|       **캐치더라인 (feat. 드래그&스와이프)**         |                      **힌트 기능 (feat. ObjectAnimator)**                      |
+| <img height=600 src="https://user-images.githubusercontent.com/48471292/228537980-dcaa76ac-5e47-4780-b219-ed796e9ecb2e.gif"/> | <img height=600 src="https://user-images.githubusercontent.com/48471292/228539595-422c18f5-2849-443e-b8e3-d93bde53206d.gif"/> |
+|       **게임중 컨텐츠 변경시 알림 문구 및 되돌리기**         |                      **오디오 재생 상태 관리**<br>(https://www.youtube.com/watch?v=ifRw4bDwlac)                      |
+| <img height=600 src="https://user-images.githubusercontent.com/48471292/228540971-c61afe6a-3421-418c-bdd6-1ff20ddf6862.gif"/> | <img height=600 src="https://user-images.githubusercontent.com/48471292/228543960-1e819c2a-a92a-4c5f-8c8e-ef9de92a23ac.gif"/> |
 
 ## Tech Features
 ### Architecture
-MVVM
-- UI layer(View + ViewModel) + Data layer(Repository, DataSource)
-- UI layer, Data layer 분리
-- 이벤트 흐름: UI -> Data)  View -> ViewModel -> Repository -> DataSource
-- 데이터 흐름: Data -> UI) DataSource -> Repository -> ViewModel -> View
-- 객체에서 파생된 데이터는 최대한 객체 스스로 처리하도록 캡슐화
-- 클라이언트 객체를 기준으로 메서드 작성
+MVVM, Dependency Injection (Hilt)
 
 ### Jetpack Library
-ViewModel, DataBinding, LiveData -> StateFlow, Room, Navigation Component, Coroutine, Datastore
+ViewModel, DataBinding, StateFlow/SharedFlow, Room, Navigation Component, Coroutine, Datastore
 
 ### Remote
 Glide, Exoplayer, Gson, Retrofit,
 
 ---
 
-## To be continued list
-- 이미지 로딩 최적화
+## To do list
+- ~~DI(with Hilt)~~
+- 레이아웃 및 스타일 최적화
+- 네트워크 상태 반영, 로딩중 표시
+- 캐싱(audio with Exoplayer)
+- 게임 설명 화면
 - 디자인 패턴 (꾸준히 리팩토링)   
-- 캐싱(audio with Exoplayer)  
-- DI(with Hilt)  
-- 레이아웃 및 스타일 최적화  
-- Jetpack Compose  
+- Jetpack Compose (새로운 화면, 기능)
 - Rx  
-- Clean Architecture(기능 추가, 구조 확장, 도메인 레이어)
+- Clean Architecture
 - TDD
