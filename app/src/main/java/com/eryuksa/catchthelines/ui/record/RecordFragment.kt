@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentRecordBinding
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
+import com.eryuksa.catchthelines.ui.common.setSharedElementComebackTransition
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,11 +27,12 @@ class RecordFragment : Fragment() {
     private val viewModel: RecordViewModel by viewModels()
 
     private val contentsAdapter: CaughtContentsAdapter by lazy {
-        CaughtContentsAdapter { content, sharedElements: Pair<ImageView, String> ->
+        CaughtContentsAdapter { content, sharedElements: Pair<View, String> ->
             findNavController().navigate(
                 directions = RecordFragmentDirections.recordToDetail(
                     content.id,
-                    content.lineAudioUrls.toTypedArray()
+                    content.lineAudioUrls.toTypedArray(),
+                    content.posterUrl
                 ),
                 navigatorExtras = FragmentNavigatorExtras(sharedElements)
             )
@@ -54,9 +55,10 @@ class RecordFragment : Fragment() {
             setLayoutVerticalLimit(hasLimit = true)
         }
 
-        binding.rvCaughtContents.apply {
+        binding.rvCaughtContents.run {
             adapter = contentsAdapter
             addItemDecoration(caughtContentsSpaceDecorator)
+            this@RecordFragment.setSharedElementComebackTransition(this)
         }
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()

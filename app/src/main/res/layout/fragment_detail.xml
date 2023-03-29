@@ -17,10 +17,10 @@
 
         <ImageView
             android:id="@+id/iv_backdrop_poster"
-            posterUrl="@{vm.uiState.backdropPosterUrl}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:alpha="0.9"
+            posterUrl="@{vm.uiState.backdropPosterUrl}"
             android:contentDescription="@string/backdrop_poster_description"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -46,7 +46,6 @@
         <ImageView
             android:id="@+id/iv_main_poster"
             clipToOutline="@{true}"
-            posterUrl="@{vm.uiState.mainPosterPathUrl}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"

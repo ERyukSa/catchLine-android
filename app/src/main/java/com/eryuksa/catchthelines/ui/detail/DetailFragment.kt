@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,9 +13,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentDetailBinding
 import com.eryuksa.catchthelines.ui.common.getNavigationBarHeight
 import com.eryuksa.catchthelines.ui.common.getStatusBarHeight
+import com.eryuksa.catchthelines.ui.common.load
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import com.google.android.exoplayer2.ExoPlayer
@@ -51,6 +52,8 @@ class DetailFragment : Fragment() {
             vm = viewModel
         }
         setUpWindowAppearance()
+        setUpSharedElementEnterTransition()
+        loadBackPosterImageWithPostponedEnterTransition(args.mainPosterUrl)
 
         binding.btnNavigateBack.setOnClickListener {
             findNavController().navigateUp()
@@ -60,7 +63,6 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpSharedElementEnterTransition()
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -103,12 +105,8 @@ class DetailFragment : Fragment() {
     private fun setUpSharedElementEnterTransition() {
         binding.ivMainPoster.transitionName = args.contentId.toString()
         sharedElementEnterTransition = TransitionInflater.from(requireContext())
-            .inflateTransition(android.R.transition.move)
-            .apply { duration = 700 }
+            .inflateTransition(R.transition.detail_poster_image)
         postponeEnterTransition()
-        binding.root.doOnPreDraw {
-            startPostponedEnterTransition()
-        }
     }
 
     private fun setUpAudioPlayer(urls: List<String>) {
@@ -121,4 +119,9 @@ class DetailFragment : Fragment() {
             prepare()
         }
     }
+
+    private fun loadBackPosterImageWithPostponedEnterTransition(mainPosterUrl: String) =
+        binding.ivMainPoster.load(mainPosterUrl) {
+            startPostponedEnterTransition()
+        }
 }

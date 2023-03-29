@@ -4,15 +4,16 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
-import com.eryuksa.catchthelines.ui.common.preloadImage
+import com.eryuksa.catchthelines.ui.common.preload
+import com.eryuksa.catchthelines.ui.common.toSharedElementPair
 import com.eryuksa.catchthelines.ui.game.uistate.PosterItem
 
 interface PosterDragListener {
@@ -26,7 +27,7 @@ interface PosterDragListener {
 
 class PosterViewPagerAdapter(
     val dragListener: PosterDragListener,
-    val onClick: (position: Int, sharedElements: Pair<ImageView, String>) -> Unit
+    val onClick: (position: Int, sharedElement: Pair<View, String>) -> Unit
 ) : ListAdapter<PosterItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
@@ -38,7 +39,7 @@ class PosterViewPagerAdapter(
     override fun onBindViewHolder(holder: PosterViewHolder, position: Int) {
         holder.bind(getItem(position))
         val futurePosition = (position + 3).coerceAtMost(currentList.lastIndex)
-        Glide.get(holder.itemView.context).preloadImage(getItem(futurePosition).posterUrl)
+        Glide.get(holder.itemView.context).preload(getItem(futurePosition).posterUrl)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -63,7 +64,7 @@ class PosterViewPagerAdapter(
 
         init {
             binding.btnNavigateToDetail.setOnClickListener {
-                onClick(layoutPosition, Pair(binding.ivPoster, binding.ivPoster.transitionName))
+                onClick(layoutPosition, binding.ivPoster.toSharedElementPair())
             }
             binding.root.setOnTouchListener { _, event ->
                 if (canDrag) {

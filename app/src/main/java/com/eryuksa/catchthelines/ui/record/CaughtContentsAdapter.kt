@@ -1,16 +1,18 @@
 package com.eryuksa.catchthelines.ui.record
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.databinding.ItemCaughtContentBinding
-import com.eryuksa.catchthelines.ui.common.preloadImage
+import com.eryuksa.catchthelines.ui.common.preload
+import com.eryuksa.catchthelines.ui.common.toSharedElementPair
 
-class CaughtContentsAdapter(private val onClick: (content: Content, sharedElements: Pair<ImageView, String>) -> Unit) :
-    RecyclerView.Adapter<CaughtContentsAdapter.ViewHolder>() {
+class CaughtContentsAdapter(
+    private val onClick: (content: Content, sharedElements: Pair<View, String>) -> Unit
+) : RecyclerView.Adapter<CaughtContentsAdapter.ViewHolder>() {
 
     var contents: List<Content> = emptyList()
         set(value) {
@@ -27,7 +29,7 @@ class CaughtContentsAdapter(private val onClick: (content: Content, sharedElemen
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(contents[position])
         val futurePosition = (position + 5).coerceAtMost(contents.lastIndex)
-        Glide.get(holder.itemView.context).preloadImage(contents[futurePosition].posterUrl)
+        Glide.get(holder.itemView.context).preload(contents[futurePosition].posterUrl)
     }
 
     override fun getItemCount(): Int = contents.size
@@ -38,7 +40,7 @@ class CaughtContentsAdapter(private val onClick: (content: Content, sharedElemen
         init {
             itemView.setOnClickListener {
                 val content = contents[layoutPosition]
-                onClick(content, Pair(binding.ivPoster, binding.ivPoster.transitionName))
+                onClick(content, binding.ivPoster.toSharedElementPair())
             }
         }
 

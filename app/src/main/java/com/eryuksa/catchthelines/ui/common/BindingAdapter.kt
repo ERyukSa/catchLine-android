@@ -14,7 +14,6 @@ fun View.setVisible(visible: Boolean) {
 fun ImageView.setPosterImage(posterUrl: String) {
     Glide.with(context)
         .load(posterUrl)
-        .dontTransform()
         .into(this)
 }
 

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.doOnLayout
@@ -25,6 +24,7 @@ import com.eryuksa.catchthelines.R
 import com.eryuksa.catchthelines.databinding.FragmentGameBinding
 import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
+import com.eryuksa.catchthelines.ui.common.setSharedElementComebackTransition
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHelper
@@ -46,13 +46,14 @@ class GameFragment : Fragment() {
 
     private lateinit var posterDragListener: PosterDragListener
     private lateinit var posterAdapter: PosterViewPagerAdapter
-    private val onClickPoster = { position: Int, sharedElements: Pair<ImageView, String> ->
+    private val onClickPoster = { position: Int, sharedElement: Pair<View, String> ->
         findNavController().navigate(
             directions = GameFragmentDirections.gameToDetail(
                 viewModel.uiState.value.contentItems[position].id,
-                viewModel.uiState.value.contentItems[position].audioUrls.toTypedArray()
+                viewModel.uiState.value.contentItems[position].audioUrls.toTypedArray(),
+                viewModel.uiState.value.contentItems[position].posterUrl
             ),
-            navigatorExtras = FragmentNavigatorExtras(sharedElements)
+            navigatorExtras = FragmentNavigatorExtras(sharedElement)
         )
     }
 
@@ -133,6 +134,7 @@ class GameFragment : Fragment() {
             this.removeOverScroll()
             setPageTransformer(buildPageTransformer())
             registerOnPageChangeCallback(onPageChange)
+            this@GameFragment.setSharedElementComebackTransition(this)
         }
     }
 
