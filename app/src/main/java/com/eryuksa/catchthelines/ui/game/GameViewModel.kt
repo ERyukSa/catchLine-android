@@ -47,6 +47,7 @@ class GameViewModel @Inject constructor(
     val userInputTitle = MutableStateFlow<String>("")
 
     var audioPlaybackPosition = 0L
+    var audioWasBeingPlayed = false
 
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
@@ -153,6 +154,11 @@ class GameViewModel @Inject constructor(
     fun removeCaughtContent() {
         setWatchingMode()
         removeCurrentContent()
+    }
+
+    fun saveAudioState(playPosition: Long, wasBeingPlayed: Boolean) {
+        this.audioPlaybackPosition = playPosition
+        this.audioWasBeingPlayed = wasBeingPlayed
     }
 
     private fun useClearerPosterHint() {

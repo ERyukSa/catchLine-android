@@ -20,12 +20,13 @@ class AudioPlayerHelper(private val context: Context, private val viewModel: Gam
                 }
             )
             seekTo(viewModel.uiState.value.audioIndex, viewModel.audioPlaybackPosition)
+            playWhenReady = viewModel.audioWasBeingPlayed
             prepare()
         }
     }
 
     fun release() {
-        viewModel.audioPlaybackPosition = audioPlayer.currentPosition
+        viewModel.saveAudioState(audioPlayer.currentPosition, audioPlayer.playWhenReady)
         audioPlayer.release()
         _audioPlayer = null
     }
