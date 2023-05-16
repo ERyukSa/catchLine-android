@@ -51,9 +51,10 @@ class DetailFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             vm = viewModel
         }
+
         setUpWindowAppearance()
         setUpSharedElementEnterTransition()
-        loadBackPosterImageWithPostponedEnterTransition(args.mainPosterUrl)
+        loadMainPosterImageWithPostponedEnterTransition(args.mainPosterUrl)
 
         binding.btnNavigateBack.setOnClickListener {
             findNavController().navigateUp()
@@ -120,7 +121,7 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun loadBackPosterImageWithPostponedEnterTransition(mainPosterUrl: String) =
+    private fun loadMainPosterImageWithPostponedEnterTransition(mainPosterUrl: String) =
         binding.ivMainPoster.load(mainPosterUrl) {
             startPostponedEnterTransition()
         }
