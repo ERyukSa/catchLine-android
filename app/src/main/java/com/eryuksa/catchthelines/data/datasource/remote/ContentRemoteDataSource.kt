@@ -11,8 +11,8 @@ class ContentRemoteDataSource @Inject constructor(
     private val contentDetailApi: ContentDetailRetrofitApi
 ) {
 
-    suspend fun getContents(): List<Content> {
-        val response = contentsApi.getMediaContents()
+    suspend fun getContents(limit: Int, offset: Int): List<Content> {
+        val response = contentsApi.getMediaContents(limit, offset)
         return if (response.isSuccessful) {
             response.body()?.values?.toList() ?: emptyList()
         } else {

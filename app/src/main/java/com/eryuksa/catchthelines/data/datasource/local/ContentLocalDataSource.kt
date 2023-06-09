@@ -10,8 +10,8 @@ class ContentLocalDataSource @Inject constructor(
     private val dao: ContentDAO
 ) {
 
-    suspend fun getContents(): List<Content> =
-        dao.getContents()
+    suspend fun getContents(limit: Int, offset: Int): List<Content> =
+        dao.getContents(limit, offset)
 
     suspend fun saveContents(contents: List<Content>) {
         dao.insert(contents)

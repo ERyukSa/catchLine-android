@@ -19,17 +19,18 @@ class ContentRepository @Inject constructor(
     private val localDataSource: ContentLocalDataSource,
     @ApplicationScope private val externalScope: CoroutineScope
 ) {
-
-    suspend fun getContents(): List<Content> {
+    suspend fun getContents(offset: Int): List<Content> {
         return withContext(Dispatchers.IO) {
-            val contentsFromLocal = localDataSource.getContents()
+            val contentsFromLocal = localDataSource.getContents(CONTENT_FETCH_SIZE, offset)
             if (contentsFromLocal.isNotEmpty()) {
                 return@withContext contentsFromLocal
             }
 
-            val contentsFromRemote = remoteDataSource.getContents()
-            externalScope.launch {
-                localDataSource.saveContents(contentsFromRemote)
+            val contentsFromRemote = remoteDataSource.getContents(CONTENT_FETCH_SIZE, offset)
+            if (contentsFromRemote.isNotEmpty()) {
+                externalScope.launch {
+                    localDataSource.saveContents(contentsFromRemote)
+                }
             }
             return@withContext contentsFromRemote
         }
@@ -69,4 +70,8 @@ class ContentRepository @Inject constructor(
 
     suspend fun getCaughtContentsCount(): Int =
         localDataSource.getCaughtContentsCount()
+
+    companion object {
+        private const val CONTENT_FETCH_SIZE = 10
+    }
 }

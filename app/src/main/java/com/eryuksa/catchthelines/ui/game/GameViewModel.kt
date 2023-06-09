@@ -1,5 +1,6 @@
 package com.eryuksa.catchthelines.ui.game
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.repository.ContentRepository
@@ -81,11 +82,17 @@ class GameViewModel @Inject constructor(
     )
 
     init {
+        fetchContents(offset = 0)
         viewModelScope.launch {
-            contentRepository.getContents().also { contents ->
-                _contentItems.value = contents.map { ContentItem.from(it) }
-            }
             hintCountRepository.availableHintCount.collectLatest { _availableHintCount.value = it }
+        }
+    }
+    fun fetchContents(offset: Int) {
+        viewModelScope.launch {
+            contentRepository.getContents(offset).also { contents ->
+                Log.d("로그", "fetchContents, offset: $offset, contents: ${contents.map { it.title }}")
+                _contentItems.value += contents.map { ContentItem.from(it) }
+            }
         }
     }
 

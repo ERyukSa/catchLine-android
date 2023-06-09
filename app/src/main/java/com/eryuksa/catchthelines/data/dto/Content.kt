@@ -11,5 +11,6 @@ data class Content(
     val id: Int,
     @SerializedName("title") val title: String,
     @SerializedName("posterUrl") val posterUrl: String,
-    @SerializedName("lineAudioUrls") val lineAudioUrls: List<String>
+    @SerializedName("lineAudioUrls") val lineAudioUrls: List<String>,
+    @SerializedName("type") val type: String
 )

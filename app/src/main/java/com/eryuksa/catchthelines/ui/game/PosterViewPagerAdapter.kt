@@ -10,9 +10,7 @@ import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.eryuksa.catchthelines.databinding.ItemPosterBinding
-import com.eryuksa.catchthelines.ui.common.preload
 import com.eryuksa.catchthelines.ui.common.toSharedElementPair
 import com.eryuksa.catchthelines.ui.game.uistate.PosterItem
 
@@ -27,7 +25,8 @@ interface PosterDragListener {
 
 class PosterViewPagerAdapter(
     val dragListener: PosterDragListener,
-    val onClick: (position: Int, sharedElement: Pair<View, String>) -> Unit
+    val onClick: (position: Int, sharedElement: Pair<View, String>) -> Unit,
+    val fetchItems: (startPosition: Int) -> Unit
 ) : ListAdapter<PosterItem, PosterViewPagerAdapter.PosterViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PosterViewHolder {
@@ -38,8 +37,9 @@ class PosterViewPagerAdapter(
 
     override fun onBindViewHolder(holder: PosterViewHolder, position: Int) {
         holder.bind(getItem(position))
-        val futurePosition = (position + 3).coerceAtMost(currentList.lastIndex)
-        Glide.get(holder.itemView.context).preload(getItem(futurePosition).posterUrl)
+        if (position == currentList.size - 1) {
+            fetchItems(currentList.size)
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

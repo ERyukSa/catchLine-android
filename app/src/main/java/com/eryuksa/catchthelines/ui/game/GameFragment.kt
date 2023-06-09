@@ -128,7 +128,11 @@ class GameFragment : Fragment() {
                 binding,
                 removeCaughtContent = viewModel::removeCaughtContent
             )
-            adapter = PosterViewPagerAdapter(posterDragListener, onClickPoster).also {
+            adapter = PosterViewPagerAdapter(
+                posterDragListener,
+                onClickPoster,
+                viewModel::fetchContents
+            ).also {
                 this@GameFragment.posterAdapter = it
             }
             this.removeOverScroll()

@@ -20,9 +20,9 @@ interface ContentDAO {
     @Query(
         "SELECT content.* FROM content LEFT JOIN tried_content " +
             "ON content.id = tried_content.id AND tried_content.isCaught " +
-            "WHERE tried_content.id IS null ORDER BY random()"
+            "WHERE tried_content.id IS null LIMIT :limit OFFSET :offset"
     )
-    suspend fun getContents(): List<Content>
+    suspend fun getContents(limit: Int, offset: Int): List<Content>
 
     @Query("SELECT * FROM content WHERE id = :id")
     suspend fun getContent(id: Int): Content
