@@ -7,7 +7,8 @@ data class ContentItem(
     override val posterUrl: String,
     val title: String,
     val audioUrls: List<String>,
-    override val blurDegree: Int
+    override val blurDegree: Int,
+    val type: ContentType
 ) : PosterItem {
 
     fun toClearerPosterContent(): ContentItem =
@@ -27,7 +28,8 @@ data class ContentItem(
                 posterUrl = content.posterUrl,
                 title = content.title,
                 audioUrls = content.lineAudioUrls,
-                blurDegree = DEFAULT_BLUE_DEGREE
+                blurDegree = DEFAULT_BLUE_DEGREE,
+                type = if (content.type == "movie") ContentType.MOVIE else ContentType.DRAMA
             )
         }
     }

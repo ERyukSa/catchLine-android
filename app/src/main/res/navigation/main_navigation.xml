@@ -8,6 +8,7 @@
         android:id="@+id/entryFragment"
         android:name="com.eryuksa.catchthelines.ui.EntryFragment"
         android:label="EntryActivity">
+
         <action
             android:id="@+id/entry_to_game"
             app:destination="@id/gameFragment"
@@ -26,38 +27,50 @@
         android:id="@+id/gameFragment"
         android:name="com.eryuksa.catchthelines.ui.game.GameFragment"
         android:label="GameFragment">
+
         <action
-            android:id="@+id/game_to_detail"
-            app:destination="@id/detailFragment"
+            android:id="@+id/game_to_movie_detail"
+            app:destination="@id/movieDetailFragment"
             app:enterAnim="@animator/nav_default_enter_anim"
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/gameFragment" />
+
+        <action
+            android:id="@+id/game_to_drama_detail"
+            app:destination="@id/dramaDetailFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/guideFragment"
         android:name="com.eryuksa.catchthelines.ui.guide.GuideFragment"
         android:label="GuideFragment" />
+
     <fragment
         android:id="@+id/recordFragment"
         android:name="com.eryuksa.catchthelines.ui.record.RecordFragment"
         android:label="RecordFragment">
+
         <action
-            android:id="@+id/record_to_detail"
-            app:destination="@id/detailFragment"
+            android:id="@+id/record_to_movie_detail"
+            app:destination="@id/movieDetailFragment"
             app:popUpTo="@id/recordFragment"
             app:enterAnim="@animator/nav_default_enter_anim"
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+
+        <action
+            android:id="@+id/record_to_drama_detail"
+            app:destination="@id/dramaDetailFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/detailFragment"
-        android:name="com.eryuksa.catchthelines.ui.detail.DetailFragment"
-        android:label="DetailFragment">
+        android:id="@+id/movieDetailFragment"
+        android:name="com.eryuksa.catchthelines.ui.detail.movie.MovieDetailFragment"
+        android:label="MovieDetailFragment">
+
         <argument
             android:name="contentId"
             app:argType="integer" />
@@ -67,5 +80,15 @@
         <argument
             android:name="mainPosterUrl"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dramaDetailFragment"
+        android:name="com.eryuksa.catchthelines.ui.detail.drama.DramaDetailFragment"
+        android:label="DramaDetailFragment" >
+
+        <argument
+            android:name="contentId"
+            app:argType="integer" />
     </fragment>
 </navigation>

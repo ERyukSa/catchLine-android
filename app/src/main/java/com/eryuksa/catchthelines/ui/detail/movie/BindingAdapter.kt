@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.ui.detail
+package com.eryuksa.catchthelines.ui.detail.movie
 
 import androidx.core.view.children
 import androidx.databinding.BindingAdapter

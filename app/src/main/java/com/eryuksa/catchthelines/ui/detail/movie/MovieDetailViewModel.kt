@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.ui.detail
+package com.eryuksa.catchthelines.ui.detail.movie
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailViewModel @Inject constructor(
+class MovieDetailViewModel @Inject constructor(
     private val repository: ContentRepository
 ) : ViewModel() {
 

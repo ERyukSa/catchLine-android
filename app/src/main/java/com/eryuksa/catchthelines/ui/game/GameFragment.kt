@@ -26,6 +26,8 @@ import com.eryuksa.catchthelines.ui.common.removeOverScroll
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setSharedElementComebackTransition
 import com.eryuksa.catchthelines.ui.common.setStatusBarIconColor
+import com.eryuksa.catchthelines.ui.game.uistate.ContentItem
+import com.eryuksa.catchthelines.ui.game.uistate.ContentType
 import com.eryuksa.catchthelines.ui.game.uistate.Hint
 import com.eryuksa.catchthelines.ui.game.utility.AudioPlayerHelper
 import com.eryuksa.catchthelines.ui.game.utility.HintButtonHelper
@@ -47,14 +49,11 @@ class GameFragment : Fragment() {
     private lateinit var posterDragListener: PosterDragListener
     private lateinit var posterAdapter: PosterViewPagerAdapter
     private val onClickPoster = { position: Int, sharedElement: Pair<View, String> ->
-        findNavController().navigate(
-            directions = GameFragmentDirections.gameToDetail(
-                viewModel.uiState.value.contentItems[position].id,
-                viewModel.uiState.value.contentItems[position].audioUrls.toTypedArray(),
-                viewModel.uiState.value.contentItems[position].posterUrl
-            ),
-            navigatorExtras = FragmentNavigatorExtras(sharedElement)
-        )
+        val contentItem = viewModel.uiState.value.contentItems[position]
+        when (contentItem.type) {
+            ContentType.MOVIE -> navigateToMovieDetail(contentItem, sharedElement)
+            ContentType.DRAMA -> navigateToDramaDetail(contentItem)
+        }
     }
 
     private val audioPlayerHelper: AudioPlayerHelper by lazy {
@@ -119,6 +118,23 @@ class GameFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun navigateToDramaDetail(contentItem: ContentItem) {
+        findNavController().navigate(
+            directions = GameFragmentDirections.gameToDramaDetail(contentItem.id)
+        )
+    }
+
+    private fun navigateToMovieDetail(contentItem: ContentItem, sharedElement: Pair<View, String>) {
+        findNavController().navigate(
+            directions = GameFragmentDirections.gameToMovieDetail(
+                contentItem.id,
+                contentItem.audioUrls.toTypedArray(),
+                contentItem.posterUrl
+            ),
+            navigatorExtras = FragmentNavigatorExtras(sharedElement)
+        )
     }
 
     private fun initPosterViewPager() {

@@ -12,6 +12,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.eryuksa.catchthelines.R
+import com.eryuksa.catchthelines.data.dto.Content
 import com.eryuksa.catchthelines.databinding.FragmentRecordBinding
 import com.eryuksa.catchthelines.ui.common.setLayoutVerticalLimit
 import com.eryuksa.catchthelines.ui.common.setSharedElementComebackTransition
@@ -28,14 +29,10 @@ class RecordFragment : Fragment() {
 
     private val contentsAdapter: CaughtContentsAdapter by lazy {
         CaughtContentsAdapter { content, sharedElements: Pair<View, String> ->
-            findNavController().navigate(
-                directions = RecordFragmentDirections.recordToDetail(
-                    content.id,
-                    content.lineAudioUrls.toTypedArray(),
-                    content.posterUrl
-                ),
-                navigatorExtras = FragmentNavigatorExtras(sharedElements)
-            )
+            when (content.type) {
+                "movie" -> navigateToMovieDetail(content, sharedElements)
+                "drama" -> navigateToDramaDetail(content)
+            }
         }
     }
 
@@ -70,6 +67,23 @@ class RecordFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun navigateToDramaDetail(content: Content) {
+        findNavController().navigate(
+            directions = RecordFragmentDirections.recordToDramaDetail(content.id)
+        )
+    }
+
+    private fun navigateToMovieDetail(content: Content, sharedElement: Pair<View, String>) {
+        findNavController().navigate(
+            directions = RecordFragmentDirections.recordToMovieDetail(
+                content.id,
+                content.lineAudioUrls.toTypedArray(),
+                content.posterUrl
+            ),
+            navigatorExtras = FragmentNavigatorExtras(sharedElement)
+        )
     }
 
     private val caughtContentsSpaceDecorator = object : RecyclerView.ItemDecoration() {

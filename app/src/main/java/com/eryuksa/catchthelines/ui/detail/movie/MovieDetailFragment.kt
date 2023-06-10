@@ -1,4 +1,4 @@
-package com.eryuksa.catchthelines.ui.detail
+package com.eryuksa.catchthelines.ui.detail.movie
 
 import android.os.Bundle
 import android.transition.TransitionInflater
@@ -26,14 +26,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class DetailFragment : Fragment() {
+class MovieDetailFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding: FragmentDetailBinding
         get() = _binding!!
 
-    private val viewModel: DetailViewModel by viewModels()
-    private val args: DetailFragmentArgs by navArgs()
+    private val viewModel: MovieDetailViewModel by viewModels()
+    private val args: MovieDetailFragmentArgs by navArgs()
 
     private lateinit var audioPlayer: ExoPlayer
 
@@ -81,6 +81,11 @@ class DetailFragment : Fragment() {
             viewModel.saveAudioPlayState(playWhenReady, currentMediaItemIndex, currentPosition)
             release()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setUpWindowAppearance() {
