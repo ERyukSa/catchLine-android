@@ -19,22 +19,44 @@ class ContentRepository @Inject constructor(
     private val localDataSource: ContentLocalDataSource,
     @ApplicationScope private val externalScope: CoroutineScope
 ) {
+    private var uncaughtContentCount = 0
+    private var randomIndices: List<Int> = emptyList()
+    private var remotePageEnded = false
+
     suspend fun getContents(offset: Int): List<Content> {
-        return withContext(Dispatchers.IO) {
-            val contentsFromLocal = localDataSource.getContents(CONTENT_FETCH_SIZE, offset)
-            if (contentsFromLocal.isNotEmpty()) {
-                return@withContext contentsFromLocal
+        return withContext(externalScope.coroutineContext) {
+            if (offset == 0) {
+                uncaughtContentCount = localDataSource.getUncaughtContentCount()
+                randomIndices = MutableList(uncaughtContentCount) { i -> i }.apply { shuffle() }
             }
 
-            val contentsFromRemote = remoteDataSource.getContents(CONTENT_FETCH_SIZE, offset)
+            if (offset < uncaughtContentCount) {
+                return@withContext getContentsFromLocal(offset)
+            }
+
+            val contentsFromRemote = getContentsFromRemote(offset)
             if (contentsFromRemote.isNotEmpty()) {
                 externalScope.launch {
                     localDataSource.saveContents(contentsFromRemote)
                 }
             }
-            return@withContext contentsFromRemote
+            return@withContext getContentsFromRemote(offset)
         }
     }
+
+    private suspend fun getContentsFromLocal(offset: Int): List<Content> =
+        localDataSource.getContents(
+            randomIndices.subList(offset, offset + CONTENT_FETCH_SIZE)
+        )
+
+    private suspend fun getContentsFromRemote(offset: Int): List<Content> =
+        if (remotePageEnded.not()) {
+            val contentsFromRemote = remoteDataSource.getContents(CONTENT_FETCH_SIZE, offset)
+            if (contentsFromRemote.size < CONTENT_FETCH_SIZE) remotePageEnded = true
+            contentsFromRemote
+        } else {
+            emptyList()
+        }
 
     suspend fun getContentDetail(id: Int): ContentDetail? =
         remoteDataSource.getContentDetail(id)

@@ -18,11 +18,18 @@ interface ContentDAO {
     suspend fun insert(contents: List<Content>)
 
     @Query(
+        "SELECT count(*) FROM content LEFT JOIN tried_content " +
+            "ON content.id = tried_content.id AND tried_content.isCaught " +
+            "WHERE tried_content.id IS null"
+    )
+    suspend fun getUncaughtContentCount(): Int
+
+    @Query(
         "SELECT content.* FROM content LEFT JOIN tried_content " +
             "ON content.id = tried_content.id AND tried_content.isCaught " +
-            "WHERE tried_content.id IS null LIMIT :limit OFFSET :offset"
+            "WHERE tried_content.id IS NULL AND content.`index` in (:indexList)"
     )
-    suspend fun getContents(limit: Int, offset: Int): List<Content>
+    suspend fun getContents(indexList: List<Int>): List<Content>
 
     @Query("SELECT * FROM content WHERE id = :id")
     suspend fun getContent(id: Int): Content

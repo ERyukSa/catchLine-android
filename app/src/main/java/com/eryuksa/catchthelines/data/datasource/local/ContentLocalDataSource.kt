@@ -10,8 +10,9 @@ class ContentLocalDataSource @Inject constructor(
     private val dao: ContentDAO
 ) {
 
-    suspend fun getContents(limit: Int, offset: Int): List<Content> =
-        dao.getContents(limit, offset)
+    suspend fun getContents(indexList: List<Int>): List<Content> {
+        return dao.getContents(indexList).shuffled()
+    }
 
     suspend fun saveContents(contents: List<Content>) {
         dao.insert(contents)
@@ -29,4 +30,6 @@ class ContentLocalDataSource @Inject constructor(
 
     suspend fun getCaughtContentsCount(): Int =
         dao.getCaughtContentsCount()
+
+    suspend fun getUncaughtContentCount(): Int = dao.getUncaughtContentCount()
 }
