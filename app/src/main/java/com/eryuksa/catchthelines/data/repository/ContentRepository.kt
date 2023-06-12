@@ -21,7 +21,6 @@ class ContentRepository @Inject constructor(
 ) {
     private var uncaughtContentCount = 0
     private var randomIndices: List<Int> = emptyList()
-    private var remotePageEnded = false
 
     suspend fun getContents(offset: Int): List<Content> {
         return withContext(externalScope.coroutineContext) {
@@ -34,13 +33,9 @@ class ContentRepository @Inject constructor(
                 return@withContext getContentsFromLocal(offset)
             }
 
-            val contentsFromRemote = getContentsFromRemote(offset)
-            if (contentsFromRemote.isNotEmpty()) {
-                externalScope.launch {
-                    localDataSource.saveContents(contentsFromRemote)
-                }
+            return@withContext remoteDataSource.getContents(CONTENT_FETCH_SIZE, offset).also {
+                saveContentsInLocal(it)
             }
-            return@withContext getContentsFromRemote(offset)
         }
     }
 
@@ -49,14 +44,13 @@ class ContentRepository @Inject constructor(
             randomIndices.subList(offset, offset + CONTENT_FETCH_SIZE)
         )
 
-    private suspend fun getContentsFromRemote(offset: Int): List<Content> =
-        if (remotePageEnded.not()) {
-            val contentsFromRemote = remoteDataSource.getContents(CONTENT_FETCH_SIZE, offset)
-            if (contentsFromRemote.size < CONTENT_FETCH_SIZE) remotePageEnded = true
-            contentsFromRemote
-        } else {
-            emptyList()
+    private fun saveContentsInLocal(contents: List<Content>) {
+        if (contents.isNotEmpty()) {
+            externalScope.launch {
+                localDataSource.saveContents(contents)
+            }
         }
+    }
 
     suspend fun getContentDetail(id: Int): ContentDetail? =
         remoteDataSource.getContentDetail(id)

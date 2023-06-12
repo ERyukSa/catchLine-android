@@ -1,6 +1,5 @@
 package com.eryuksa.catchthelines.ui.game
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eryuksa.catchthelines.data.repository.ContentRepository
@@ -50,6 +49,9 @@ class GameViewModel @Inject constructor(
     var audioPlaybackPosition = 0L
     var audioWasBeingPlayed = false
 
+    private var contentPageEnded = false
+    private var isLoadingContent = false
+
     val uiState: StateFlow<GameUiState> = combine(
         _currentPage,
         _contentItems,
@@ -88,10 +90,15 @@ class GameViewModel @Inject constructor(
         }
     }
     fun fetchContents(offset: Int) {
+        if (isLoadingContent) return
+        if (contentPageEnded) return
+
         viewModelScope.launch {
+            isLoadingContent = true
             contentRepository.getContents(offset).also { contents ->
-                Log.d("로그", "fetchContents, offset: $offset, contents: ${contents.map { it.title }}")
                 _contentItems.value += contents.map { ContentItem.from(it) }
+                isLoadingContent = false
+                if (contents.isEmpty()) contentPageEnded = true
             }
         }
     }
